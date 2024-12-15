@@ -7,7 +7,6 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
-import { BarChart as RechartsBarChart, Bar, XAxis, YAxis, ResponsiveContainer } from "recharts";
 import { Sidebar } from "@/components/dashboard/Sidebar";
 import { Stats } from "@/components/dashboard/Stats";
 
@@ -19,16 +18,6 @@ interface Idea {
   createdAt: Date;
   priority?: "high" | "medium" | "low";
 }
-
-const mockChartData = [
-  { name: "Mon", ideas: 4 },
-  { name: "Tue", ideas: 3 },
-  { name: "Wed", ideas: 2 },
-  { name: "Thu", ideas: 6 },
-  { name: "Fri", ideas: 4 },
-  { name: "Sat", ideas: 3 },
-  { name: "Sun", ideas: 5 },
-];
 
 const popularTags = ["work", "personal", "urgent", "creative", "goals"];
 
@@ -150,20 +139,6 @@ const Dashboard = () => {
               popularTags={popularTags}
               onTagClick={handleSearch}
             />
-          </div>
-
-          {/* Activity Chart */}
-          <div className="bg-white p-6 rounded-lg shadow-sm mb-8">
-            <h3 className="text-lg font-semibold mb-4">Weekly Activity</h3>
-            <div className="h-64">
-              <ResponsiveContainer width="100%" height="100%">
-                <RechartsBarChart data={mockChartData}>
-                  <XAxis dataKey="name" />
-                  <YAxis />
-                  <Bar dataKey="ideas" fill="#4F46E5" radius={[4, 4, 0, 0]} />
-                </RechartsBarChart>
-              </ResponsiveContainer>
-            </div>
           </div>
 
           {/* Recent Ideas */}
