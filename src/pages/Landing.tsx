@@ -6,8 +6,46 @@ import { ArrowRight, Brain, Users, Tag, Layout } from "lucide-react";
 const Landing = () => {
   return (
     <div className="min-h-screen bg-white">
-      {/* Hero Section */}
-      <section className="py-20 px-4">
+      {/* Navigation Bar */}
+      <nav className="fixed top-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-sm border-b">
+        <div className="max-w-6xl mx-auto px-4 py-4">
+          <div className="flex items-center justify-between">
+            <Link to="/" className="text-2xl font-bold text-primary">
+              IdeaVault
+            </Link>
+            <div className="hidden md:flex items-center space-x-8">
+              <Link to="#features" className="text-gray-600 hover:text-primary transition-colors">
+                Features
+              </Link>
+              <Link to="#community" className="text-gray-600 hover:text-primary transition-colors">
+                Community
+              </Link>
+              <Link to="#pricing" className="text-gray-600 hover:text-primary transition-colors">
+                Pricing
+              </Link>
+              <Link to="#about" className="text-gray-600 hover:text-primary transition-colors">
+                About Us
+              </Link>
+              <Button 
+                asChild
+                size="sm"
+                className="bg-primary hover:bg-primary-hover text-white shadow-md hover:shadow-lg transition-all"
+              >
+                <Link to="/signup">Sign Up</Link>
+              </Button>
+            </div>
+            {/* Mobile Menu Button */}
+            <button className="md:hidden p-2 text-gray-600">
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+              </svg>
+            </button>
+          </div>
+        </div>
+      </nav>
+
+      {/* Hero Section with Get Started Button */}
+      <section className="pt-24 pb-20 px-4">
         <div className="max-w-6xl mx-auto text-center">
           <h1 className="text-5xl font-bold tracking-tight mb-6">
             Capture. Organize. Transform Your Ideas.
@@ -15,12 +53,18 @@ const Landing = () => {
           <p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
             Store your ideas, collaborate with others, and turn sparks of inspiration into actionable plans.
           </p>
-          <div className="flex justify-center gap-4 max-w-md mx-auto">
-            <Input type="email" placeholder="Enter your email" className="w-full" />
-            <Button size="lg">
+          <div className="flex flex-col items-center gap-6">
+            <Button
+              size="lg"
+              className="bg-primary hover:bg-primary-hover text-white text-lg px-8 py-6 rounded-full 
+                         shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-300
+                         animate-fade-in"
+              aria-label="Get Started with IdeaVault"
+            >
               Get Started
-              <ArrowRight className="ml-2 h-4 w-4" />
+              <ArrowRight className="ml-2 w-5 h-5" />
             </Button>
+            <p className="text-sm text-gray-500">Create your account in just a few seconds</p>
           </div>
         </div>
       </section>
