@@ -5,6 +5,15 @@ import { Heart, MessageSquare, Bookmark, Share, UserPlus, UserCheck } from "luci
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
+import {
+  NavigationMenu,
+  NavigationMenuContent,
+  NavigationMenuItem,
+  NavigationMenuLink,
+  NavigationMenuList,
+  NavigationMenuTrigger,
+} from "@/components/ui/navigation-menu";
+import { Link } from "react-router-dom";
 
 interface CommunityPost {
   id: string;
@@ -76,6 +85,66 @@ const Community = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
+      <div className="border-b bg-white">
+        <div className="max-w-4xl mx-auto">
+          <NavigationMenu className="py-2">
+            <NavigationMenuList>
+              <NavigationMenuItem>
+                <NavigationMenuTrigger>Discover</NavigationMenuTrigger>
+                <NavigationMenuContent>
+                  <div className="grid gap-3 p-4 w-[400px]">
+                    <NavigationMenuLink asChild>
+                      <Link to="/community" className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground">
+                        <div className="text-sm font-medium leading-none">Latest Ideas</div>
+                        <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
+                          Browse the most recent project ideas from the community
+                        </p>
+                      </Link>
+                    </NavigationMenuLink>
+                    <NavigationMenuLink asChild>
+                      <Link to="/community?filter=trending" className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground">
+                        <div className="text-sm font-medium leading-none">Trending</div>
+                        <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
+                          See what ideas are gaining traction in the community
+                        </p>
+                      </Link>
+                    </NavigationMenuLink>
+                  </div>
+                </NavigationMenuContent>
+              </NavigationMenuItem>
+              <NavigationMenuItem>
+                <NavigationMenuTrigger>Categories</NavigationMenuTrigger>
+                <NavigationMenuContent>
+                  <div className="grid gap-3 p-4 w-[400px]">
+                    <NavigationMenuLink asChild>
+                      <Link to="/community?category=web" className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground">
+                        <div className="text-sm font-medium leading-none">Web Development</div>
+                        <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
+                          Projects focused on web technologies and frameworks
+                        </p>
+                      </Link>
+                    </NavigationMenuLink>
+                    <NavigationMenuLink asChild>
+                      <Link to="/community?category=mobile" className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground">
+                        <div className="text-sm font-medium leading-none">Mobile Apps</div>
+                        <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
+                          Mobile application ideas and concepts
+                        </p>
+                      </Link>
+                    </NavigationMenuLink>
+                  </div>
+                </NavigationMenuContent>
+              </NavigationMenuItem>
+              <NavigationMenuItem>
+                <Link to="/dashboard">
+                  <Button variant="ghost">My Dashboard</Button>
+                </Link>
+              </NavigationMenuItem>
+            </NavigationMenuList>
+          </NavigationMenu>
+        </div>
+      </div>
+
       <div className="max-w-4xl mx-auto p-8">
         <div className="flex justify-between items-center mb-8">
           <div>
