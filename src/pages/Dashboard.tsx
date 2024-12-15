@@ -7,9 +7,9 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { BarChart, Home, Settings, Star, Tag } from "lucide-react";
 import { BarChart as RechartsBarChart, Bar, XAxis, YAxis, ResponsiveContainer } from "recharts";
+import { Sidebar } from "@/components/dashboard/Sidebar";
+import { Stats } from "@/components/dashboard/Stats";
 
 interface Idea {
   id: string;
@@ -98,36 +98,8 @@ const Dashboard = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Navigation Sidebar */}
-      <div className="fixed left-0 top-0 h-full w-64 bg-white border-r border-gray-200 p-6">
-        <div className="flex items-center gap-3 mb-8">
-          <Avatar>
-            <AvatarImage src="https://github.com/shadcn.png" />
-            <AvatarFallback>JD</AvatarFallback>
-          </Avatar>
-          <div>
-            <h3 className="font-semibold">John Doe</h3>
-            <p className="text-sm text-gray-500">john@example.com</p>
-          </div>
-        </div>
+      <Sidebar />
 
-        <nav className="space-y-2">
-          <Button variant="ghost" className="w-full justify-start">
-            <Home className="mr-2 h-4 w-4" /> Dashboard
-          </Button>
-          <Button variant="ghost" className="w-full justify-start">
-            <Star className="mr-2 h-4 w-4" /> Favorites
-          </Button>
-          <Button variant="ghost" className="w-full justify-start">
-            <Tag className="mr-2 h-4 w-4" /> Tags
-          </Button>
-          <Button variant="ghost" className="w-full justify-start">
-            <Settings className="mr-2 h-4 w-4" /> Settings
-          </Button>
-        </nav>
-      </div>
-
-      {/* Main Content */}
       <div className="ml-64 p-8">
         <div className="max-w-6xl mx-auto">
           {/* Header */}
@@ -172,37 +144,12 @@ const Dashboard = () => {
             <div className="col-span-2">
               <SearchBar onSearch={handleSearch} />
             </div>
-            <div className="bg-white p-4 rounded-lg shadow-sm">
-              <h3 className="text-sm font-medium text-gray-600 mb-2">Quick Stats</h3>
-              <div className="flex justify-between">
-                <div>
-                  <p className="text-2xl font-bold">{ideas.length}</p>
-                  <p className="text-sm text-gray-500">Total Ideas</p>
-                </div>
-                <div>
-                  <p className="text-2xl font-bold">{highPriorityCount}</p>
-                  <p className="text-sm text-gray-500">High Priority</p>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Popular Tags */}
-          <div className="mb-8">
-            <h3 className="text-lg font-semibold mb-3">Popular Tags</h3>
-            <div className="flex flex-wrap gap-2">
-              {popularTags.map((tag) => (
-                <Button
-                  key={tag}
-                  variant="outline"
-                  size="sm"
-                  className="hover:bg-primary hover:text-white"
-                  onClick={() => handleSearch(tag)}
-                >
-                  {tag}
-                </Button>
-              ))}
-            </div>
+            <Stats
+              totalIdeas={ideas.length}
+              highPriorityCount={highPriorityCount}
+              popularTags={popularTags}
+              onTagClick={handleSearch}
+            />
           </div>
 
           {/* Activity Chart */}
