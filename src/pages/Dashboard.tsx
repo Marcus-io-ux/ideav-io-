@@ -7,8 +7,8 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
-import { Sidebar } from "@/components/dashboard/Sidebar";
 import { Stats } from "@/components/dashboard/Stats";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 interface Idea {
   id: string;
@@ -17,6 +17,7 @@ interface Idea {
   tags: string[];
   createdAt: Date;
   priority?: "high" | "medium" | "low";
+  isFavorite?: boolean;
 }
 
 const Dashboard = () => {
@@ -28,6 +29,7 @@ const Dashboard = () => {
       tags: ["web", "portfolio", "3D"],
       createdAt: new Date("2024-02-20"),
       priority: "high",
+      isFavorite: true,
     },
     {
       id: "2",
@@ -36,11 +38,13 @@ const Dashboard = () => {
       tags: ["AI", "programming", "learning"],
       createdAt: new Date("2024-02-21"),
       priority: "medium",
+      isFavorite: false,
     },
   ]);
   
   const [newIdea, setNewIdea] = useState({ title: "", content: "", tags: "" });
   const [searchQuery, setSearchQuery] = useState("");
+  const [showFavoritesOnly, setShowFavoritesOnly] = useState(false);
   const { toast } = useToast();
 
   const handleSearch = (query: string) => {
@@ -63,6 +67,7 @@ const Dashboard = () => {
       content: newIdea.content,
       tags: newIdea.tags.split(",").map(tag => tag.trim()).filter(tag => tag),
       createdAt: new Date(),
+      isFavorite: false,
     };
 
     setIdeas([idea, ...ideas]);
@@ -76,18 +81,17 @@ const Dashboard = () => {
 
   const filteredIdeas = ideas.filter(
     (idea) =>
-      idea.title.toLowerCase().includes(searchQuery) ||
-      idea.content.toLowerCase().includes(searchQuery) ||
-      idea.tags.some((tag) => tag.toLowerCase().includes(searchQuery))
+      (showFavoritesOnly ? idea.isFavorite : true) &&
+      (idea.title.toLowerCase().includes(searchQuery) ||
+       idea.content.toLowerCase().includes(searchQuery) ||
+       idea.tags.some((tag) => tag.toLowerCase().includes(searchQuery)))
   );
 
   const highPriorityCount = ideas.filter(idea => idea.priority === "high").length;
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <Sidebar />
-
-      <div className="ml-64 p-8">
+      <div className="p-8">
         <div className="max-w-6xl mx-auto">
           {/* Header */}
           <div className="flex justify-between items-center mb-8">
@@ -137,14 +141,42 @@ const Dashboard = () => {
             />
           </div>
 
-          {/* Recent Ideas */}
+          {/* Ideas Sections */}
           <div>
-            <h3 className="text-lg font-semibold mb-4">Recent Ideas</h3>
-            <div className="grid gap-6">
-              {filteredIdeas.map((idea) => (
-                <IdeaCard key={idea.id} {...idea} />
-              ))}
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-lg font-semibold">Your Ideas</h3>
+              <Button
+                variant="ghost"
+                onClick={() => setShowFavoritesOnly(!showFavoritesOnly)}
+                className={cn(
+                  "text-sm",
+                  showFavoritesOnly && "text-primary"
+                )}
+              >
+                {showFavoritesOnly ? "Show All" : "Show Favorites"}
+              </Button>
             </div>
+
+            <Tabs defaultValue="recent" className="mb-8">
+              <TabsList>
+                <TabsTrigger value="recent">Recent Ideas</TabsTrigger>
+                <TabsTrigger value="all">All Ideas</TabsTrigger>
+              </TabsList>
+              <TabsContent value="recent">
+                <div className="grid gap-6">
+                  {filteredIdeas.slice(0, 5).map((idea) => (
+                    <IdeaCard key={idea.id} {...idea} />
+                  ))}
+                </div>
+              </TabsContent>
+              <TabsContent value="all">
+                <div className="grid gap-6">
+                  {filteredIdeas.map((idea) => (
+                    <IdeaCard key={idea.id} {...idea} />
+                  ))}
+                </div>
+              </TabsContent>
+            </Tabs>
           </div>
         </div>
       </div>

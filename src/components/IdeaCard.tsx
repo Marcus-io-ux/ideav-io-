@@ -5,6 +5,7 @@ import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 
 interface Message {
   id: string;
@@ -17,10 +18,11 @@ interface IdeaCardProps {
   title: string;
   content: string;
   createdAt: Date;
+  isFavorite?: boolean;
 }
 
-export const IdeaCard = ({ title, content, createdAt }: IdeaCardProps) => {
-  const [isFavorite, setIsFavorite] = useState(false);
+export const IdeaCard = ({ title, content, createdAt, isFavorite: initialFavorite = false }: IdeaCardProps) => {
+  const [isFavorite, setIsFavorite] = useState(initialFavorite);
   const [showMessages, setShowMessages] = useState(false);
   const [newMessage, setNewMessage] = useState("");
   const [messages, setMessages] = useState<Message[]>([]);
@@ -60,12 +62,16 @@ export const IdeaCard = ({ title, content, createdAt }: IdeaCardProps) => {
           <CardTitle className="text-xl font-semibold">{title}</CardTitle>
           <button
             onClick={toggleFavorite}
-            className="p-1 rounded-full hover:bg-gray-100 transition-colors"
+            className={cn(
+              "p-1 rounded-full transition-colors",
+              isFavorite ? "text-primary hover:bg-primary-light" : "text-gray-400 hover:bg-gray-100"
+            )}
           >
             <Star
-              className={`h-5 w-5 transition-colors ${
-                isFavorite ? "fill-yellow-400 text-yellow-400" : "text-gray-400"
-              }`}
+              className={cn(
+                "h-5 w-5 transition-colors",
+                isFavorite && "fill-primary"
+              )}
             />
           </button>
         </div>
