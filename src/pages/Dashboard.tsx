@@ -43,10 +43,17 @@ const Dashboard = () => {
   
   const [newIdea, setNewIdea] = useState({ title: "", content: "", tags: "" });
   const [searchQuery, setSearchQuery] = useState("");
+  const [selectedTag, setSelectedTag] = useState<string>("");
   const { toast } = useToast();
 
   const handleSearch = (query: string) => {
     setSearchQuery(query.toLowerCase());
+    setSelectedTag(""); // Clear tag filter when searching
+  };
+
+  const handleTagClick = (tag: string) => {
+    setSelectedTag(tag);
+    setSearchQuery(""); // Clear search when filtering by tag
   };
 
   const handleAddIdea = () => {
@@ -77,10 +84,19 @@ const Dashboard = () => {
   };
 
   const filteredIdeas = ideas.filter(
-    (idea) =>
-      idea.title.toLowerCase().includes(searchQuery) ||
-      idea.content.toLowerCase().includes(searchQuery) ||
-      idea.tags.some((tag) => tag.toLowerCase().includes(searchQuery))
+    (idea) => {
+      const matchesSearch = searchQuery 
+        ? idea.title.toLowerCase().includes(searchQuery) ||
+          idea.content.toLowerCase().includes(searchQuery) ||
+          idea.tags.some((tag) => tag.toLowerCase().includes(searchQuery))
+        : true;
+      
+      const matchesTag = selectedTag
+        ? idea.tags.includes(selectedTag)
+        : true;
+
+      return matchesSearch && matchesTag;
+    }
   );
 
   const highPriorityCount = ideas.filter(idea => idea.priority === "high").length;
@@ -137,7 +153,8 @@ const Dashboard = () => {
               totalIdeas={ideas.length}
               highPriorityCount={highPriorityCount}
               popularTags={popularTags}
-              onTagClick={handleSearch}
+              selectedTag={selectedTag}
+              onTagClick={handleTagClick}
             />
           </div>
 

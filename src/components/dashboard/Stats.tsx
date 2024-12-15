@@ -4,10 +4,11 @@ interface StatsProps {
   totalIdeas: number;
   highPriorityCount: number;
   popularTags: string[];
+  selectedTag: string | null;
   onTagClick: (tag: string) => void;
 }
 
-export const Stats = ({ totalIdeas, highPriorityCount, popularTags, onTagClick }: StatsProps) => {
+export const Stats = ({ totalIdeas, highPriorityCount, popularTags, selectedTag, onTagClick }: StatsProps) => {
   return (
     <>
       <div className="bg-white p-4 rounded-lg shadow-sm">
@@ -25,19 +26,29 @@ export const Stats = ({ totalIdeas, highPriorityCount, popularTags, onTagClick }
       </div>
 
       <div className="mb-8">
-        <h3 className="text-lg font-semibold mb-3">Popular Tags</h3>
+        <h3 className="text-lg font-semibold mb-3">Filter by Tag</h3>
         <div className="flex flex-wrap gap-2">
           {popularTags.map((tag) => (
             <Button
               key={tag}
-              variant="outline"
+              variant={selectedTag === tag ? "default" : "outline"}
               size="sm"
-              className="hover:bg-primary hover:text-white"
+              className={selectedTag === tag ? "bg-primary text-white" : "hover:bg-primary hover:text-white"}
               onClick={() => onTagClick(tag)}
             >
               {tag}
             </Button>
           ))}
+          {selectedTag && (
+            <Button
+              variant="ghost"
+              size="sm"
+              className="text-gray-500 hover:text-gray-700"
+              onClick={() => onTagClick("")}
+            >
+              Clear Filter
+            </Button>
+          )}
         </div>
       </div>
     </>
