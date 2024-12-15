@@ -1,12 +1,26 @@
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
-import { ArrowRight, Brain, Lock, Search } from "lucide-react";
+import { ArrowRight, Brain, Lock, Search, LogIn } from "lucide-react";
 
 const Index = () => {
   const navigate = useNavigate();
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
+      <nav className="container mx-auto px-4 py-6 flex justify-between items-center">
+        <h1 className="text-2xl font-bold text-primary">IdeaVault</h1>
+        <div className="flex gap-4">
+          <Button
+            variant="outline"
+            onClick={() => navigate("/dashboard")}
+            className="flex items-center gap-2"
+          >
+            <LogIn className="w-4 h-4" />
+            Log In
+          </Button>
+        </div>
+      </nav>
+
       <div className="container mx-auto px-4 py-16">
         {/* Hero Section */}
         <div className="text-center mb-16">
