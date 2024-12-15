@@ -1,14 +1,17 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Heart, MessageSquare, Bookmark, Share } from "lucide-react";
+import { Heart, MessageSquare, Bookmark, Share, UserPlus, UserCheck } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { useState } from "react";
+import { useToast } from "@/hooks/use-toast";
 
 interface CommunityPost {
   id: string;
   title: string;
   content: string;
   author: {
+    id: string;
     name: string;
     avatar?: string;
   };
@@ -24,6 +27,7 @@ const SAMPLE_POSTS: CommunityPost[] = [
     title: "Building a Personal Portfolio Website",
     content: "I'm thinking of creating a unique portfolio website using Three.js for interactive 3D elements. Would love to get some feedback on this approach.",
     author: {
+      id: "user1",
       name: "Sarah Chen",
       avatar: "/placeholder.svg",
     },
@@ -37,6 +41,7 @@ const SAMPLE_POSTS: CommunityPost[] = [
     title: "Mobile App for Local Events",
     content: "Working on an app that helps people discover local events and meetups. Looking for ideas on making the discovery process more intuitive.",
     author: {
+      id: "user2",
       name: "Mike Ross",
       avatar: "/placeholder.svg",
     },
@@ -48,6 +53,27 @@ const SAMPLE_POSTS: CommunityPost[] = [
 ];
 
 const Community = () => {
+  const [followedUsers, setFollowedUsers] = useState<string[]>([]);
+  const { toast } = useToast();
+
+  const handleFollow = (userId: string, userName: string) => {
+    setFollowedUsers((prev) => {
+      const isFollowing = prev.includes(userId);
+      const newFollowedUsers = isFollowing
+        ? prev.filter((id) => id !== userId)
+        : [...prev, userId];
+
+      toast({
+        title: isFollowing ? "Unfollowed" : "Following",
+        description: isFollowing
+          ? `You have unfollowed ${userName}`
+          : `You are now following ${userName}`,
+      });
+
+      return newFollowedUsers;
+    });
+  };
+
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-4xl mx-auto p-8">
@@ -71,7 +97,7 @@ const Community = () => {
                       <AvatarImage src={post.author.avatar} />
                       <AvatarFallback>{post.author.name.charAt(0)}</AvatarFallback>
                     </Avatar>
-                    <div>
+                    <div className="flex flex-col">
                       <CardTitle className="text-xl">{post.title}</CardTitle>
                       <div className="flex items-center gap-2 mt-1">
                         <span className="text-sm text-gray-600">{post.author.name}</span>
@@ -79,22 +105,24 @@ const Community = () => {
                         <span className="text-sm text-gray-600">
                           {new Date(post.createdAt).toLocaleDateString()}
                         </span>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="ml-2"
+                          onClick={() => handleFollow(post.author.id, post.author.name)}
+                        >
+                          {followedUsers.includes(post.author.id) ? (
+                            <UserCheck className="w-4 h-4 text-green-500" />
+                          ) : (
+                            <UserPlus className="w-4 h-4" />
+                          )}
+                        </Button>
                       </div>
                     </div>
                   </div>
                 </CardHeader>
                 <CardContent>
                   <p className="text-gray-600 mb-4">{post.content}</p>
-                  <div className="flex flex-wrap gap-2 mb-4">
-                    {post.tags.map((tag) => (
-                      <span
-                        key={tag}
-                        className="px-2 py-1 bg-gray-100 text-gray-600 rounded-full text-sm"
-                      >
-                        {tag}
-                      </span>
-                    ))}
-                  </div>
                   <div className="flex items-center gap-6">
                     <Button variant="ghost" size="sm" className="gap-2">
                       <Heart className="w-4 h-4" />
