@@ -1,4 +1,4 @@
-import { Home, Star, Tag, Settings, LogOut } from "lucide-react";
+import { Home, Star, Tag, Settings, LogOut, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useNavigate } from "react-router-dom";
@@ -31,7 +31,7 @@ export const Sidebar = () => {
       </div>
 
       <nav className="space-y-2">
-        <Button variant="ghost" className="w-full justify-start">
+        <Button variant="ghost" className="w-full justify-start" onClick={() => navigate("/dashboard")}>
           <Home className="mr-2 h-4 w-4" /> Dashboard
         </Button>
         <Button variant="ghost" className="w-full justify-start">
@@ -39,6 +39,9 @@ export const Sidebar = () => {
         </Button>
         <Button variant="ghost" className="w-full justify-start">
           <Tag className="mr-2 h-4 w-4" /> Tags
+        </Button>
+        <Button variant="ghost" className="w-full justify-start" onClick={() => navigate("/community")}>
+          <Users className="mr-2 h-4 w-4" /> Community
         </Button>
         <Button variant="ghost" className="w-full justify-start">
           <Settings className="mr-2 h-4 w-4" /> Settings
