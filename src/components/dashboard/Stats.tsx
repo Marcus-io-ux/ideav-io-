@@ -12,7 +12,7 @@ export const Stats = ({ totalIdeas, highPriorityCount, followersCount, following
   return (
     <div className="bg-white p-4 rounded-lg shadow-sm">
       <h3 className="text-sm font-medium text-gray-600 mb-4">Quick Stats</h3>
-      <div className="grid grid-cols-2 gap-4">
+      <div className="flex justify-between items-center space-x-4">
         <div>
           <p className="text-2xl font-bold">{totalIdeas}</p>
           <p className="text-sm text-gray-500">Total Ideas</p>
