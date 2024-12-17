@@ -24,17 +24,6 @@ interface IdeaCardProps {
   emojiReactions?: Record<string, number>;
 }
 
-interface CommentResponse {
-  id: string;
-  content: string;
-  created_at: string;
-  user_id: string;
-  author: {
-    username: string | null;
-    avatar_url: string | null;
-  } | null;
-}
-
 export const IdeaCard = ({
   id,
   title,
@@ -49,6 +38,7 @@ export const IdeaCard = ({
 }: IdeaCardProps) => {
   const [isLiked, setIsLiked] = useState(false);
   const [likeCount, setLikeCount] = useState(likes);
+  const [commentCount, setCommentCount] = useState(comments);
   const [showComments, setShowComments] = useState(false);
   const [commentsList, setCommentsList] = useState<any[]>([]);
   const [newComment, setNewComment] = useState("");
@@ -61,7 +51,54 @@ export const IdeaCard = ({
       setCurrentUserId(user?.id || null);
     };
     getCurrentUser();
-  }, []);
+
+    // Subscribe to real-time updates for likes and comments
+    const channel = supabase
+      .channel(`post_${id}_updates`)
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'community_post_likes',
+          filter: `post_id=eq.${id}`
+        },
+        (payload) => {
+          if (payload.eventType === 'INSERT') {
+            setLikeCount(prev => prev + 1);
+          } else if (payload.eventType === 'DELETE') {
+            setLikeCount(prev => Math.max(0, prev - 1));
+          }
+        }
+      )
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'community_comments',
+          filter: `post_id=eq.${id}`
+        },
+        (payload) => {
+          if (payload.eventType === 'INSERT') {
+            setCommentCount(prev => prev + 1);
+            if (showComments) {
+              fetchComments();
+            }
+          } else if (payload.eventType === 'DELETE') {
+            setCommentCount(prev => Math.max(0, prev - 1));
+            if (showComments) {
+              fetchComments();
+            }
+          }
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [id, showComments]);
 
   const handleLike = async () => {
     const { data: { user } } = await supabase.auth.getUser();
@@ -135,7 +172,6 @@ export const IdeaCard = ({
 
   const fetchComments = async () => {
     try {
-      // First, get comments with user_id
       const { data: commentsData, error: commentsError } = await supabase
         .from("community_comments")
         .select(`
@@ -152,7 +188,6 @@ export const IdeaCard = ({
         return;
       }
 
-      // Then, for each comment, get the author's profile
       const commentsWithAuthors = await Promise.all(
         commentsData.map(async (comment) => {
           const { data: profileData } = await supabase
@@ -241,7 +276,7 @@ export const IdeaCard = ({
           ownerId={author.id}
           isLiked={isLiked}
           likeCount={likeCount}
-          comments={comments}
+          comments={commentCount}
           onLike={handleLike}
           onComment={() => {
             setShowComments(!showComments);
