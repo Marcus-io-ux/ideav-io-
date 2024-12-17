@@ -84,12 +84,12 @@ export const IdeasList = ({
               Restore Selected ({selectedIds.length})
             </Button>
           )}
-          <div className="flex items-center gap-4 bg-accent rounded-lg px-4 py-2">
-            <span className="flex items-center gap-2">
+          <div className="flex items-center gap-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg px-4 py-2 border border-blue-100 dark:border-blue-800">
+            <span className="flex items-center gap-2 text-blue-700 dark:text-blue-300">
               <Lightbulb className="h-4 w-4" />
               {activeIdeas.length} Ideas
             </span>
-            <span className="flex items-center gap-2">
+            <span className="flex items-center gap-2 text-blue-700 dark:text-blue-300">
               <Star className="h-4 w-4" />
               {favoriteIdeas.length} Favorites
             </span>
