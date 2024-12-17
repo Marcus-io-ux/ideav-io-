@@ -1,11 +1,10 @@
 import { useState } from "react";
-import { Separator } from "@/components/ui/separator";
 import { SettingsSidebar } from "@/components/settings/SettingsSidebar";
-import { ProfileSettings } from "@/components/settings/ProfileSettings";
-import { PreferencesSettings } from "@/components/settings/PreferencesSettings";
-import { SubscriptionSettings } from "@/components/settings/SubscriptionSettings";
-import { SecuritySettings } from "@/components/settings/SecuritySettings";
-import { NotificationSettings } from "@/components/settings/NotificationSettings";
+import { ProfileTab } from "@/components/settings/tabs/ProfileTab";
+import { PreferencesTab } from "@/components/settings/tabs/PreferencesTab";
+import { SubscriptionTab } from "@/components/settings/tabs/SubscriptionTab";
+import { SecurityTab } from "@/components/settings/tabs/SecurityTab";
+import { NotificationsTab } from "@/components/settings/tabs/NotificationsTab";
 
 type SettingsSection = "profile" | "preferences" | "subscription" | "security" | "notifications";
 
@@ -20,11 +19,11 @@ export default function Settings() {
         </aside>
         <div className="flex-1 lg:max-w-3xl">
           <div className="space-y-6">
-            {activeSection === "profile" && <ProfileSettings />}
-            {activeSection === "preferences" && <PreferencesSettings />}
-            {activeSection === "subscription" && <SubscriptionSettings />}
-            {activeSection === "security" && <SecuritySettings />}
-            {activeSection === "notifications" && <NotificationSettings />}
+            {activeSection === "profile" && <ProfileTab />}
+            {activeSection === "preferences" && <PreferencesTab />}
+            {activeSection === "subscription" && <SubscriptionTab />}
+            {activeSection === "security" && <SecurityTab />}
+            {activeSection === "notifications" && <NotificationsTab />}
           </div>
         </div>
       </div>
