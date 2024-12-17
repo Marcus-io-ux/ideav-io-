@@ -59,15 +59,16 @@ const Inbox = () => {
     if (!currentUser) return;
 
     const fetchConversations = async () => {
+      // First, get all messages for the current user
       const { data: messages, error } = await supabase
         .from("messages")
         .select(`
           *,
-          sender:sender_id(id, profile:profiles(*)),
-          recipient:recipient_id(id, profile:profiles(*))
+          sender:profiles!messages_sender_id_fkey(user_id, username, avatar_url),
+          recipient:profiles!messages_recipient_id_fkey(user_id, username, avatar_url)
         `)
         .or(`sender_id.eq.${currentUser.id},recipient_id.eq.${currentUser.id}`)
-        .order("created_at", { ascending: false });
+        .order('created_at', { ascending: false });
 
       if (error) {
         toast({
@@ -82,22 +83,22 @@ const Inbox = () => {
       const conversationsMap = new Map();
       messages?.forEach((message: any) => {
         const otherUser =
-          message.sender.id === currentUser.id ? message.recipient : message.sender;
+          message.sender.user_id === currentUser.id ? message.recipient : message.sender;
         const conversationId = `${Math.min(
-          parseInt(message.sender.id),
-          parseInt(message.recipient.id)
+          parseInt(message.sender_id),
+          parseInt(message.recipient_id)
         )}-${Math.max(
-          parseInt(message.sender.id),
-          parseInt(message.recipient.id)
+          parseInt(message.sender_id),
+          parseInt(message.recipient_id)
         )}`;
 
         if (!conversationsMap.has(conversationId)) {
           conversationsMap.set(conversationId, {
             id: conversationId,
             user: {
-              id: otherUser.id,
-              name: otherUser.profile.username,
-              avatar: otherUser.profile.avatar_url,
+              id: otherUser.user_id,
+              name: otherUser.username,
+              avatar: otherUser.avatar_url,
             },
             lastMessage: {
               content: message.content,
@@ -143,7 +144,7 @@ const Inbox = () => {
         .from("messages")
         .select(`
           *,
-          sender:sender_id(id, profile:profiles(*))
+          sender:profiles!messages_sender_id_fkey(user_id, username, avatar_url)
         `)
         .or(
           `and(sender_id.eq.${user1Id},recipient_id.eq.${user2Id}),and(sender_id.eq.${user2Id},recipient_id.eq.${user1Id})`
@@ -165,9 +166,9 @@ const Inbox = () => {
           content: message.content,
           timestamp: new Date(message.created_at),
           sender: {
-            id: message.sender.id,
-            name: message.sender.profile.username,
-            avatar: message.sender.profile.avatar_url,
+            id: message.sender.user_id,
+            name: message.sender.username,
+            avatar: message.sender.avatar_url,
           },
           isRead: message.is_read,
         })) || []
