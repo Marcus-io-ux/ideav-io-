@@ -50,7 +50,7 @@ export const fetchPricingPlans = async () => {
       id: "1",
       planName: "Free",
       price: 0,
-      billingCycle: "monthly",
+      billingCycle: "monthly" as const,
       featuresIncluded: [
         "Up to 50 ideas",
         "Basic organization",
@@ -62,7 +62,7 @@ export const fetchPricingPlans = async () => {
       id: "2",
       planName: "Pro",
       price: 9.99,
-      billingCycle: "monthly",
+      billingCycle: "monthly" as const,
       featuresIncluded: [
         "Unlimited ideas",
         "Advanced organization",
