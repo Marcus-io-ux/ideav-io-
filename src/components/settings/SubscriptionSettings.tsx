@@ -1,31 +1,16 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { useEffect, useState } from "react";
+import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { Badge } from "@/components/ui/badge";
 import { Loader2, CheckCircle2 } from "lucide-react";
-
-interface MembershipTier {
-  id: string;
-  name: string;
-  price: number;
-  description: string;
-  features: string[];
-  created_at?: string;
-}
-
-interface UserMembership {
-  tier_id: string;
-  status: string;
-  start_date: string;
-  end_date: string | null;
-}
+import { MembershipTier } from "@/types/settings";
 
 export function SubscriptionSettings() {
   const [loading, setLoading] = useState(true);
   const [tiers, setTiers] = useState<MembershipTier[]>([]);
-  const [currentMembership, setCurrentMembership] = useState<UserMembership | null>(null);
+  const [currentMembership, setCurrentMembership] = useState<any>(null);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -36,7 +21,6 @@ export function SubscriptionSettings() {
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (user) {
-        // Fetch available tiers
         const { data: tiersData, error: tiersError } = await supabase
           .from("membership_tiers")
           .select("*")
@@ -45,12 +29,11 @@ export function SubscriptionSettings() {
         if (tiersError) throw tiersError;
 
         // Transform the features from Json to string[]
-        const transformedTiers = tiersData.map(tier => ({
+        const transformedTiers: MembershipTier[] = tiersData.map(tier => ({
           ...tier,
-          features: Array.isArray(tier.features) ? tier.features : []
+          features: Array.isArray(tier.features) ? tier.features.map(f => String(f)) : []
         }));
 
-        // Fetch user's current membership
         const { data: membershipData, error: membershipError } = await supabase
           .from("user_memberships")
           .select("*")
