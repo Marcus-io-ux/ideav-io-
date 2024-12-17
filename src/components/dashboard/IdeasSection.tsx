@@ -1,4 +1,3 @@
-import { Stats } from "@/components/dashboard/Stats";
 import { IdeasList } from "@/components/dashboard/IdeasList";
 
 interface Idea {
@@ -31,10 +30,6 @@ export const IdeasSection = ({
 }: IdeasSectionProps) => {
   return (
     <div className="space-y-8">
-      <Stats
-        totalIdeas={ideas.filter(i => !i.deleted).length}
-        favoritesCount={ideas.filter((idea) => idea.isFavorite).length}
-      />
       <div className="mt-8">
         <IdeasList
           ideas={ideas}
