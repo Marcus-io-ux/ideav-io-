@@ -6,6 +6,7 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import useEmblaCarousel from "embla-carousel-react";
 import Autoplay from "embla-carousel-autoplay";
+import { useEffect } from "react";
 
 const testimonials = [
   {
@@ -59,21 +60,27 @@ const testimonials = [
 ];
 
 export const TestimonialsCarousel = () => {
-  const [api] = useEmblaCarousel(
+  const autoplayOptions = {
+    delay: 5000,
+    stopOnInteraction: false,
+    rootNode: (emblaRoot: any) => emblaRoot.parentElement,
+  };
+
+  const [emblaRef, emblaApi] = useEmblaCarousel(
     { 
       loop: true,
       align: "start",
       skipSnaps: false,
-      duration: 50, // Smooth scrolling duration in milliseconds
+      duration: 50,
     },
-    [
-      Autoplay({
-        delay: 5000, // Time between slides in milliseconds
-        stopOnInteraction: false, // Continue autoplay after user interaction
-        rootNode: (emblaRoot) => emblaRoot.parentElement, // Ensures autoplay works with container
-      })
-    ]
+    [Autoplay(autoplayOptions)]
   );
+
+  useEffect(() => {
+    if (emblaApi) {
+      emblaApi.play(); // Explicitly start autoplay when component mounts
+    }
+  }, [emblaApi]);
 
   return (
     <section className="py-20 bg-gradient-to-br from-accent/30 to-background">
@@ -91,7 +98,7 @@ export const TestimonialsCarousel = () => {
             loop: true,
           }}
           className="w-full max-w-6xl mx-auto"
-          ref={api}
+          ref={emblaRef}
         >
           <CarouselContent>
             {testimonials.map((testimonial, index) => (
