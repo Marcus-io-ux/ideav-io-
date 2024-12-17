@@ -1,10 +1,11 @@
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { MessageCircle, ThumbsUp, UserPlus, Pin } from "lucide-react";
+import { MessageCircle, Heart, UserPlus, Pin, Trash2 } from "lucide-react";
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { IdeaComments } from "./IdeaComments";
 
 interface IdeaCardProps {
   id: string;
@@ -37,6 +38,9 @@ export const IdeaCard = ({
 }: IdeaCardProps) => {
   const [isLiked, setIsLiked] = useState(false);
   const [likeCount, setLikeCount] = useState(likes);
+  const [showComments, setShowComments] = useState(false);
+  const [commentsList, setCommentsList] = useState<any[]>([]);
+  const [newComment, setNewComment] = useState("");
   const { toast } = useToast();
 
   const handleLike = async () => {
@@ -78,11 +82,109 @@ export const IdeaCard = ({
     }
   };
 
+  const handleDelete = async () => {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user || user.id !== author.id) {
+      toast({
+        title: "Unauthorized",
+        description: "You can only delete your own posts",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const { error } = await supabase
+      .from("community_posts")
+      .delete()
+      .match({ id });
+
+    if (error) {
+      console.error("Error deleting post:", error);
+      toast({
+        title: "Error",
+        description: "Failed to delete post",
+        variant: "destructive",
+      });
+    } else {
+      toast({
+        title: "Success",
+        description: "Post deleted successfully",
+      });
+      // You might want to trigger a refresh of the posts list here
+    }
+  };
+
   const handleCollaborate = () => {
     toast({
       title: "Collaboration request sent",
       description: `Your request to collaborate has been sent to ${author.name}`,
     });
+  };
+
+  const handleAddComment = async () => {
+    if (!newComment.trim()) return;
+
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) {
+      toast({
+        title: "Please sign in",
+        description: "You need to be signed in to comment",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("username, avatar_url")
+      .eq("user_id", user.id)
+      .single();
+
+    const { error } = await supabase
+      .from("community_comments")
+      .insert({
+        post_id: id,
+        user_id: user.id,
+        content: newComment,
+      });
+
+    if (error) {
+      console.error("Error adding comment:", error);
+      toast({
+        title: "Error",
+        description: "Failed to add comment",
+        variant: "destructive",
+      });
+    } else {
+      setNewComment("");
+      // Refresh comments
+      fetchComments();
+      toast({
+        title: "Success",
+        description: "Comment added successfully",
+      });
+    }
+  };
+
+  const fetchComments = async () => {
+    const { data, error } = await supabase
+      .from("community_comments")
+      .select(`
+        *,
+        profiles:user_id (
+          username,
+          avatar_url
+        )
+      `)
+      .eq("post_id", id)
+      .order("created_at", { ascending: true });
+
+    if (error) {
+      console.error("Error fetching comments:", error);
+      return;
+    }
+
+    setCommentsList(data || []);
   };
 
   return (
@@ -107,6 +209,16 @@ export const IdeaCard = ({
             </div>
           </div>
         </div>
+        {author.id === (async () => (await supabase.auth.getUser()).data.user?.id)() && (
+          <Button
+            variant="ghost"
+            size="icon"
+            className="text-destructive hover:text-destructive/90"
+            onClick={handleDelete}
+          >
+            <Trash2 className="h-4 w-4" />
+          </Button>
+        )}
       </CardHeader>
       <CardContent>
         <p className="text-gray-600 mb-4">{content}</p>
@@ -126,13 +238,23 @@ export const IdeaCard = ({
           <Button
             variant="ghost"
             size="sm"
-            className={`gap-2 ${isLiked ? "text-primary" : ""}`}
+            className={`gap-2 ${isLiked ? "text-red-500" : ""}`}
             onClick={handleLike}
           >
-            <ThumbsUp className="h-4 w-4" />
+            <Heart className={`h-4 w-4 ${isLiked ? "fill-current" : ""}`} />
             <span>{likeCount}</span>
           </Button>
-          <Button variant="ghost" size="sm" className="gap-2">
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            className="gap-2"
+            onClick={() => {
+              setShowComments(!showComments);
+              if (!showComments) {
+                fetchComments();
+              }
+            }}
+          >
             <MessageCircle className="h-4 w-4" />
             <span>{comments}</span>
           </Button>
@@ -146,6 +268,23 @@ export const IdeaCard = ({
             <span>Collaborate</span>
           </Button>
         </div>
+
+        {showComments && (
+          <IdeaComments
+            comments={commentsList.map(comment => ({
+              id: comment.id,
+              content: comment.content,
+              author: {
+                name: comment.profiles?.username || "Anonymous",
+                avatar: comment.profiles?.avatar_url,
+              },
+              createdAt: new Date(comment.created_at),
+            }))}
+            newComment={newComment}
+            onNewCommentChange={setNewComment}
+            onAddComment={handleAddComment}
+          />
+        )}
 
         {Object.keys(emojiReactions).length > 0 && (
           <div className="flex flex-wrap gap-2 mt-4">
