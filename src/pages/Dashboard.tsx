@@ -16,7 +16,6 @@ interface IdeaDB {
   deleted_at: string | null;
 }
 
-// Frontend type for the UI
 interface Idea {
   id: string;
   title: string;
@@ -43,19 +42,36 @@ const Dashboard = () => {
   const fetchUserProfile = async () => {
     try {
       const { data: { user } } = await supabase.auth.getUser();
-      if (user) {
-        const { data: profile } = await supabase
+      if (!user) return;
+
+      // First try to get existing onboarding data
+      let { data: profile, error } = await supabase
+        .from('onboarding_data')
+        .select('full_name')
+        .eq('user_id', user.id)
+        .maybeSingle(); // Use maybeSingle() instead of single()
+
+      // If no profile exists, create one
+      if (!profile) {
+        const { data: newProfile, error: insertError } = await supabase
           .from('onboarding_data')
+          .insert([{ 
+            user_id: user.id,
+            full_name: user.email?.split('@')[0] || 'User' // Default name from email
+          }])
           .select('full_name')
-          .eq('user_id', user.id)
           .single();
-        
-        if (profile?.full_name) {
-          setUserName(profile.full_name.split(' ')[0]);
-        }
+
+        if (insertError) throw insertError;
+        profile = newProfile;
+      }
+
+      if (profile?.full_name) {
+        setUserName(profile.full_name.split(' ')[0]);
       }
     } catch (error) {
       console.error('Error fetching user profile:', error);
+      setUserName("User"); // Fallback name
     }
   };
 
@@ -235,8 +251,8 @@ const Dashboard = () => {
   };
 
   const highPriorityCount = ideas.filter((idea) => idea.priority === "high").length;
-  const followersCount = 128; // This should be fetched from user_follows table
-  const followingCount = 89; // This should be fetched from user_follows table
+  const followersCount = 128;
+  const followingCount = 89;
 
   return (
     <div className="min-h-screen bg-gray-50">
