@@ -5,8 +5,8 @@ interface StatsProps {
 
 export const Stats = ({ totalIdeas, favoritesCount }: StatsProps) => {
   return (
-    <div className="bg-white px-4 py-2 rounded-lg shadow-sm">
-      <div className="flex items-center space-x-8">
+    <div className="bg-white p-4 rounded-lg shadow-sm">
+      <div className="flex flex-col space-y-4">
         <div>
           <p className="text-xl font-bold">{totalIdeas}</p>
           <p className="text-sm text-gray-500">Total Ideas</p>
