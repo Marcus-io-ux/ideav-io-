@@ -1,16 +1,35 @@
 import { useState, useEffect } from "react";
 import { IdeaCard } from "@/components/IdeaCard";
+import { CommunityIdeaCard } from "@/components/community/IdeaCard";
 import { SearchBar } from "@/components/SearchBar";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 
-interface Idea {
+interface BaseIdea {
   id: string;
   title: string;
   content: string;
   createdAt: Date;
   isFavorite: boolean;
 }
+
+interface RegularIdea extends BaseIdea {
+  type: 'idea';
+}
+
+interface CommunityIdea extends BaseIdea {
+  type: 'community_post';
+  author: {
+    id: string;
+    name: string;
+    avatar?: string;
+  };
+  likes: number;
+  comments: number;
+  tags: string[];
+}
+
+type Idea = RegularIdea | CommunityIdea;
 
 const Favorites = () => {
   const [ideas, setIdeas] = useState<Idea[]>([]);
@@ -26,12 +45,11 @@ const Favorites = () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
 
-      // First, get all favorites for the user
+      // Get all favorites for the user
       const { data: favorites, error: favoritesError } = await supabase
         .from('favorites')
-        .select('idea_id')
-        .eq('user_id', user.id)
-        .eq('item_type', 'idea');
+        .select('idea_id, item_type')
+        .eq('user_id', user.id);
 
       if (favoritesError) throw favoritesError;
 
@@ -40,25 +58,73 @@ const Favorites = () => {
         return;
       }
 
-      // Then, get the actual ideas using the favorite idea_ids
-      const ideaIds = favorites.map(fav => fav.idea_id);
-      const { data: ideasData, error: ideasError } = await supabase
-        .from('ideas')
-        .select('*')
-        .in('id', ideaIds)
-        .eq('deleted', false);
+      // Separate IDs by type
+      const regularIdeaIds = favorites
+        .filter(fav => fav.item_type === 'idea')
+        .map(fav => fav.idea_id);
+      
+      const communityPostIds = favorites
+        .filter(fav => fav.item_type === 'community_post')
+        .map(fav => fav.idea_id);
 
-      if (ideasError) throw ideasError;
+      // Fetch regular ideas
+      const regularIdeasPromise = regularIdeaIds.length > 0
+        ? supabase
+            .from('ideas')
+            .select('*')
+            .in('id', regularIdeaIds)
+            .eq('deleted', false)
+        : Promise.resolve({ data: [] });
 
-      const formattedIdeas = ideasData?.map(idea => ({
+      // Fetch community posts
+      const communityPostsPromise = communityPostIds.length > 0
+        ? supabase
+            .from('community_posts')
+            .select(`
+              *,
+              author:profiles(username, avatar_url)
+            `)
+            .in('id', communityPostIds)
+        : Promise.resolve({ data: [] });
+
+      const [
+        { data: regularIdeasData, error: regularIdeasError },
+        { data: communityPostsData, error: communityPostsError }
+      ] = await Promise.all([regularIdeasPromise, communityPostsPromise]);
+
+      if (regularIdeasError) throw regularIdeasError;
+      if (communityPostsError) throw communityPostsError;
+
+      // Format regular ideas
+      const formattedRegularIdeas: RegularIdea[] = (regularIdeasData || []).map(idea => ({
         id: idea.id,
         title: idea.title,
         content: idea.content,
         createdAt: new Date(idea.created_at),
-        isFavorite: true
-      })) || [];
+        isFavorite: true,
+        type: 'idea'
+      }));
 
-      setIdeas(formattedIdeas);
+      // Format community posts
+      const formattedCommunityPosts: CommunityIdea[] = (communityPostsData || []).map(post => ({
+        id: post.id,
+        title: post.title,
+        content: post.content,
+        createdAt: new Date(post.created_at),
+        isFavorite: true,
+        type: 'community_post',
+        author: {
+          id: post.user_id,
+          name: post.author?.username || 'Anonymous',
+          avatar: post.author?.avatar_url
+        },
+        likes: post.likes_count || 0,
+        comments: post.comments_count || 0,
+        tags: post.tags || []
+      }));
+
+      // Combine all ideas
+      setIdeas([...formattedRegularIdeas, ...formattedCommunityPosts]);
     } catch (error) {
       console.error('Error fetching favorites:', error);
       toast({
@@ -97,7 +163,22 @@ const Favorites = () => {
 
         <div className="grid gap-6">
           {filteredIdeas.map((idea) => (
-            <IdeaCard key={idea.id} {...idea} />
+            idea.type === 'idea' ? (
+              <IdeaCard key={idea.id} {...idea} />
+            ) : (
+              <CommunityIdeaCard
+                key={idea.id}
+                id={idea.id}
+                title={idea.title}
+                content={idea.content}
+                author={idea.author}
+                likes={idea.likes}
+                comments={idea.comments}
+                tags={idea.tags}
+                createdAt={idea.createdAt}
+                emojiReactions={{}}
+              />
+            )
           ))}
           {filteredIdeas.length === 0 && (
             <div className="text-center py-12">
