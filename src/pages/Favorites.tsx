@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { IdeaCard } from "@/components/IdeaCard";
-import { CommunityIdeaCard } from "@/components/community/IdeaCard";
+import { IdeaCard as CommunityIdeaCard } from "@/components/community/IdeaCard";
 import { SearchBar } from "@/components/SearchBar";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -46,12 +46,10 @@ const Favorites = () => {
       if (!user) return;
 
       // Get all favorites for the user
-      const { data: favorites, error: favoritesError } = await supabase
+      const { data: favorites } = await supabase
         .from('favorites')
         .select('idea_id, item_type')
         .eq('user_id', user.id);
-
-      if (favoritesError) throw favoritesError;
 
       if (!favorites || favorites.length === 0) {
         setIdeas([]);
@@ -87,16 +85,21 @@ const Favorites = () => {
             .in('id', communityPostIds)
         : Promise.resolve({ data: [] });
 
-      const [
-        { data: regularIdeasData, error: regularIdeasError },
-        { data: communityPostsData, error: communityPostsError }
-      ] = await Promise.all([regularIdeasPromise, communityPostsPromise]);
+      const [regularIdeasResponse, communityPostsResponse] = await Promise.all([
+        regularIdeasPromise,
+        communityPostsPromise
+      ]);
 
-      if (regularIdeasError) throw regularIdeasError;
-      if (communityPostsError) throw communityPostsError;
+      if (regularIdeasResponse.error) {
+        throw new Error(regularIdeasResponse.error.message);
+      }
+
+      if (communityPostsResponse.error) {
+        throw new Error(communityPostsResponse.error.message);
+      }
 
       // Format regular ideas
-      const formattedRegularIdeas: RegularIdea[] = (regularIdeasData || []).map(idea => ({
+      const formattedRegularIdeas: RegularIdea[] = (regularIdeasResponse.data || []).map(idea => ({
         id: idea.id,
         title: idea.title,
         content: idea.content,
@@ -106,7 +109,7 @@ const Favorites = () => {
       }));
 
       // Format community posts
-      const formattedCommunityPosts: CommunityIdea[] = (communityPostsData || []).map(post => ({
+      const formattedCommunityPosts: CommunityIdea[] = (communityPostsResponse.data || []).map(post => ({
         id: post.id,
         title: post.title,
         content: post.content,
