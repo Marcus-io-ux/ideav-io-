@@ -141,22 +141,20 @@ export const IdeaCard = ({
         content,
         created_at,
         user_id,
-        author:profiles!community_comments_user_id_fkey(
+        author:profiles(
           username,
           avatar_url
         )
       `)
       .eq("post_id", id)
-      .order("created_at", { ascending: true }) as { data: CommentResponse[] | null, error: any };
+      .order("created_at", { ascending: true });
 
     if (error) {
       console.error("Error fetching comments:", error);
       return;
     }
 
-    if (!data) return;
-
-    const formattedComments = data.map(comment => ({
+    const formattedComments = data?.map(comment => ({
       id: comment.id,
       content: comment.content,
       createdAt: new Date(comment.created_at),
@@ -164,7 +162,7 @@ export const IdeaCard = ({
         name: comment.author?.username || "Anonymous",
         avatar: comment.author?.avatar_url
       }
-    }));
+    })) || [];
 
     setCommentsList(formattedComments);
   };
