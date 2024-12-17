@@ -1,14 +1,13 @@
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { AddIdeaButton } from "@/components/AddIdeaButton";
 import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
-import { Check, Share2, Plus, ChevronRight } from "lucide-react";
+import { Check, Share2, Plus, ChevronRight, Save, X, Tag } from "lucide-react";
 
 interface AddIdeaDialogProps {
   onIdeaSubmit: (idea: {
@@ -41,7 +40,7 @@ export const AddIdeaDialog = ({ onIdeaSubmit }: AddIdeaDialogProps) => {
       }, 1000);
     } else if (showSuccess && redirectCountdown === 0) {
       navigate("/dashboard");
-      setOpen(false); // Close the dialog when redirecting
+      setOpen(false);
     }
     return () => clearTimeout(timer);
   }, [showSuccess, redirectCountdown, navigate]);
@@ -76,7 +75,6 @@ export const AddIdeaDialog = ({ onIdeaSubmit }: AddIdeaDialogProps) => {
 
     setShowSuccess(true);
     setNewIdea({ title: "", content: "", tags: "", shareToCommunity: false });
-    setOpen(false); // Close the dialog after successful submission
   };
 
   const handleViewIdea = () => {
@@ -99,40 +97,72 @@ export const AddIdeaDialog = ({ onIdeaSubmit }: AddIdeaDialogProps) => {
       <DialogTrigger asChild>
         <AddIdeaButton onClick={() => setOpen(true)} />
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[425px]">
+      <DialogContent className="sm:max-w-[525px]">
         <DialogHeader>
-          <DialogTitle>Add New Idea</DialogTitle>
+          <DialogTitle className="text-2xl font-semibold">Add New Idea</DialogTitle>
         </DialogHeader>
         {!showSuccess ? (
-          <div className="grid gap-4 py-4">
-            <Input
-              placeholder="Title"
-              value={newIdea.title}
-              onChange={(e) => setNewIdea({ ...newIdea, title: e.target.value })}
-              className="w-full"
-            />
-            <Textarea
-              placeholder="Describe your idea..."
-              value={newIdea.content}
-              onChange={(e) => setNewIdea({ ...newIdea, content: e.target.value })}
-              className="min-h-[100px]"
-            />
-            <Input
-              placeholder="Tags (comma-separated)"
-              value={newIdea.tags}
-              onChange={(e) => setNewIdea({ ...newIdea, tags: e.target.value })}
-            />
-            <div className="flex items-center space-x-2">
-              <Switch
-                id="share-to-community"
-                checked={newIdea.shareToCommunity}
-                onCheckedChange={(checked) =>
-                  setNewIdea({ ...newIdea, shareToCommunity: checked })
-                }
+          <div className="space-y-6 py-4">
+            <div className="space-y-2">
+              <Label htmlFor="title">Title</Label>
+              <Input
+                id="title"
+                placeholder="What's your big idea?"
+                value={newIdea.title}
+                onChange={(e) => setNewIdea({ ...newIdea, title: e.target.value })}
+                className="w-full"
               />
-              <Label htmlFor="share-to-community">Share to Community</Label>
             </div>
-            <Button onClick={handleSubmit}>Save Idea</Button>
+            <div className="space-y-2">
+              <Label htmlFor="content">Description</Label>
+              <Textarea
+                id="content"
+                placeholder="Add details or context to your idea..."
+                value={newIdea.content}
+                onChange={(e) => setNewIdea({ ...newIdea, content: e.target.value })}
+                className="min-h-[100px]"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="tags">Tags</Label>
+              <Input
+                id="tags"
+                placeholder="Add tags (comma-separated)"
+                value={newIdea.tags}
+                onChange={(e) => setNewIdea({ ...newIdea, tags: e.target.value })}
+              />
+            </div>
+            <DialogFooter className="flex justify-between sm:justify-between">
+              <div className="flex items-center gap-4">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setOpen(false)}
+                  className="gap-2"
+                >
+                  <X className="h-4 w-4" />
+                  Cancel
+                </Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => {
+                    toast({
+                      title: "Saved as draft",
+                      description: "Your idea has been saved as a draft",
+                    });
+                  }}
+                  className="gap-2"
+                >
+                  <Save className="h-4 w-4" />
+                  Save Draft
+                </Button>
+              </div>
+              <Button onClick={handleSubmit} className="gap-2">
+                <Tag className="h-4 w-4" />
+                Save Idea
+              </Button>
+            </DialogFooter>
           </div>
         ) : (
           <div className="py-6 space-y-6">
@@ -149,11 +179,9 @@ export const AddIdeaDialog = ({ onIdeaSubmit }: AddIdeaDialogProps) => {
               <Button onClick={handleViewIdea} className="w-full gap-2">
                 View Idea <ChevronRight className="h-4 w-4" />
               </Button>
-              {!newIdea.shareToCommunity && (
-                <Button onClick={() => setNewIdea({ ...newIdea, shareToCommunity: true })} variant="outline" className="w-full gap-2">
-                  Share with Community <Share2 className="h-4 w-4" />
-                </Button>
-              )}
+              <Button onClick={() => setNewIdea({ ...newIdea, shareToCommunity: true })} variant="outline" className="w-full gap-2">
+                Share with Community <Share2 className="h-4 w-4" />
+              </Button>
               <Button onClick={handleCreateAnother} variant="outline" className="w-full gap-2">
                 Create Another Idea <Plus className="h-4 w-4" />
               </Button>
