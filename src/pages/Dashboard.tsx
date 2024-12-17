@@ -5,12 +5,24 @@ import { AddIdeaDialog } from "@/components/dashboard/AddIdeaDialog";
 import { IdeasList } from "@/components/dashboard/IdeasList";
 import { supabase } from "@/integrations/supabase/client";
 
+// Database type from Supabase
+interface IdeaDB {
+  id: string;
+  title: string;
+  content: string;
+  user_id: string | null;
+  created_at: string;
+  deleted: boolean | null;
+  deleted_at: string | null;
+}
+
+// Frontend type for the UI
 interface Idea {
   id: string;
   title: string;
   content: string;
   tags: string[];
-  created_at: Date;
+  createdAt: Date;
   priority?: "high" | "medium" | "low";
   isFavorite?: boolean;
   sharedToCommunity?: boolean;
@@ -38,11 +50,17 @@ const Dashboard = () => {
       }
 
       if (data) {
-        setIdeas(data.map(idea => ({
-          ...idea,
-          created_at: new Date(idea.created_at),
-          tags: idea.tags || []
-        })));
+        // Map database records to frontend model
+        const mappedIdeas: Idea[] = data.map((idea: IdeaDB) => ({
+          id: idea.id,
+          title: idea.title,
+          content: idea.content,
+          tags: [], // Initialize empty tags array since it's not in DB yet
+          createdAt: new Date(idea.created_at),
+          isFavorite: false,
+          sharedToCommunity: false
+        }));
+        setIdeas(mappedIdeas);
       }
     } catch (error) {
       console.error('Error fetching ideas:', error);
@@ -66,7 +84,6 @@ const Dashboard = () => {
         .insert([{
           title: newIdeaData.title,
           content: newIdeaData.content,
-          tags: newIdeaData.tags,
         }])
         .select()
         .single();
@@ -77,8 +94,11 @@ const Dashboard = () => {
 
       if (data) {
         const newIdea: Idea = {
-          ...data,
-          created_at: new Date(data.created_at),
+          id: data.id,
+          title: data.title,
+          content: data.content,
+          tags: newIdeaData.tags,
+          createdAt: new Date(data.created_at),
           isFavorite: false,
           sharedToCommunity: newIdeaData.shareToCommunity,
         };
