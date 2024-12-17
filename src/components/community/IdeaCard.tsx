@@ -24,6 +24,17 @@ interface IdeaCardProps {
   emojiReactions?: Record<string, number>;
 }
 
+interface CommentResponse {
+  id: string;
+  content: string;
+  created_at: string;
+  user_id: string;
+  author: {
+    username: string | null;
+    avatar_url: string | null;
+  } | null;
+}
+
 export const IdeaCard = ({
   id,
   title,
@@ -122,13 +133,6 @@ export const IdeaCard = ({
     }
   };
 
-  const handleCollaborate = () => {
-    toast({
-      title: "Collaboration request sent",
-      description: `Your request to collaborate has been sent to ${author.name}`,
-    });
-  };
-
   const fetchComments = async () => {
     const { data, error } = await supabase
       .from("community_comments")
@@ -143,12 +147,14 @@ export const IdeaCard = ({
         )
       `)
       .eq("post_id", id)
-      .order("created_at", { ascending: true });
+      .order("created_at", { ascending: true }) as { data: CommentResponse[] | null, error: any };
 
     if (error) {
       console.error("Error fetching comments:", error);
       return;
     }
+
+    if (!data) return;
 
     const formattedComments = data.map(comment => ({
       id: comment.id,
