@@ -1,4 +1,4 @@
-import { Star, Pencil, Trash } from "lucide-react";
+import { Star, Trash } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface CardHeaderActionsProps {
@@ -11,7 +11,6 @@ interface CardHeaderActionsProps {
 export const CardHeaderActions = ({
   isFavorite,
   onToggleFavorite,
-  onEdit,
   onDelete,
 }: CardHeaderActionsProps) => {
   return (
@@ -30,14 +29,6 @@ export const CardHeaderActions = ({
           )}
         />
       </button>
-      {onEdit && (
-        <button
-          onClick={onEdit}
-          className="p-1 rounded-full hover:bg-gray-100"
-        >
-          <Pencil className="h-4 w-4 text-gray-500" />
-        </button>
-      )}
       {onDelete && (
         <button
           onClick={onDelete}
