@@ -2,6 +2,7 @@ import { HeroSection } from "@/components/landing/HeroSection";
 import { HowItWorksSection } from "@/components/landing/HowItWorksSection";
 import { KeyFeaturesSection } from "@/components/landing/KeyFeaturesSection";
 import { JoinCommunitySection } from "@/components/landing/JoinCommunitySection";
+import { PricingSection } from "@/components/landing/PricingSection";
 import { Footer } from "@/components/landing/Footer";
 import { NavigationBar } from "@/components/landing/NavigationBar";
 import { TestimonialsCarousel } from "@/components/testimonials/TestimonialsCarousel";
@@ -20,6 +21,7 @@ const Landing = () => {
         <div id="community">
           <JoinCommunitySection />
         </div>
+        <PricingSection />
         <TestimonialsCarousel />
         <div id="faq">
           <FAQSection />
