@@ -32,9 +32,12 @@ export const NavigationBar = () => {
             >
               Community
             </button>
-            <Link to="#pricing" className="text-gray-600 hover:text-blue-500 transition-colors">
+            <button 
+              onClick={() => scrollToSection('pricing-section')}
+              className="text-gray-600 hover:text-blue-500 transition-colors"
+            >
               Pricing
-            </Link>
+            </button>
             <Link to="#about" className="text-gray-600 hover:text-blue-500 transition-colors">
               About Us
             </Link>
