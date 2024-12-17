@@ -48,7 +48,7 @@ const Dashboard = () => {
 
       if (error) throw error;
       
-      // If no points record exists, create one with the user_id
+      // If no points record exists, create one
       if (!userPoints) {
         const { data: newPoints, error: insertError } = await supabase
           .from('user_points')
@@ -56,10 +56,11 @@ const Dashboard = () => {
             { 
               user_id: user.id,
               current_streak: 0,
-              points: 0
+              points: 0,
+              badges: []
             }
           ])
-          .select('current_streak')
+          .select()
           .single();
 
         if (insertError) throw insertError;
@@ -305,7 +306,7 @@ const Dashboard = () => {
 
           <Stats
             totalIdeas={ideas.filter(i => !i.deleted).length}
-            favoritesCount={favoritesCount}
+            favoritesCount={ideas.filter((idea) => idea.isFavorite).length}
             currentStreak={currentStreak}
           />
 
