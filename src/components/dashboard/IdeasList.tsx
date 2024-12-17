@@ -58,16 +58,16 @@ export const IdeasList = ({
   };
 
   return (
-    <div>
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4">
-        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 w-full sm:w-auto">
-          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full sm:w-auto">
+    <div className="space-y-6">
+      <div className="flex flex-col sm:flex-row justify-between items-stretch sm:items-center gap-4">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 w-full sm:w-auto">
+          <div className="flex flex-row items-center gap-2 w-full sm:w-auto">
             {selectedIds.length > 0 && activeTab !== "trash" && (
               <Button
                 variant="destructive"
                 size="sm"
                 onClick={handleBulkDelete}
-                className="flex items-center justify-center gap-2"
+                className="flex-1 sm:flex-none items-center justify-center gap-2 px-4"
               >
                 <Trash2 className="h-4 w-4" />
                 Delete Selected ({selectedIds.length})
@@ -78,16 +78,16 @@ export const IdeasList = ({
                 variant="default"
                 size="sm"
                 onClick={handleBulkRestore}
-                className="flex items-center justify-center gap-2"
+                className="flex-1 sm:flex-none items-center justify-center gap-2 px-4"
               >
                 <RotateCcw className="h-4 w-4" />
                 Restore Selected ({selectedIds.length})
               </Button>
             )}
           </div>
-          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-4 bg-white dark:bg-blue-900/20 rounded-lg px-4 py-2 border border-blue-100 dark:border-blue-800 shadow-lg hover:shadow-xl transition-all duration-300">
-            <span className="flex items-center gap-2 text-black dark:text-white whitespace-nowrap">
-              <Lightbulb className="h-4 w-4" />
+          <div className="flex items-center gap-2 bg-white dark:bg-blue-900/20 rounded-lg px-6 py-3 border border-blue-100 dark:border-blue-800 shadow-sm">
+            <Lightbulb className="h-4 w-4 text-primary" />
+            <span className="text-black dark:text-white font-medium">
               You have {activeIdeas.length} ideas stored
             </span>
           </div>
@@ -95,15 +95,15 @@ export const IdeasList = ({
         <AddIdeaDialog onIdeaSubmit={() => {}} />
       </div>
 
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="mb-8">
-        <TabsList className="w-full sm:w-auto">
-          <TabsTrigger value="recent" className="flex-1 sm:flex-none">Recent Ideas</TabsTrigger>
-          <TabsTrigger value="all" className="flex-1 sm:flex-none">All Ideas</TabsTrigger>
-          <TabsTrigger value="trash" className="flex-1 sm:flex-none">Trash</TabsTrigger>
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+        <TabsList className="w-full sm:w-auto grid grid-cols-3 h-auto p-1">
+          <TabsTrigger value="recent" className="px-8 py-2">Recent Ideas</TabsTrigger>
+          <TabsTrigger value="all" className="px-8 py-2">All Ideas</TabsTrigger>
+          <TabsTrigger value="trash" className="px-8 py-2">Trash</TabsTrigger>
         </TabsList>
         
         <TabsContent value="recent">
-          <div className="grid gap-6">
+          <div className="grid gap-6 mt-6">
             {activeIdeas.slice(0, 5).map((idea) => (
               <IdeaCard
                 key={idea.id}
@@ -118,7 +118,7 @@ export const IdeasList = ({
         </TabsContent>
         
         <TabsContent value="all">
-          <div className="grid gap-6">
+          <div className="grid gap-6 mt-6">
             {activeIdeas.map((idea) => (
               <IdeaCard
                 key={idea.id}
@@ -133,7 +133,7 @@ export const IdeasList = ({
         </TabsContent>
 
         <TabsContent value="trash">
-          <div className="grid gap-6">
+          <div className="grid gap-6 mt-6">
             {trashedIdeas.map((idea) => (
               <IdeaCard
                 key={idea.id}
