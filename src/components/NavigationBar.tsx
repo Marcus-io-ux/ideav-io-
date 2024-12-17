@@ -11,6 +11,7 @@ export const NavigationBar = () => {
 
   const navItems = [
     { label: "Ideas", icon: Home, path: "/dashboard" },
+    { label: "Community", icon: Users, path: "/community" },
     { label: "Profile", icon: UserCircle, path: "/profile" },
     { label: "About Us", icon: Users, path: "/about" },
     { label: "Inbox", icon: Inbox, path: "/inbox" },
