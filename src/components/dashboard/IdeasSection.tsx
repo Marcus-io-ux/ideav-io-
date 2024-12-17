@@ -31,7 +31,6 @@ export const IdeasSection = ({
 }: IdeasSectionProps) => {
   return (
     <div className="space-y-8">
-      <h3 className="text-lg font-semibold">Your Ideas</h3>
       <Stats
         totalIdeas={ideas.filter(i => !i.deleted).length}
         favoritesCount={ideas.filter((idea) => idea.isFavorite).length}
