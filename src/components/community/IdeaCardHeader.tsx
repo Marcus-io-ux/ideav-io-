@@ -3,6 +3,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Pin, Trash2 } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
+import { IdeaBadge } from "./badges/IdeaBadge";
 
 interface IdeaCardHeaderProps {
   title: string;
@@ -15,6 +16,8 @@ interface IdeaCardHeaderProps {
   isPinned?: boolean;
   currentUserId: string | null;
   onDelete: () => void;
+  category?: string;
+  feedbackType?: string;
 }
 
 export const IdeaCardHeader = ({
@@ -24,6 +27,8 @@ export const IdeaCardHeader = ({
   isPinned,
   currentUserId,
   onDelete,
+  category,
+  feedbackType,
 }: IdeaCardHeaderProps) => {
   return (
     <div className="flex flex-row items-start justify-between space-y-0">
@@ -33,9 +38,15 @@ export const IdeaCardHeader = ({
           <AvatarFallback>{author.name.charAt(0)}</AvatarFallback>
         </Avatar>
         <div className="flex flex-col">
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 flex-wrap">
             <h3 className="text-xl font-semibold">{title}</h3>
             {isPinned && <Pin className="h-4 w-4 text-primary" />}
+            {category && (
+              <IdeaBadge type="category" label={category} />
+            )}
+            {feedbackType && (
+              <IdeaBadge type="feedback" label={feedbackType} />
+            )}
           </div>
           <div className="flex items-center gap-2 mt-1">
             <span className="text-sm text-gray-600">{author.name}</span>

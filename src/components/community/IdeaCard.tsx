@@ -154,6 +154,8 @@ export const IdeaCard = ({
           isPinned={isPinned}
           currentUserId={currentUserId}
           onDelete={() => {}}
+          category={category}
+          feedbackType={feedbackType}
         />
       </CardHeader>
       <CardContent>
