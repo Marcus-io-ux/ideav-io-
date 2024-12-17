@@ -250,9 +250,8 @@ const Dashboard = () => {
     }
   };
 
-  const highPriorityCount = ideas.filter((idea) => idea.priority === "high").length;
+  const favoritesCount = ideas.filter((idea) => idea.isFavorite).length;
   const followersCount = 128;
-  const followingCount = 89;
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -265,15 +264,12 @@ const Dashboard = () => {
 
           <Stats
             totalIdeas={ideas.filter(i => !i.deleted).length}
-            highPriorityCount={highPriorityCount}
+            favoritesCount={favoritesCount}
             followersCount={followersCount}
-            followingCount={followingCount}
           />
 
           <IdeasList
             ideas={ideas}
-            showFavoritesOnly={false}
-            onToggleFavorites={() => {}}
             onEditIdea={handleEditIdea}
             onDeleteIdeas={handleDeleteIdeas}
             onRestoreIdeas={handleRestoreIdeas}
