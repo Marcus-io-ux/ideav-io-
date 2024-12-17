@@ -21,7 +21,7 @@ interface CommunityPost {
   } | null;
 }
 
-export const useCommunityPosts = (channel: string) => {
+export const useCommunityPosts = (channelName: string) => {
   const [posts, setPosts] = useState<CommunityPost[]>([]);
   const { toast } = useToast();
 
@@ -32,7 +32,7 @@ export const useCommunityPosts = (channel: string) => {
         *,
         author:profiles(username, avatar_url)
       `)
-      .eq("channel", channel)
+      .eq("channel", channelName)
       .order("is_pinned", { ascending: false })
       .order("created_at", { ascending: false });
 
@@ -98,7 +98,8 @@ export const useCommunityPosts = (channel: string) => {
   useEffect(() => {
     fetchPosts();
 
-    const channel = supabase
+    // Create the subscription channel
+    const subscription = supabase
       .channel('public:community_posts')
       .on(
         'postgres_changes',
@@ -106,19 +107,20 @@ export const useCommunityPosts = (channel: string) => {
           event: '*',
           schema: 'public',
           table: 'community_posts',
-          filter: `channel=eq.${channel}`,
+          filter: `channel=eq.${channelName}`,
         },
-        async (payload) => {
-          console.log('Real-time update received:', payload);
-          fetchPosts();
+        async () => {
+          console.log('Real-time update received for channel:', channelName);
+          await fetchPosts();
         }
       )
       .subscribe();
 
+    // Cleanup function
     return () => {
-      supabase.removeChannel(channel);
+      supabase.removeChannel(subscription);
     };
-  }, [channel]);
+  }, [channelName]);
 
   return { posts, handleIdeaSubmit };
 };
