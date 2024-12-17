@@ -2,7 +2,7 @@ import { IdeaCard } from "@/components/IdeaCard";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { Trash2, RotateCcw, Lightbulb, Star } from "lucide-react";
+import { Trash2, RotateCcw, Lightbulb } from "lucide-react";
 import { useState } from "react";
 import { AddIdeaDialog } from "@/components/dashboard/AddIdeaDialog";
 
@@ -38,7 +38,6 @@ export const IdeasList = ({
 
   const activeIdeas = ideas.filter(idea => !idea.deleted);
   const trashedIdeas = ideas.filter(idea => idea.deleted);
-  const favoriteIdeas = activeIdeas.filter(idea => idea.isFavorite);
 
   const handleSelect = (id: string) => {
     setSelectedIds(prev => 
@@ -87,13 +86,9 @@ export const IdeasList = ({
             )}
           </div>
           <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-4 bg-white dark:bg-blue-900/20 rounded-lg px-4 py-2 border border-blue-100 dark:border-blue-800 shadow-lg hover:shadow-xl transition-all duration-300">
-            <span className="flex items-center gap-2 text-blue-700 dark:text-blue-300 whitespace-nowrap">
+            <span className="flex items-center gap-2 text-black dark:text-white whitespace-nowrap">
               <Lightbulb className="h-4 w-4" />
-              {activeIdeas.length} Ideas
-            </span>
-            <span className="flex items-center gap-2 text-blue-700 dark:text-blue-300 whitespace-nowrap">
-              <Star className="h-4 w-4" />
-              {favoriteIdeas.length} Favorites
+              You have {activeIdeas.length} ideas stored
             </span>
           </div>
         </div>
