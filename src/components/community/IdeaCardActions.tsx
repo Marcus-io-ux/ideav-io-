@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { Heart, MessageCircle, UserPlus } from "lucide-react";
+import { Heart, MessageCircle, UserPlus, MessageSquare } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -10,6 +10,7 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import { useState } from "react";
 import { useCollaborationRequest } from "@/hooks/use-collaboration-request";
+import { DirectMessageDialog } from "./DirectMessageDialog";
 
 interface IdeaCardActionsProps {
   postId: string;
@@ -19,6 +20,8 @@ interface IdeaCardActionsProps {
   comments: number;
   onLike: () => void;
   onComment: () => void;
+  currentUserId: string | null;
+  authorName: string;
 }
 
 export const IdeaCardActions = ({
@@ -29,8 +32,11 @@ export const IdeaCardActions = ({
   comments,
   onLike,
   onComment,
+  currentUserId,
+  authorName,
 }: IdeaCardActionsProps) => {
   const [isCollaborateOpen, setIsCollaborateOpen] = useState(false);
+  const [isMessageDialogOpen, setIsMessageDialogOpen] = useState(false);
   const [message, setMessage] = useState("");
   const { sendCollaborationRequest, isLoading } = useCollaborationRequest();
 
@@ -65,6 +71,18 @@ export const IdeaCardActions = ({
           <UserPlus className="h-4 w-4" />
           <span>Collaborate</span>
         </Button>
+        {currentUserId && currentUserId !== ownerId && (
+          <Button
+            variant="ghost"
+            size="sm"
+            className="gap-2"
+            onClick={() => setIsMessageDialogOpen(true)}
+            title="Send direct message"
+          >
+            <MessageSquare className="h-4 w-4" />
+            <span>Message</span>
+          </Button>
+        )}
       </div>
 
       <Dialog open={isCollaborateOpen} onOpenChange={setIsCollaborateOpen}>
@@ -96,6 +114,13 @@ export const IdeaCardActions = ({
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      <DirectMessageDialog
+        isOpen={isMessageDialogOpen}
+        onClose={() => setIsMessageDialogOpen(false)}
+        recipientId={ownerId}
+        recipientName={authorName}
+      />
     </>
   );
 };

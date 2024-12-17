@@ -1,9 +1,8 @@
 import { useState } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { Pin, Trash2, MessageSquare } from "lucide-react";
+import { Pin, Trash2 } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
-import { DirectMessageDialog } from "./DirectMessageDialog";
 
 interface IdeaCardHeaderProps {
   title: string;
@@ -26,8 +25,6 @@ export const IdeaCardHeader = ({
   currentUserId,
   onDelete,
 }: IdeaCardHeaderProps) => {
-  const [isMessageDialogOpen, setIsMessageDialogOpen] = useState(false);
-
   return (
     <div className="flex flex-row items-start justify-between space-y-0">
       <div className="flex items-start gap-4">
@@ -50,17 +47,6 @@ export const IdeaCardHeader = ({
         </div>
       </div>
       <div className="flex items-center gap-2">
-        {currentUserId && currentUserId !== author.id && (
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => setIsMessageDialogOpen(true)}
-            className="text-gray-600 hover:text-gray-900"
-            title="Send message"
-          >
-            <MessageSquare className="h-4 w-4" />
-          </Button>
-        )}
         {currentUserId === author.id && (
           <Button
             variant="ghost"
@@ -73,13 +59,6 @@ export const IdeaCardHeader = ({
           </Button>
         )}
       </div>
-
-      <DirectMessageDialog
-        isOpen={isMessageDialogOpen}
-        onClose={() => setIsMessageDialogOpen(false)}
-        recipientId={author.id}
-        recipientName={author.name}
-      />
     </div>
   );
 };

@@ -284,6 +284,8 @@ export const IdeaCard = ({
               fetchComments();
             }
           }}
+          currentUserId={currentUserId}
+          authorName={author.name}
         />
 
         {showComments && (
