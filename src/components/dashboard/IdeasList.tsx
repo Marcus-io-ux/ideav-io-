@@ -126,7 +126,7 @@ export const IdeasList = ({
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>No, keep items</AlertDialogCancel>
+            <AlertDialogCancel>No, keep ideas</AlertDialogCancel>
             <AlertDialogAction onClick={handleEmptyTrash} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
               Yes, empty trash
             </AlertDialogAction>
