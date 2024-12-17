@@ -1,4 +1,4 @@
-import { MessageSquare, Users, MessageCircleQuestion, Handshake, Lightbulb, Laptop, Heart, Palette, Smartphone } from "lucide-react";
+import { MessageSquare, Users, Lightbulb, Laptop, Heart, Palette, Smartphone, MessageCircleQuestion, Handshake } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -18,7 +18,6 @@ const channels: Channel[] = [
   { id: "lifestyle-wellness", name: "Lifestyle & Wellness", icon: <Heart className="h-4 w-4" /> },
   { id: "design-creativity", name: "Design & Creativity", icon: <Palette className="h-4 w-4" /> },
   { id: "apps-tech-tools", name: "Apps & Tech Tools", icon: <Smartphone className="h-4 w-4" /> },
-  { id: "user-feedback", name: "User Feedback", icon: <MessageCircleQuestion className="h-4 w-4" /> },
 ];
 
 interface ChannelListProps {
