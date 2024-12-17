@@ -5,6 +5,7 @@ import { cn } from "@/lib/utils";
 import { Trash2, RotateCcw } from "lucide-react";
 import { useState } from "react";
 import { AddIdeaDialog } from "@/components/dashboard/AddIdeaDialog";
+import { Stats } from "@/components/dashboard/Stats";
 
 interface Idea {
   id: string;
@@ -59,7 +60,11 @@ export const IdeasList = ({
 
   return (
     <div>
-      <div className="flex justify-end items-center mb-4">
+      <div className="flex justify-between items-center mb-4">
+        <Stats
+          totalIdeas={activeIdeas.length}
+          favoritesCount={ideas.filter((idea) => idea.isFavorite).length}
+        />
         <div className="flex items-center gap-2">
           {selectedIds.length > 0 && activeTab !== "trash" && (
             <Button
