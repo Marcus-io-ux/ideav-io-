@@ -1,29 +1,10 @@
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { UserPlus, UserCheck, MessageCircle, Send } from "lucide-react";
+import { MessageCircle, ThumbsUp, UserPlus, Pin } from "lucide-react";
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
-import { IdeaCardActions } from "./IdeaCardActions";
-import { IdeaComments } from "./IdeaComments";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-import { Textarea } from "@/components/ui/textarea";
-
-interface Comment {
-  id: string;
-  content: string;
-  author: {
-    name: string;
-    avatar?: string;
-  };
-  createdAt: Date;
-}
+import { supabase } from "@/integrations/supabase/client";
 
 interface IdeaCardProps {
   id: string;
@@ -38,84 +19,69 @@ interface IdeaCardProps {
   comments: number;
   tags: string[];
   createdAt: Date;
+  isPinned?: boolean;
+  emojiReactions?: Record<string, number>;
 }
 
-export const IdeaCard = ({ id, title, content, author, likes, comments: initialComments, tags, createdAt }: IdeaCardProps) => {
-  const [isFollowing, setIsFollowing] = useState(false);
+export const IdeaCard = ({
+  id,
+  title,
+  content,
+  author,
+  likes,
+  comments,
+  tags,
+  createdAt,
+  isPinned,
+  emojiReactions = {},
+}: IdeaCardProps) => {
   const [isLiked, setIsLiked] = useState(false);
   const [likeCount, setLikeCount] = useState(likes);
-  const [isFavorite, setIsFavorite] = useState(false);
-  const [showComments, setShowComments] = useState(false);
-  const [newComment, setNewComment] = useState("");
-  const [commentsList, setCommentsList] = useState<Comment[]>([]);
-  const [newMessage, setNewMessage] = useState("");
   const { toast } = useToast();
 
-  const handleFollow = () => {
-    setIsFollowing(!isFollowing);
-    toast({
-      title: isFollowing ? "Unfollowed" : "Following",
-      description: isFollowing
-        ? `You have unfollowed ${author.name}`
-        : `You are now following ${author.name}`,
-    });
+  const handleLike = async () => {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) {
+      toast({
+        title: "Please sign in",
+        description: "You need to be signed in to like posts",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const newLikeState = !isLiked;
+    setIsLiked(newLikeState);
+    setLikeCount(prev => newLikeState ? prev + 1 : prev - 1);
+
+    if (newLikeState) {
+      const { error } = await supabase
+        .from("community_post_likes")
+        .insert({ post_id: id, user_id: user.id });
+
+      if (error) {
+        console.error("Error liking post:", error);
+        setIsLiked(false);
+        setLikeCount(prev => prev - 1);
+      }
+    } else {
+      const { error } = await supabase
+        .from("community_post_likes")
+        .delete()
+        .match({ post_id: id, user_id: user.id });
+
+      if (error) {
+        console.error("Error unliking post:", error);
+        setIsLiked(true);
+        setLikeCount(prev => prev + 1);
+      }
+    }
   };
 
-  const handleLike = () => {
-    setIsLiked(!isLiked);
-    setLikeCount(prev => isLiked ? prev - 1 : prev + 1);
+  const handleCollaborate = () => {
     toast({
-      title: isLiked ? "Unliked" : "Liked",
-      description: isLiked ? "You have unliked this idea" : "You have liked this idea",
-    });
-  };
-
-  const handleFavorite = () => {
-    setIsFavorite(!isFavorite);
-    toast({
-      title: isFavorite ? "Removed from favorites" : "Added to favorites",
-      description: isFavorite 
-        ? "This idea has been removed from your favorites" 
-        : "This idea has been added to your favorites and can be found in the Favorites page",
-    });
-  };
-
-  const handleShare = () => {
-    toast({
-      title: "Share",
-      description: "Sharing functionality coming soon!",
-    });
-  };
-
-  const handleSendMessage = () => {
-    if (!newMessage.trim()) return;
-    
-    toast({
-      title: "Message Sent",
-      description: `Your message has been sent to ${author.name}`,
-    });
-    setNewMessage("");
-  };
-
-  const handleAddComment = () => {
-    if (!newComment.trim()) return;
-
-    const comment: Comment = {
-      id: Date.now().toString(),
-      content: newComment,
-      author: {
-        name: "Current User",
-        avatar: "/placeholder.svg",
-      },
-      createdAt: new Date(),
-    };
-
-    setCommentsList([...commentsList, comment]);
-    setNewComment("");
-    
-    toast({
-      title: "Comment added",
-      description: "Your comment has been posted successfully",
+      title: "Collaboration request sent",
+      description: `Your request to collaborate has been sent to ${author.name}`,
     });
   };
 
@@ -128,60 +94,23 @@ export const IdeaCard = ({ id, title, content, author, likes, comments: initialC
             <AvatarFallback>{author.name.charAt(0)}</AvatarFallback>
           </Avatar>
           <div className="flex flex-col">
-            <h3 className="text-xl font-semibold">{title}</h3>
+            <div className="flex items-center gap-2">
+              <h3 className="text-xl font-semibold">{title}</h3>
+              {isPinned && <Pin className="h-4 w-4 text-primary" />}
+            </div>
             <div className="flex items-center gap-2 mt-1">
               <span className="text-sm text-gray-600">{author.name}</span>
               <span className="text-sm text-gray-400">•</span>
               <span className="text-sm text-gray-600">
                 {new Date(createdAt).toLocaleDateString()}
               </span>
-              <div className="flex gap-2">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="transition-transform hover:scale-105"
-                  onClick={handleFollow}
-                >
-                  {isFollowing ? (
-                    <UserCheck className="w-4 h-4 text-green-500" />
-                  ) : (
-                    <UserPlus className="w-4 h-4" />
-                  )}
-                </Button>
-                <Dialog>
-                  <DialogTrigger asChild>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="transition-transform hover:scale-105"
-                    >
-                      <Send className="w-4 h-4" />
-                    </Button>
-                  </DialogTrigger>
-                  <DialogContent>
-                    <DialogHeader>
-                      <DialogTitle>Send Message to {author.name}</DialogTitle>
-                    </DialogHeader>
-                    <div className="space-y-4 mt-4">
-                      <Textarea
-                        placeholder="Write your message..."
-                        value={newMessage}
-                        onChange={(e) => setNewMessage(e.target.value)}
-                        className="min-h-[100px]"
-                      />
-                      <Button onClick={handleSendMessage} className="w-full">
-                        Send Message
-                      </Button>
-                    </div>
-                  </DialogContent>
-                </Dialog>
-              </div>
             </div>
           </div>
         </div>
       </CardHeader>
       <CardContent>
         <p className="text-gray-600 mb-4">{content}</p>
+        
         <div className="flex flex-wrap gap-2 mb-4">
           {tags.map((tag) => (
             <span
@@ -193,24 +122,42 @@ export const IdeaCard = ({ id, title, content, author, likes, comments: initialC
           ))}
         </div>
         
-        <IdeaCardActions
-          isLiked={isLiked}
-          likeCount={likeCount}
-          isFavorite={isFavorite}
-          commentsCount={commentsList.length}
-          onLike={handleLike}
-          onFavorite={handleFavorite}
-          onShare={handleShare}
-          onCommentClick={() => setShowComments(!showComments)}
-        />
+        <div className="flex items-center gap-4">
+          <Button
+            variant="ghost"
+            size="sm"
+            className={`gap-2 ${isLiked ? "text-primary" : ""}`}
+            onClick={handleLike}
+          >
+            <ThumbsUp className="h-4 w-4" />
+            <span>{likeCount}</span>
+          </Button>
+          <Button variant="ghost" size="sm" className="gap-2">
+            <MessageCircle className="h-4 w-4" />
+            <span>{comments}</span>
+          </Button>
+          <Button
+            variant="ghost"
+            size="sm"
+            className="gap-2"
+            onClick={handleCollaborate}
+          >
+            <UserPlus className="h-4 w-4" />
+            <span>Collaborate</span>
+          </Button>
+        </div>
 
-        {showComments && (
-          <IdeaComments
-            comments={commentsList}
-            newComment={newComment}
-            onNewCommentChange={setNewComment}
-            onAddComment={handleAddComment}
-          />
+        {Object.keys(emojiReactions).length > 0 && (
+          <div className="flex flex-wrap gap-2 mt-4">
+            {Object.entries(emojiReactions).map(([emoji, count]) => (
+              <span
+                key={emoji}
+                className="inline-flex items-center gap-1 px-2 py-1 bg-accent rounded-full text-sm"
+              >
+                {emoji} <span className="text-xs">{count}</span>
+              </span>
+            ))}
+          </div>
         )}
       </CardContent>
     </Card>
