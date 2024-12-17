@@ -1,15 +1,33 @@
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
-import { ArrowRight, Brain, Lock, Search, LogIn } from "lucide-react";
+import { ArrowRight, Brain, Lock, Search, LogIn, HelpCircle } from "lucide-react";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 
 const Index = () => {
   const navigate = useNavigate();
+
+  const scrollToFAQ = () => {
+    document.getElementById('faq-section')?.scrollIntoView({ behavior: 'smooth' });
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
       <nav className="container mx-auto px-4 py-6 flex justify-between items-center">
         <h1 className="text-2xl font-bold text-primary">IdeaVault</h1>
-        <div className="flex gap-4">
+        <div className="flex gap-4 items-center">
+          <Button
+            variant="ghost"
+            onClick={scrollToFAQ}
+            className="flex items-center gap-2"
+          >
+            <HelpCircle className="w-4 h-4" />
+            FAQ
+          </Button>
           <Button
             variant="outline"
             onClick={() => navigate("/dashboard")}
@@ -64,6 +82,37 @@ const Index = () => {
               Your ideas are precious. We ensure they stay private and secure.
             </p>
           </div>
+        </div>
+
+        {/* FAQ Section */}
+        <div id="faq-section" className="max-w-3xl mx-auto mt-24 mb-16 scroll-mt-20">
+          <h2 className="text-3xl font-bold text-center mb-12">Frequently Asked Questions</h2>
+          <Accordion type="single" collapsible className="w-full">
+            <AccordionItem value="item-1">
+              <AccordionTrigger>How secure are my ideas?</AccordionTrigger>
+              <AccordionContent>
+                Your ideas are encrypted and stored securely. Only you can access your private ideas, and we use industry-standard security measures to protect your data.
+              </AccordionContent>
+            </AccordionItem>
+            <AccordionItem value="item-2">
+              <AccordionTrigger>Can I collaborate with others?</AccordionTrigger>
+              <AccordionContent>
+                Yes! You can choose to share specific ideas with collaborators while keeping others private. Our platform makes it easy to work together on shared projects.
+              </AccordionContent>
+            </AccordionItem>
+            <AccordionItem value="item-3">
+              <AccordionTrigger>Is there a free plan available?</AccordionTrigger>
+              <AccordionContent>
+                Yes, we offer a free plan that includes all essential features. Premium plans are available for users who need advanced collaboration tools and increased storage.
+              </AccordionContent>
+            </AccordionItem>
+            <AccordionItem value="item-4">
+              <AccordionTrigger>How can I organize my ideas?</AccordionTrigger>
+              <AccordionContent>
+                You can use tags, folders, and our powerful search feature to organize and find your ideas quickly. We also provide customizable categories and filters.
+              </AccordionContent>
+            </AccordionItem>
+          </Accordion>
         </div>
       </div>
     </div>
