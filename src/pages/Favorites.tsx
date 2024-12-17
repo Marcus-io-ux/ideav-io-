@@ -80,35 +80,30 @@ const Favorites = () => {
   );
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="p-8">
-        <div className="max-w-6xl mx-auto">
-          <div className="flex justify-between items-center mb-8">
-            <div>
-              <h1 className="text-3xl font-bold text-gray-900">Favorite Ideas</h1>
-              <p className="text-gray-600">
-                You have {filteredIdeas.length} favorite ideas
-              </p>
+    <div className="min-h-screen bg-background">
+      <div className="container max-w-4xl py-8 space-y-8 animate-fade-in">
+        <div className="text-center space-y-4">
+          <h1 className="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary to-primary-light">
+            Favorite Ideas
+          </h1>
+          <p className="text-muted-foreground text-lg">
+            Your collection of saved inspirations
+          </p>
+        </div>
+
+        <div className="mb-8">
+          <SearchBar onSearch={handleSearch} />
+        </div>
+
+        <div className="grid gap-6">
+          {filteredIdeas.map((idea) => (
+            <IdeaCard key={idea.id} {...idea} />
+          ))}
+          {filteredIdeas.length === 0 && (
+            <div className="text-center py-12">
+              <p className="text-muted-foreground">No favorite ideas found</p>
             </div>
-          </div>
-
-          <div className="mb-8">
-            <SearchBar onSearch={handleSearch} />
-          </div>
-
-          <div className="grid gap-6">
-            {filteredIdeas.map((idea) => (
-              <IdeaCard
-                key={idea.id}
-                {...idea}
-              />
-            ))}
-            {filteredIdeas.length === 0 && (
-              <div className="text-center py-12">
-                <p className="text-gray-500">No favorite ideas found</p>
-              </div>
-            )}
-          </div>
+          )}
         </div>
       </div>
     </div>
