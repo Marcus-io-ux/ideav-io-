@@ -27,20 +27,23 @@ export const NavigationBar = () => {
               How it Works
             </button>
             <button 
-              onClick={() => scrollToSection('faq')}
+              onClick={() => scrollToSection('community')}
               className="text-gray-600 hover:text-blue-500 transition-colors"
             >
-              FAQ
-            </button>
-            <Link to="#community" className="text-gray-600 hover:text-blue-500 transition-colors">
               Community
-            </Link>
+            </button>
             <Link to="#pricing" className="text-gray-600 hover:text-blue-500 transition-colors">
               Pricing
             </Link>
             <Link to="#about" className="text-gray-600 hover:text-blue-500 transition-colors">
               About Us
             </Link>
+            <button 
+              onClick={() => scrollToSection('faq')}
+              className="text-gray-600 hover:text-blue-500 transition-colors"
+            >
+              FAQ
+            </button>
             <Button 
               asChild
               size="sm"

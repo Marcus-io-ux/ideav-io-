@@ -17,7 +17,9 @@ const Landing = () => {
           <HowItWorksSection />
           <KeyFeaturesSection />
         </div>
-        <JoinCommunitySection />
+        <div id="community">
+          <JoinCommunitySection />
+        </div>
         <TestimonialsCarousel />
         <CTASection />
       </main>
