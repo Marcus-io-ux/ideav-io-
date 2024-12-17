@@ -2,7 +2,7 @@ import { IdeaCard } from "@/components/IdeaCard";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { Trash2, RotateCcw } from "lucide-react";
+import { Trash2, RotateCcw, Lightbulb, Star } from "lucide-react";
 import { useState } from "react";
 import { AddIdeaDialog } from "@/components/dashboard/AddIdeaDialog";
 
@@ -38,6 +38,7 @@ export const IdeasList = ({
 
   const activeIdeas = ideas.filter(idea => !idea.deleted);
   const trashedIdeas = ideas.filter(idea => idea.deleted);
+  const favoriteIdeas = activeIdeas.filter(idea => idea.isFavorite);
 
   const handleSelect = (id: string) => {
     setSelectedIds(prev => 
@@ -60,7 +61,7 @@ export const IdeasList = ({
   return (
     <div>
       <div className="flex justify-between items-center mb-4">
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-4">
           {selectedIds.length > 0 && activeTab !== "trash" && (
             <Button
               variant="destructive"
@@ -83,6 +84,16 @@ export const IdeasList = ({
               Restore Selected ({selectedIds.length})
             </Button>
           )}
+          <div className="flex items-center gap-4 text-muted-foreground">
+            <span className="flex items-center gap-2">
+              <Lightbulb className="h-4 w-4" />
+              {activeIdeas.length} Ideas
+            </span>
+            <span className="flex items-center gap-2">
+              <Star className="h-4 w-4" />
+              {favoriteIdeas.length} Favorites
+            </span>
+          </div>
         </div>
         <AddIdeaDialog onIdeaSubmit={() => {}} />
       </div>
