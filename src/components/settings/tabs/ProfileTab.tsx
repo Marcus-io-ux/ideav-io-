@@ -17,13 +17,24 @@ export const ProfileTab = () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error("No user found");
       
-      const { data } = await supabase
-        .from("profiles")
-        .select("*")
-        .eq("user_id", user.id)
-        .single();
+      const [{ data: profile }, { data: onboardingData }] = await Promise.all([
+        supabase
+          .from("profiles")
+          .select("*")
+          .eq("user_id", user.id)
+          .single(),
+        supabase
+          .from("onboarding_data")
+          .select("*")
+          .eq("user_id", user.id)
+          .single()
+      ]);
       
-      return data;
+      return {
+        ...profile,
+        first_name: onboardingData?.full_name?.split(' ')[0] || '',
+        last_name: onboardingData?.full_name?.split(' ')[1] || '',
+      };
     },
   });
 
@@ -42,12 +53,22 @@ export const ProfileTab = () => {
         location: String(formData.get("location") || ""),
       };
 
-      const { error } = await supabase
-        .from("profiles")
-        .update(updates)
-        .eq("user_id", user.id);
+      const onboardingUpdates = {
+        full_name: `${String(formData.get("first_name") || "")} ${String(formData.get("last_name") || "")}`.trim(),
+      };
 
-      if (error) throw error;
+      const [{ error: profileError }, { error: onboardingError }] = await Promise.all([
+        supabase
+          .from("profiles")
+          .update(updates)
+          .eq("user_id", user.id),
+        supabase
+          .from("onboarding_data")
+          .update(onboardingUpdates)
+          .eq("user_id", user.id),
+      ]);
+
+      if (profileError || onboardingError) throw profileError || onboardingError;
 
       toast({
         title: "Profile updated",
@@ -74,6 +95,27 @@ export const ProfileTab = () => {
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-4">
+        <div className="grid grid-cols-2 gap-4">
+          <div className="space-y-2">
+            <Label htmlFor="first_name">First Name</Label>
+            <Input
+              id="first_name"
+              name="first_name"
+              defaultValue={profile?.first_name}
+              placeholder="Your first name"
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="last_name">Last Name</Label>
+            <Input
+              id="last_name"
+              name="last_name"
+              defaultValue={profile?.last_name}
+              placeholder="Your last name"
+            />
+          </div>
+        </div>
+
         <div className="space-y-2">
           <Label htmlFor="username">Username</Label>
           <Input

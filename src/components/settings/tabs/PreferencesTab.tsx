@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -27,6 +27,17 @@ export const PreferencesTab = () => {
     },
   });
 
+  useEffect(() => {
+    // Apply theme when component mounts or theme changes
+    if (settings?.theme) {
+      if (settings.theme === 'dark') {
+        document.documentElement.classList.add('dark');
+      } else {
+        document.documentElement.classList.remove('dark');
+      }
+    }
+  }, [settings?.theme]);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
@@ -48,6 +59,13 @@ export const PreferencesTab = () => {
         .eq("user_id", user.id);
 
       if (error) throw error;
+
+      // Apply theme change immediately
+      if (updates.theme === 'dark') {
+        document.documentElement.classList.add('dark');
+      } else {
+        document.documentElement.classList.remove('dark');
+      }
 
       toast({
         title: "Preferences updated",

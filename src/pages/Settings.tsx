@@ -4,6 +4,7 @@ import { ProfileTab } from "@/components/settings/tabs/ProfileTab";
 import { PreferencesTab } from "@/components/settings/tabs/PreferencesTab";
 import { NotificationsTab } from "@/components/settings/tabs/NotificationsTab";
 import { SecurityTab } from "@/components/settings/tabs/SecurityTab";
+import { PlanTab } from "@/components/settings/tabs/PlanTab";
 
 const Settings = () => {
   return (
@@ -15,6 +16,7 @@ const Settings = () => {
           <TabsTrigger value="preferences">Preferences</TabsTrigger>
           <TabsTrigger value="notifications">Notifications</TabsTrigger>
           <TabsTrigger value="security">Security</TabsTrigger>
+          <TabsTrigger value="plan">Plan</TabsTrigger>
         </TabsList>
 
         <Card className="p-6">
@@ -29,6 +31,9 @@ const Settings = () => {
           </TabsContent>
           <TabsContent value="security">
             <SecurityTab />
+          </TabsContent>
+          <TabsContent value="plan">
+            <PlanTab />
           </TabsContent>
         </Card>
       </Tabs>
