@@ -15,6 +15,7 @@ import Onboarding from "./pages/Onboarding";
 import Profile from "./pages/Profile";
 import Inbox from "./pages/Inbox";
 import Settings from "./pages/Settings";
+import Announcements from "./pages/Announcements";
 
 const queryClient = new QueryClient();
 
@@ -40,6 +41,7 @@ const App = () => {
             <Route path="/inbox" element={<Inbox />} />
             <Route path="/tags" element={<Index />} />
             <Route path="/settings" element={<Settings />} />
+            <Route path="/announcements" element={<Announcements />} />
           </Routes>
         </BrowserRouter>
       </TooltipProvider>
