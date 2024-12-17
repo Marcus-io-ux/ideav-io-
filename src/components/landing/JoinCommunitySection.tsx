@@ -53,24 +53,6 @@ export const JoinCommunitySection = () => {
           ))}
         </div>
 
-        {/* Social Proof */}
-        <div className="text-center mb-12">
-          <div className="flex justify-center gap-12 mb-8">
-            <div>
-              <p className="text-3xl font-bold text-blue-600">5,000+</p>
-              <p className="text-gray-600">Active Members</p>
-            </div>
-            <div>
-              <p className="text-3xl font-bold text-blue-600">10,000+</p>
-              <p className="text-gray-600">Ideas Shared</p>
-            </div>
-          </div>
-          <blockquote className="max-w-2xl mx-auto text-gray-600 italic">
-            "This community has helped me refine and launch my startup idea!"
-            <footer className="text-gray-500 not-italic mt-2">– Sarah, Founder</footer>
-          </blockquote>
-        </div>
-
         {/* CTA */}
         <div className="text-center">
           <Link to="/signup">
