@@ -208,6 +208,8 @@ export const IdeaCard = ({
         />
         
         <IdeaCardActions
+          postId={id}
+          ownerId={author.id}
           isLiked={isLiked}
           likeCount={likeCount}
           comments={comments}
@@ -218,20 +220,11 @@ export const IdeaCard = ({
               fetchComments();
             }
           }}
-          onCollaborate={handleCollaborate}
         />
 
         {showComments && (
           <IdeaComments
-            comments={commentsList.map(comment => ({
-              id: comment.id,
-              content: comment.content,
-              author: {
-                name: comment.profiles?.username || "Anonymous",
-                avatar: comment.profiles?.avatar_url,
-              },
-              createdAt: new Date(comment.created_at),
-            }))}
+            comments={commentsList}
             newComment={newComment}
             onNewCommentChange={setNewComment}
             onAddComment={handleAddComment}
