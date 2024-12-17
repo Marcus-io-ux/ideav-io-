@@ -1,6 +1,6 @@
 import { Link, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Home, Star, Users, MessageSquare, Settings, LogOut } from "lucide-react";
+import { Home, Star, Users, MessageSquare, Settings, LogOut, UserCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export const NavigationBar = () => {
@@ -36,17 +36,28 @@ export const NavigationBar = () => {
                 </Link>
               ))}
             </div>
-            <Button
-              variant="ghost"
-              className="flex items-center space-x-2 text-sm font-medium text-muted-foreground hover:text-primary"
-              onClick={() => {
-                // Add logout logic here
-                console.log("Logging out...");
-              }}
-            >
-              <LogOut className="h-4 w-4" />
-              <span>Logout</span>
-            </Button>
+            <div className="flex items-center space-x-4">
+              <Button
+                variant="ghost"
+                size="icon"
+                className="rounded-full"
+                onClick={() => {
+                  console.log("Profile clicked");
+                }}
+              >
+                <UserCircle className="h-5 w-5" />
+              </Button>
+              <Button
+                variant="ghost"
+                className="flex items-center space-x-2 text-sm font-medium text-muted-foreground hover:text-primary"
+                onClick={() => {
+                  console.log("Logging out...");
+                }}
+              >
+                <LogOut className="h-4 w-4" />
+                <span>Logout</span>
+              </Button>
+            </div>
           </div>
         </div>
       </div>
