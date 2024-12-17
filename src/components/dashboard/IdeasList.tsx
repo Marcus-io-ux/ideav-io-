@@ -83,8 +83,8 @@ export const IdeasList = ({
               Restore Selected ({selectedIds.length})
             </Button>
           )}
-          <AddIdeaDialog onIdeaSubmit={() => {}} />
         </div>
+        <AddIdeaDialog onIdeaSubmit={() => {}} />
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="mb-8">
