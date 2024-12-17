@@ -12,6 +12,7 @@ interface MembershipTier {
   price: number;
   description: string;
   features: string[];
+  created_at?: string;
 }
 
 interface UserMembership {
@@ -43,6 +44,12 @@ export function SubscriptionSettings() {
 
         if (tiersError) throw tiersError;
 
+        // Transform the features from Json to string[]
+        const transformedTiers = tiersData.map(tier => ({
+          ...tier,
+          features: Array.isArray(tier.features) ? tier.features : []
+        }));
+
         // Fetch user's current membership
         const { data: membershipData, error: membershipError } = await supabase
           .from("user_memberships")
@@ -52,7 +59,7 @@ export function SubscriptionSettings() {
 
         if (membershipError && membershipError.code !== "PGRST116") throw membershipError;
 
-        setTiers(tiersData);
+        setTiers(transformedTiers);
         setCurrentMembership(membershipData);
       }
     } catch (error) {

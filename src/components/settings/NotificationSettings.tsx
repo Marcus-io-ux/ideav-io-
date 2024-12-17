@@ -7,6 +7,13 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2 } from "lucide-react";
 
+interface NotificationPreferences {
+  collaboration_requests: boolean;
+  comments: boolean;
+  mentions: boolean;
+  updates: boolean;
+}
+
 export function NotificationSettings() {
   const [loading, setLoading] = useState(false);
   const [settings, setSettings] = useState({
@@ -17,7 +24,7 @@ export function NotificationSettings() {
       comments: true,
       mentions: true,
       updates: true,
-    },
+    } as NotificationPreferences,
   });
   const { toast } = useToast();
 
@@ -36,15 +43,19 @@ export function NotificationSettings() {
           .single();
 
         if (userSettings) {
+          const notificationPrefs = typeof userSettings.notification_preferences === 'object' 
+            ? userSettings.notification_preferences as NotificationPreferences 
+            : {
+                collaboration_requests: true,
+                comments: true,
+                mentions: true,
+                updates: true,
+              };
+
           setSettings({
             email_notifications: userSettings.email_notifications,
             push_notifications: userSettings.push_notifications,
-            notification_preferences: userSettings.notification_preferences || {
-              collaboration_requests: true,
-              comments: true,
-              mentions: true,
-              updates: true,
-            },
+            notification_preferences: notificationPrefs,
           });
         }
       }
