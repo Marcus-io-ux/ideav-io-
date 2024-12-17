@@ -14,6 +14,7 @@ import {
   Lock,
   Unlock,
 } from "lucide-react";
+import { ProfileHeader } from "@/components/profile/ProfileHeader";
 
 const Profile = () => {
   const [isPublic, setIsPublic] = useState(false);
@@ -43,32 +44,27 @@ const Profile = () => {
     <div className="min-h-screen bg-gray-50 py-8">
       <div className="max-w-6xl mx-auto px-4">
         <div className="space-y-8">
-          {/* Profile Header */}
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-4">
-              <div className="h-20 w-20 rounded-full bg-gray-200 flex items-center justify-center">
-                <span className="text-2xl font-semibold text-gray-600">JD</span>
-              </div>
-              <div>
-                <h1 className="text-2xl font-bold">John Doe</h1>
-                <p className="text-gray-600">Joined January 2024</p>
-              </div>
-            </div>
-            <div className="flex items-center space-x-2">
-              {isPublic ? (
-                <Unlock className="h-4 w-4 text-green-500" />
-              ) : (
-                <Lock className="h-4 w-4 text-gray-500" />
-              )}
-              <Switch
-                checked={isPublic}
-                onCheckedChange={handlePrivacyChange}
-                id="profile-privacy"
-              />
-              <Label htmlFor="profile-privacy">
-                {isPublic ? "Public Profile" : "Private Profile"}
-              </Label>
-            </div>
+          <ProfileHeader
+            username="johndoe"
+            fullName="John Doe"
+            location="San Francisco, CA"
+            bio="Passionate about creating and sharing ideas that make a difference."
+          />
+
+          <div className="flex items-center space-x-2 mb-6">
+            {isPublic ? (
+              <Unlock className="h-4 w-4 text-green-500" />
+            ) : (
+              <Lock className="h-4 w-4 text-gray-500" />
+            )}
+            <Switch
+              checked={isPublic}
+              onCheckedChange={handlePrivacyChange}
+              id="profile-privacy"
+            />
+            <Label htmlFor="profile-privacy">
+              {isPublic ? "Public Profile" : "Private Profile"}
+            </Label>
           </div>
 
           <Separator />

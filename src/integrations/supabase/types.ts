@@ -296,22 +296,28 @@ export type Database = {
       profiles: {
         Row: {
           avatar_url: string | null
+          bio: string | null
           created_at: string | null
           id: string
+          location: string | null
           user_id: string | null
           username: string | null
         }
         Insert: {
           avatar_url?: string | null
+          bio?: string | null
           created_at?: string | null
           id?: string
+          location?: string | null
           user_id?: string | null
           username?: string | null
         }
         Update: {
           avatar_url?: string | null
+          bio?: string | null
           created_at?: string | null
           id?: string
+          location?: string | null
           user_id?: string | null
           username?: string | null
         }
@@ -410,33 +416,39 @@ export type Database = {
         Row: {
           completed_tour: boolean | null
           created_at: string | null
+          email_notifications: boolean | null
           font_size: string | null
           id: string
           language: string | null
           notification_preferences: Json | null
           profile_visibility: string | null
+          push_notifications: boolean | null
           theme: string | null
           user_id: string | null
         }
         Insert: {
           completed_tour?: boolean | null
           created_at?: string | null
+          email_notifications?: boolean | null
           font_size?: string | null
           id?: string
           language?: string | null
           notification_preferences?: Json | null
           profile_visibility?: string | null
+          push_notifications?: boolean | null
           theme?: string | null
           user_id?: string | null
         }
         Update: {
           completed_tour?: boolean | null
           created_at?: string | null
+          email_notifications?: boolean | null
           font_size?: string | null
           id?: string
           language?: string | null
           notification_preferences?: Json | null
           profile_visibility?: string | null
+          push_notifications?: boolean | null
           theme?: string | null
           user_id?: string | null
         }
