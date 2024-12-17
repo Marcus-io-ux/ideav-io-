@@ -62,29 +62,31 @@ export const IdeasList = ({
     <div>
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4">
         <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 w-full sm:w-auto">
-          {selectedIds.length > 0 && activeTab !== "trash" && (
-            <Button
-              variant="destructive"
-              size="sm"
-              onClick={handleBulkDelete}
-              className="flex items-center gap-2 w-full sm:w-auto"
-            >
-              <Trash2 className="h-4 w-4" />
-              Delete Selected ({selectedIds.length})
-            </Button>
-          )}
-          {selectedIds.length > 0 && activeTab === "trash" && (
-            <Button
-              variant="default"
-              size="sm"
-              onClick={handleBulkRestore}
-              className="flex items-center gap-2 w-full sm:w-auto"
-            >
-              <RotateCcw className="h-4 w-4" />
-              Restore Selected ({selectedIds.length})
-            </Button>
-          )}
-          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-4 bg-white dark:bg-blue-900/20 rounded-lg px-4 py-2 border border-blue-100 dark:border-blue-800 shadow-lg hover:shadow-xl transition-all duration-300 w-full sm:w-auto">
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full sm:w-auto">
+            {selectedIds.length > 0 && activeTab !== "trash" && (
+              <Button
+                variant="destructive"
+                size="sm"
+                onClick={handleBulkDelete}
+                className="flex items-center justify-center gap-2"
+              >
+                <Trash2 className="h-4 w-4" />
+                Delete Selected ({selectedIds.length})
+              </Button>
+            )}
+            {selectedIds.length > 0 && activeTab === "trash" && (
+              <Button
+                variant="default"
+                size="sm"
+                onClick={handleBulkRestore}
+                className="flex items-center justify-center gap-2"
+              >
+                <RotateCcw className="h-4 w-4" />
+                Restore Selected ({selectedIds.length})
+              </Button>
+            )}
+          </div>
+          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-4 bg-white dark:bg-blue-900/20 rounded-lg px-4 py-2 border border-blue-100 dark:border-blue-800 shadow-lg hover:shadow-xl transition-all duration-300">
             <span className="flex items-center gap-2 text-blue-700 dark:text-blue-300 whitespace-nowrap">
               <Lightbulb className="h-4 w-4" />
               {activeIdeas.length} Ideas
