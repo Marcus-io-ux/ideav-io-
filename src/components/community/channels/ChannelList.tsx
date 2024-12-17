@@ -1,4 +1,4 @@
-import { MessageSquare, Megaphone, Users, Bookmark, MessageCircleQuestion, Handshake } from "lucide-react";
+import { MessageSquare, Megaphone, Users, Bookmark, MessageCircleQuestion, Handshake, Lightbulb, Laptop, Heart, Palette, Smartphone } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -13,7 +13,12 @@ interface Channel {
 
 const channels: Channel[] = [
   { id: "announcements", name: "Announcements", icon: <Megaphone className="h-4 w-4" /> },
-  { id: "general", name: "General Discussion", icon: <MessageSquare className="h-4 w-4" /> },
+  { id: "community-ideas", name: "Community Ideas", icon: <MessageSquare className="h-4 w-4" /> },
+  { id: "startups-business", name: "Startups & Business Ideas", icon: <Lightbulb className="h-4 w-4" /> },
+  { id: "tech-innovation", name: "Tech & Innovation", icon: <Laptop className="h-4 w-4" /> },
+  { id: "lifestyle-wellness", name: "Lifestyle & Wellness", icon: <Heart className="h-4 w-4" /> },
+  { id: "design-creativity", name: "Design & Creativity", icon: <Palette className="h-4 w-4" /> },
+  { id: "apps-tech-tools", name: "Apps & Tech Tools", icon: <Smartphone className="h-4 w-4" /> },
   { id: "shared-ideas", name: "Shared Ideas", icon: <Users className="h-4 w-4" /> },
   { id: "feedback", name: "Feedback Requests", icon: <MessageCircleQuestion className="h-4 w-4" /> },
   { id: "collaboration", name: "Collaboration Corner", icon: <Handshake className="h-4 w-4" /> },
