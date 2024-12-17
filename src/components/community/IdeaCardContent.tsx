@@ -1,12 +1,18 @@
+import { IdeaBadge } from "./badges/IdeaBadge";
+
 interface IdeaCardContentProps {
   content: string;
   tags: string[];
+  category?: string;
+  feedbackType?: string;
   emojiReactions?: Record<string, number>;
 }
 
 export const IdeaCardContent = ({
   content,
   tags,
+  category,
+  feedbackType,
   emojiReactions = {},
 }: IdeaCardContentProps) => {
   return (
@@ -14,6 +20,12 @@ export const IdeaCardContent = ({
       <p className="text-gray-600 mb-4">{content}</p>
       
       <div className="flex flex-wrap gap-2 mb-4">
+        {category && (
+          <IdeaBadge type="category" label={category} />
+        )}
+        {feedbackType && (
+          <IdeaBadge type="feedback" label={feedbackType} />
+        )}
         {tags.map((tag) => (
           <span
             key={tag}

@@ -20,6 +20,8 @@ interface IdeaCardProps {
   likes: number;
   comments: number;
   tags: string[];
+  category?: string;
+  feedbackType?: string;
   createdAt: Date;
   isPinned?: boolean;
   emojiReactions?: Record<string, number>;
@@ -31,6 +33,8 @@ export const IdeaCard = ({
   content,
   author,
   tags,
+  category,
+  feedbackType,
   createdAt,
   isPinned,
   emojiReactions = {},
@@ -156,6 +160,8 @@ export const IdeaCard = ({
         <IdeaCardContent
           content={content}
           tags={tags}
+          category={category}
+          feedbackType={feedbackType}
           emojiReactions={emojiReactions}
         />
         
