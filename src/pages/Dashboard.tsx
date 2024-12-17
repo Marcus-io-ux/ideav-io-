@@ -254,19 +254,24 @@ const Dashboard = () => {
             description={`"${dailyQuote}"`}
           />
 
-          <Stats
-            totalIdeas={ideas.filter(i => !i.deleted).length}
-            favoritesCount={ideas.filter((idea) => idea.isFavorite).length}
-          />
+          <div className="space-y-8">
+            <div className="flex flex-col md:flex-row md:justify-between md:items-start gap-4">
+              <h3 className="text-lg font-semibold">Your Ideas</h3>
+              <Stats
+                totalIdeas={ideas.filter(i => !i.deleted).length}
+                favoritesCount={ideas.filter((idea) => idea.isFavorite).length}
+              />
+            </div>
 
-          <IdeasList
-            ideas={ideas}
-            showFavoritesOnly={showFavoritesOnly}
-            onToggleFavorites={handleToggleFavorites}
-            onEditIdea={handleEditIdea}
-            onDeleteIdeas={handleDeleteIdeas}
-            onRestoreIdeas={handleRestoreIdeas}
-          />
+            <IdeasList
+              ideas={ideas}
+              showFavoritesOnly={showFavoritesOnly}
+              onToggleFavorites={handleToggleFavorites}
+              onEditIdea={handleEditIdea}
+              onDeleteIdeas={handleDeleteIdeas}
+              onRestoreIdeas={handleRestoreIdeas}
+            />
+          </div>
         </div>
       </div>
     </div>
