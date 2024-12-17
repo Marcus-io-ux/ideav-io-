@@ -35,9 +35,9 @@ const Community = () => {
         .from("community_posts")
         .select(`
           *,
-          author:user_id (
-            username:profiles(username),
-            avatar_url:profiles(avatar_url)
+          author:profiles!community_posts_user_id_fkey (
+            username,
+            avatar_url
           )
         `)
         .eq("channel", activeChannel)
@@ -49,7 +49,19 @@ const Community = () => {
         return;
       }
 
-      setPosts(data || []);
+      // Parse emoji_reactions from JSON to Record<string, number>
+      const parsedPosts = data?.map(post => ({
+        ...post,
+        emoji_reactions: typeof post.emoji_reactions === 'string' 
+          ? JSON.parse(post.emoji_reactions) 
+          : post.emoji_reactions || {},
+        author: {
+          username: post.author?.username || "Anonymous",
+          avatar_url: post.author?.avatar_url || "",
+        }
+      }));
+
+      setPosts(parsedPosts || []);
     };
 
     fetchPosts();

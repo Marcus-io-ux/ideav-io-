@@ -20,7 +20,7 @@ export const ActiveUsersList = () => {
         .select(`
           user_id,
           status,
-          profiles:user_id (
+          profiles!user_presence_user_id_fkey (
             username,
             avatar_url
           )
