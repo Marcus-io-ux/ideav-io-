@@ -13,6 +13,7 @@ export const NavigationBar = () => {
     { label: "Ideas", icon: Home, path: "/dashboard" },
     { label: "Profile", icon: UserCircle, path: "/profile" },
     { label: "Community", icon: Users, path: "/community" },
+    { label: "About Us", icon: Users, path: "/about" },
     { label: "Inbox", icon: Inbox, path: "/inbox" },
     { label: "Settings", icon: Settings, path: "/settings" },
   ];
