@@ -40,9 +40,9 @@ const Index = () => {
         </div>
       </nav>
 
-      <div className="container mx-auto px-4 py-16">
+      <main className="container mx-auto px-4">
         {/* Hero Section */}
-        <div className="text-center mb-16">
+        <div className="text-center mb-16 pt-16">
           <h1 className="text-5xl md:text-6xl font-bold text-gray-900 mb-6">
             Capture Your Brilliant Ideas
           </h1>
@@ -59,7 +59,7 @@ const Index = () => {
         </div>
 
         {/* Features Section */}
-        <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+        <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto mb-16">
           <div className="bg-white p-8 rounded-xl shadow-md hover:shadow-lg transition-shadow">
             <Brain className="w-12 h-12 text-primary mb-4" />
             <h3 className="text-xl font-semibold mb-3">Effortless Capture</h3>
@@ -86,10 +86,12 @@ const Index = () => {
         </div>
 
         {/* Testimonials Section */}
-        <TestimonialsCarousel />
+        <div className="w-full mb-16">
+          <TestimonialsCarousel />
+        </div>
 
         {/* FAQ Section */}
-        <div id="faq-section" className="max-w-3xl mx-auto mt-24 mb-16 scroll-mt-20">
+        <div id="faq-section" className="max-w-3xl mx-auto mb-16 scroll-mt-20">
           <h2 className="text-3xl font-bold text-center mb-12">Frequently Asked Questions</h2>
           <Accordion type="single" collapsible className="w-full">
             <AccordionItem value="item-1">
@@ -118,7 +120,7 @@ const Index = () => {
             </AccordionItem>
           </Accordion>
         </div>
-      </div>
+      </main>
     </div>
   );
 };
