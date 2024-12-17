@@ -3,7 +3,7 @@ import { ChannelList } from "@/components/community/channels/ChannelList";
 import { ActiveUsersList } from "@/components/community/users/ActiveUsersList";
 import { IdeaCard } from "@/components/community/IdeaCard";
 import { Button } from "@/components/ui/button";
-import { Plus, Menu } from "lucide-react";
+import { Plus, Menu, Users } from "lucide-react";
 import { ShareIdeaModal } from "@/components/community/ShareIdeaModal";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { supabase } from "@/integrations/supabase/client";
