@@ -9,6 +9,8 @@ import { useToast } from "@/hooks/use-toast";
 import { Stats } from "@/components/dashboard/Stats";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { cn } from "@/lib/utils";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
 
 interface Idea {
   id: string;
@@ -18,6 +20,7 @@ interface Idea {
   createdAt: Date;
   priority?: "high" | "medium" | "low";
   isFavorite?: boolean;
+  sharedToCommunity?: boolean;
 }
 
 const Dashboard = () => {
@@ -42,7 +45,12 @@ const Dashboard = () => {
     },
   ]);
   
-  const [newIdea, setNewIdea] = useState({ title: "", content: "", tags: "" });
+  const [newIdea, setNewIdea] = useState({ 
+    title: "", 
+    content: "", 
+    tags: "",
+    shareToCommunity: false 
+  });
   const [showFavoritesOnly, setShowFavoritesOnly] = useState(false);
   const { toast } = useToast();
 
@@ -63,15 +71,24 @@ const Dashboard = () => {
       tags: newIdea.tags.split(",").map(tag => tag.trim()).filter(tag => tag),
       createdAt: new Date(),
       isFavorite: false,
+      sharedToCommunity: newIdea.shareToCommunity
     };
 
     setIdeas([idea, ...ideas]);
-    setNewIdea({ title: "", content: "", tags: "" });
     
-    toast({
-      title: "Success!",
-      description: "Your idea has been saved.",
-    });
+    if (newIdea.shareToCommunity) {
+      toast({
+        title: "Idea Shared!",
+        description: "Your idea has been saved and shared to the community.",
+      });
+    } else {
+      toast({
+        title: "Success!",
+        description: "Your idea has been saved.",
+      });
+    }
+
+    setNewIdea({ title: "", content: "", tags: "", shareToCommunity: false });
   };
 
   const filteredIdeas = ideas.filter(
@@ -79,8 +96,6 @@ const Dashboard = () => {
   );
 
   const highPriorityCount = ideas.filter(idea => idea.priority === "high").length;
-
-  // Mock following counts for now
   const followersCount = 128;
   const followingCount = 89;
 
@@ -88,7 +103,6 @@ const Dashboard = () => {
     <div className="min-h-screen bg-gray-50">
       <div className="p-8">
         <div className="max-w-6xl mx-auto">
-          {/* Header */}
           <div className="flex justify-between items-center mb-8">
             <div>
               <h1 className="text-3xl font-bold text-gray-900">Welcome back, John!</h1>
@@ -108,24 +122,35 @@ const Dashboard = () => {
                     placeholder="Title"
                     value={newIdea.title}
                     onChange={(e) => setNewIdea({ ...newIdea, title: e.target.value })}
+                    className="w-full"
                   />
                   <Textarea
                     placeholder="Describe your idea..."
                     value={newIdea.content}
                     onChange={(e) => setNewIdea({ ...newIdea, content: e.target.value })}
+                    className="min-h-[100px]"
                   />
                   <Input
                     placeholder="Tags (comma-separated)"
                     value={newIdea.tags}
                     onChange={(e) => setNewIdea({ ...newIdea, tags: e.target.value })}
                   />
+                  <div className="flex items-center space-x-2">
+                    <Switch
+                      id="share-to-community"
+                      checked={newIdea.shareToCommunity}
+                      onCheckedChange={(checked) => 
+                        setNewIdea({ ...newIdea, shareToCommunity: checked })
+                      }
+                    />
+                    <Label htmlFor="share-to-community">Share to Community</Label>
+                  </div>
                   <Button onClick={handleAddIdea}>Save Idea</Button>
                 </div>
               </DialogContent>
             </Dialog>
           </div>
 
-          {/* Stats Row */}
           <div className="mb-8">
             <Stats
               totalIdeas={ideas.length}
@@ -135,7 +160,6 @@ const Dashboard = () => {
             />
           </div>
 
-          {/* Ideas Sections */}
           <div>
             <div className="flex justify-between items-center mb-4">
               <h3 className="text-lg font-semibold">Your Ideas</h3>
