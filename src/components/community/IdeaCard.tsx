@@ -1,9 +1,20 @@
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { Heart, MessageSquare, UserPlus, UserCheck, Share2, Bookmark } from "lucide-react";
+import { Heart, MessageSquare, UserPlus, UserCheck, Share2, Bookmark, Send } from "lucide-react";
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
+import { Input } from "@/components/ui/input";
+
+interface Comment {
+  id: string;
+  content: string;
+  author: {
+    name: string;
+    avatar?: string;
+  };
+  createdAt: Date;
+}
 
 interface IdeaCardProps {
   id: string;
@@ -20,11 +31,14 @@ interface IdeaCardProps {
   createdAt: Date;
 }
 
-export const IdeaCard = ({ id, title, content, author, likes, comments, tags, createdAt }: IdeaCardProps) => {
+export const IdeaCard = ({ id, title, content, author, likes, comments: initialComments, tags, createdAt }: IdeaCardProps) => {
   const [isFollowing, setIsFollowing] = useState(false);
   const [isLiked, setIsLiked] = useState(false);
   const [likeCount, setLikeCount] = useState(likes);
   const [isBookmarked, setIsBookmarked] = useState(false);
+  const [showComments, setShowComments] = useState(false);
+  const [newComment, setNewComment] = useState("");
+  const [commentsList, setCommentsList] = useState<Comment[]>([]);
   const { toast } = useToast();
 
   const handleFollow = () => {
@@ -61,6 +75,28 @@ export const IdeaCard = ({ id, title, content, author, likes, comments, tags, cr
     toast({
       title: "Share",
       description: "Sharing functionality coming soon!",
+    });
+  };
+
+  const handleAddComment = () => {
+    if (!newComment.trim()) return;
+
+    const comment: Comment = {
+      id: Date.now().toString(),
+      content: newComment,
+      author: {
+        name: "Current User", // In a real app, this would come from auth
+        avatar: "/placeholder.svg",
+      },
+      createdAt: new Date(),
+    };
+
+    setCommentsList([...commentsList, comment]);
+    setNewComment("");
+    
+    toast({
+      title: "Comment added",
+      description: "Your comment has been posted successfully",
     });
   };
 
@@ -126,9 +162,10 @@ export const IdeaCard = ({ id, title, content, author, likes, comments, tags, cr
             variant="ghost" 
             size="sm" 
             className="group flex items-center gap-2 transition-transform hover:scale-105"
+            onClick={() => setShowComments(!showComments)}
           >
             <MessageSquare className="w-5 h-5 group-hover:text-primary" />
-            <span className="text-sm">{comments}</span>
+            <span className="text-sm">{commentsList.length}</span>
           </Button>
           <Button 
             variant="ghost" 
@@ -151,6 +188,43 @@ export const IdeaCard = ({ id, title, content, author, likes, comments, tags, cr
             <Share2 className="w-5 h-5 group-hover:text-primary" />
           </Button>
         </div>
+
+        {showComments && (
+          <div className="mt-4 space-y-4">
+            <div className="max-h-48 overflow-y-auto space-y-2">
+              {commentsList.map((comment) => (
+                <div key={comment.id} className="bg-gray-50 p-3 rounded-lg">
+                  <div className="flex justify-between items-start">
+                    <div className="flex items-center gap-2">
+                      <Avatar className="w-6 h-6">
+                        <AvatarImage src={comment.author.avatar} />
+                        <AvatarFallback>{comment.author.name.charAt(0)}</AvatarFallback>
+                      </Avatar>
+                      <span className="font-medium text-sm">{comment.author.name}</span>
+                    </div>
+                    <span className="text-xs text-gray-500">
+                      {new Date(comment.createdAt).toLocaleDateString()}
+                    </span>
+                  </div>
+                  <p className="text-sm mt-1 ml-8">{comment.content}</p>
+                </div>
+              ))}
+            </div>
+            
+            <div className="flex gap-2">
+              <Input
+                placeholder="Write a comment..."
+                value={newComment}
+                onChange={(e) => setNewComment(e.target.value)}
+                onKeyPress={(e) => e.key === 'Enter' && handleAddComment()}
+                className="flex-1"
+              />
+              <Button onClick={handleAddComment} size="icon">
+                <Send className="h-4 w-4" />
+              </Button>
+            </div>
+          </div>
+        )}
       </CardContent>
     </Card>
   );
