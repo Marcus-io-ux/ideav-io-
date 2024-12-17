@@ -1,7 +1,7 @@
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { UserPlus, UserCheck, MessageSquare } from "lucide-react";
+import { UserPlus, UserCheck, MessageCircle, Send } from "lucide-react";
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { IdeaCardActions } from "./IdeaCardActions";
@@ -155,7 +155,7 @@ export const IdeaCard = ({ id, title, content, author, likes, comments: initialC
                       size="sm"
                       className="transition-transform hover:scale-105"
                     >
-                      <MessageSquare className="w-4 h-4" />
+                      <Send className="w-4 h-4" />
                     </Button>
                   </DialogTrigger>
                   <DialogContent>
