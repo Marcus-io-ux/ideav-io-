@@ -14,7 +14,6 @@ interface Idea {
   content: string;
   tags: string[];
   createdAt: Date;
-  priority?: "high" | "medium" | "low";
   isFavorite?: boolean;
   sharedToCommunity?: boolean;
   deleted?: boolean;
@@ -23,7 +22,6 @@ interface Idea {
 const Dashboard = () => {
   const [ideas, setIdeas] = useState<Idea[]>([]);
   const [userName, setUserName] = useState("");
-  const [currentStreak, setCurrentStreak] = useState(0);
   const [showFavoritesOnly, setShowFavoritesOnly] = useState(false);
   const [dailyQuote] = useState("The best way to predict the future is to create it.");
   const { toast } = useToast();
@@ -31,72 +29,25 @@ const Dashboard = () => {
   useEffect(() => {
     fetchIdeas();
     fetchUserProfile();
-    fetchUserStreak();
   }, []);
-
-  const fetchUserStreak = async () => {
-    try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return;
-
-      // First try to get the user's points
-      let { data: userPoints, error } = await supabase
-        .from('user_points')
-        .select('current_streak')
-        .eq('user_id', user.id)
-        .maybeSingle();
-
-      if (error) throw error;
-      
-      // If no points record exists, create one
-      if (!userPoints) {
-        const { data: newPoints, error: insertError } = await supabase
-          .from('user_points')
-          .insert([
-            { 
-              user_id: user.id,
-              current_streak: 0,
-              points: 0,
-              badges: []
-            }
-          ])
-          .select()
-          .single();
-
-        if (insertError) throw insertError;
-        userPoints = newPoints;
-      }
-
-      setCurrentStreak(userPoints?.current_streak || 0);
-    } catch (error) {
-      console.error('Error fetching user streak:', error);
-      toast({
-        title: "Error",
-        description: "Failed to fetch streak data. Please try again.",
-        variant: "destructive",
-      });
-    }
-  };
 
   const fetchUserProfile = async () => {
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
 
-      // First try to get existing onboarding data
       let { data: profile, error } = await supabase
         .from('onboarding_data')
         .select('full_name')
         .eq('user_id', user.id)
         .maybeSingle();
 
-      // If no profile exists, create one
       if (!profile) {
         const { data: newProfile, error: insertError } = await supabase
           .from('onboarding_data')
           .insert([{ 
             user_id: user.id,
-            full_name: user.email?.split('@')[0] || 'User' // Default name from email
+            full_name: user.email?.split('@')[0] || 'User'
           }])
           .select('full_name')
           .single();
@@ -110,7 +61,7 @@ const Dashboard = () => {
       }
     } catch (error) {
       console.error('Error fetching user profile:', error);
-      setUserName("User"); // Fallback name
+      setUserName("User");
     }
   };
 
@@ -218,7 +169,6 @@ const Dashboard = () => {
   };
 
   const handleEditIdea = async (id: string) => {
-    // This will be implemented in the next iteration
     toast({
       title: "Coming Soon",
       description: "Edit functionality will be available soon!",
@@ -307,7 +257,6 @@ const Dashboard = () => {
           <Stats
             totalIdeas={ideas.filter(i => !i.deleted).length}
             favoritesCount={ideas.filter((idea) => idea.isFavorite).length}
-            currentStreak={currentStreak}
           />
 
           <IdeasList
