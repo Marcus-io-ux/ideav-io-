@@ -55,6 +55,30 @@ const testimonials = [
     author: "Thomas Chen",
     role: "Tech Innovator",
     avatar: "https://i.pravatar.cc/150?u=thomas",
+  },
+  {
+    content: "Being part of this community has accelerated my professional growth exponentially.",
+    author: "Sarah Johnson",
+    role: "Digital Strategist",
+    avatar: "https://i.pravatar.cc/150?u=sarah",
+  },
+  {
+    content: "The platform's approach to idea validation and feedback has been instrumental in refining my concepts.",
+    author: "Marcus Lee",
+    role: "Product Innovator",
+    avatar: "https://i.pravatar.cc/150?u=marcus",
+  },
+  {
+    content: "I've found an incredible network of mentors and collaborators here. The community is truly special.",
+    author: "Rachel Cohen",
+    role: "Startup Advisor",
+    avatar: "https://i.pravatar.cc/150?u=rachel",
+  },
+  {
+    content: "The structured approach to idea development has helped me turn multiple concepts into successful projects.",
+    author: "Daniel Martinez",
+    role: "Serial Entrepreneur",
+    avatar: "https://i.pravatar.cc/150?u=daniel",
   }
 ];
 
@@ -65,7 +89,7 @@ export const TestimonialsCarousel = () => {
       align: "start",
       skipSnaps: false,
     },
-    [Autoplay({ delay: 3000, stopOnInteraction: false })]
+    [Autoplay({ delay: 2000, stopOnInteraction: false })]
   );
 
   return (
