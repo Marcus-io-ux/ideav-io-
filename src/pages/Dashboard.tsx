@@ -1,10 +1,12 @@
 import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { Stats } from "@/components/dashboard/Stats";
-import { AddIdeaDialog } from "@/components/dashboard/AddIdeaDialog";
 import { IdeasList } from "@/components/dashboard/IdeasList";
 import { supabase } from "@/integrations/supabase/client";
 import { PageHeader } from "@/components/ui/page-header";
+import { Tables } from "@/integrations/supabase/types";
+
+type IdeaDB = Tables<"ideas">;
 
 interface Idea {
   id: string;
