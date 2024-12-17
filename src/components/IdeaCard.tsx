@@ -49,7 +49,7 @@ export const IdeaCard = ({
   };
 
   const handleEdit = (e: React.MouseEvent) => {
-    e.stopPropagation(); // Prevent event bubbling
+    e.stopPropagation();
     if (onEdit) {
       onEdit(id);
     }
@@ -65,14 +65,14 @@ export const IdeaCard = ({
     <Card 
       onClick={handleCardClick}
       className={cn(
-        "w-full hover:shadow-lg transition-shadow duration-300 animate-fade-in group",
-        isSelected && "border-primary",
-        onEdit && "cursor-pointer hover:bg-gray-50"
+        "w-full hover:shadow-lg transition-shadow duration-300 animate-fade-in group bg-white/50 backdrop-blur-sm border border-primary/10",
+        isSelected && "border-primary ring-2 ring-primary/20",
+        onEdit && "cursor-pointer hover:bg-primary/5"
       )}
     >
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
         <div className="flex items-center gap-2">
-          <CardTitle className="text-xl font-semibold">
+          <CardTitle className="text-xl font-semibold bg-clip-text text-transparent bg-gradient-primary">
             {title}
           </CardTitle>
           <CardHeaderActions
@@ -82,19 +82,19 @@ export const IdeaCard = ({
           />
         </div>
         <div className="flex items-center gap-4">
-          <span className="text-sm text-gray-500">
+          <span className="text-sm text-muted-foreground">
             {formatDistanceToNow(createdAt, { addSuffix: true })}
           </span>
           {onSelect && (
             <Checkbox
               checked={isSelected}
               onCheckedChange={() => onSelect(id)}
-              onClick={(e) => e.stopPropagation()} // Prevent card click when selecting
+              onClick={(e) => e.stopPropagation()}
             />
           )}
         </div>
       </CardHeader>
-      <CardContent className="text-gray-600">
+      <CardContent className="text-secondary-foreground/80">
         <p>{content}</p>
       </CardContent>
     </Card>
