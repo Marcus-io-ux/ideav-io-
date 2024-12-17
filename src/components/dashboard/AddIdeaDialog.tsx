@@ -20,6 +20,7 @@ interface AddIdeaDialogProps {
 }
 
 export const AddIdeaDialog = ({ onIdeaSubmit }: AddIdeaDialogProps) => {
+  const [open, setOpen] = useState(false);
   const [newIdea, setNewIdea] = useState({
     title: "",
     content: "",
@@ -40,6 +41,7 @@ export const AddIdeaDialog = ({ onIdeaSubmit }: AddIdeaDialogProps) => {
       }, 1000);
     } else if (showSuccess && redirectCountdown === 0) {
       navigate("/dashboard");
+      setOpen(false); // Close the dialog when redirecting
     }
     return () => clearTimeout(timer);
   }, [showSuccess, redirectCountdown, navigate]);
@@ -74,10 +76,12 @@ export const AddIdeaDialog = ({ onIdeaSubmit }: AddIdeaDialogProps) => {
 
     setShowSuccess(true);
     setNewIdea({ title: "", content: "", tags: "", shareToCommunity: false });
+    setOpen(false); // Close the dialog after successful submission
   };
 
   const handleViewIdea = () => {
     navigate(`/dashboard?highlight=${savedIdeaId}`);
+    setOpen(false);
   };
 
   const handleCreateAnother = () => {
@@ -91,9 +95,9 @@ export const AddIdeaDialog = ({ onIdeaSubmit }: AddIdeaDialogProps) => {
   };
 
   return (
-    <Dialog>
+    <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <AddIdeaButton onClick={() => {}} />
+        <AddIdeaButton onClick={() => setOpen(true)} />
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
