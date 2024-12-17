@@ -6,6 +6,7 @@ import { IdeaComments } from "./IdeaComments";
 import { IdeaCardHeader } from "./IdeaCardHeader";
 import { IdeaCardActions } from "./IdeaCardActions";
 import { IdeaCardContent } from "./IdeaCardContent";
+import { usePostInteractions } from "@/hooks/use-post-interactions";
 
 interface IdeaCardProps {
   id: string;
@@ -29,94 +30,33 @@ export const IdeaCard = ({
   title,
   content,
   author,
-  likes,
-  comments: initialComments,
   tags,
   createdAt,
   isPinned,
   emojiReactions = {},
 }: IdeaCardProps) => {
-  const [isLiked, setIsLiked] = useState(false);
-  const [isFavorite, setIsFavorite] = useState(false);
-  const [likeCount, setLikeCount] = useState(likes);
-  const [commentCount, setCommentCount] = useState(initialComments);
   const [showComments, setShowComments] = useState(false);
   const [commentsList, setCommentsList] = useState<any[]>([]);
   const [newComment, setNewComment] = useState("");
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
   const { toast } = useToast();
 
+  const {
+    isLiked,
+    setIsLiked,
+    isFavorite,
+    setIsFavorite,
+    likeCount,
+    commentCount
+  } = usePostInteractions(id, currentUserId);
+
   useEffect(() => {
     const getCurrentUser = async () => {
       const { data: { user } } = await supabase.auth.getUser();
       setCurrentUserId(user?.id || null);
-
-      if (user) {
-        // Check if post is liked
-        const { data: likeData, error: likeError } = await supabase
-          .from("community_post_likes")
-          .select()
-          .eq("post_id", id)
-          .eq("user_id", user.id);
-
-        if (!likeError && likeData) {
-          setIsLiked(likeData.length > 0);
-        }
-
-        // Check if post is favorited
-        const { data: favoriteData, error: favoriteError } = await supabase
-          .from("favorites")
-          .select()
-          .eq("idea_id", id)
-          .eq("user_id", user.id)
-          .eq("item_type", 'community_post');
-
-        if (!favoriteError && favoriteData) {
-          setIsFavorite(favoriteData.length > 0);
-        }
-      }
     };
     getCurrentUser();
-  }, [id]);
-
-  const handleLike = async () => {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) {
-      toast({
-        title: "Please sign in",
-        description: "You need to be signed in to like posts",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    const newLikeState = !isLiked;
-    setIsLiked(newLikeState);
-    setLikeCount(prev => newLikeState ? prev + 1 : prev - 1);
-
-    if (newLikeState) {
-      const { error } = await supabase
-        .from("community_post_likes")
-        .insert({ post_id: id, user_id: user.id });
-
-      if (error) {
-        console.error("Error liking post:", error);
-        setIsLiked(false);
-        setLikeCount(prev => prev - 1);
-      }
-    } else {
-      const { error } = await supabase
-        .from("community_post_likes")
-        .delete()
-        .match({ post_id: id, user_id: user.id });
-
-      if (error) {
-        console.error("Error unliking post:", error);
-        setIsLiked(true);
-        setLikeCount(prev => prev + 1);
-      }
-    }
-  };
+  }, []);
 
   const fetchComments = async () => {
     try {
@@ -225,7 +165,41 @@ export const IdeaCard = ({
           isLiked={isLiked}
           likeCount={likeCount}
           comments={commentCount}
-          onLike={handleLike}
+          onLike={async () => {
+            const { data: { user } } = await supabase.auth.getUser();
+            if (!user) {
+              toast({
+                title: "Please sign in",
+                description: "You need to be signed in to like posts",
+                variant: "destructive",
+              });
+              return;
+            }
+
+            const newLikeState = !isLiked;
+            setIsLiked(newLikeState);
+
+            if (newLikeState) {
+              const { error } = await supabase
+                .from("community_post_likes")
+                .insert({ post_id: id, user_id: user.id });
+
+              if (error) {
+                console.error("Error liking post:", error);
+                setIsLiked(false);
+              }
+            } else {
+              const { error } = await supabase
+                .from("community_post_likes")
+                .delete()
+                .match({ post_id: id, user_id: user.id });
+
+              if (error) {
+                console.error("Error unliking post:", error);
+                setIsLiked(true);
+              }
+            }
+          }}
           onComment={() => {
             setShowComments(!showComments);
             if (!showComments) {
