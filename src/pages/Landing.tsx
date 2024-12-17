@@ -11,18 +11,17 @@ import { FAQSection } from "@/components/landing/FAQSection";
 
 const Landing = () => {
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-background">
       <NavigationBar />
       <main>
         <HeroSection />
-        <div id="how-it-works">
+        <div id="how-it-works" className="how-it-works">
           <HowItWorksSection />
-          <KeyFeaturesSection />
         </div>
-        <div id="about-us">
+        <div id="about-us" className="about-us">
           <AboutUsSection />
         </div>
-        <div id="community">
+        <div id="community" className="community">
           <JoinCommunitySection />
           <TestimonialsCarousel />
         </div>
