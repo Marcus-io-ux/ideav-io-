@@ -4,10 +4,11 @@ import { Users, MessageCircle, Handshake, Lightbulb } from "lucide-react";
 
 export const JoinCommunitySection = () => {
   return (
-    <section className="py-24 bg-gray-50">
+    <section className="py-24 bg-gradient-to-br from-blue-50 to-indigo-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        {/* Main Content */}
         <div className="text-center mb-16">
-          <h2 className="text-4xl md:text-5xl font-bold mb-6 text-gray-900">
+          <h2 className="text-4xl md:text-5xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-indigo-600">
             Be Part of Something Bigger
           </h2>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto">
@@ -15,6 +16,7 @@ export const JoinCommunitySection = () => {
           </p>
         </div>
 
+        {/* Benefits Grid */}
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8 mb-16">
           {[
             {
@@ -40,25 +42,26 @@ export const JoinCommunitySection = () => {
           ].map((benefit) => (
             <div
               key={benefit.title}
-              className="bg-white p-6 rounded-xl shadow-md hover:shadow-lg transition-shadow"
+              className="bg-white/80 backdrop-blur-sm p-6 rounded-xl shadow-md hover:shadow-lg transition-shadow"
             >
-              <div className="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center mb-4 mx-auto">
-                <benefit.icon className="w-6 h-6 text-white" />
+              <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mb-4 mx-auto">
+                <benefit.icon className="w-6 h-6 text-blue-600" />
               </div>
-              <h3 className="text-xl font-semibold mb-2 text-gray-900">{benefit.title}</h3>
+              <h3 className="text-xl font-semibold mb-2">{benefit.title}</h3>
               <p className="text-gray-600">{benefit.description}</p>
             </div>
           ))}
         </div>
 
+        {/* Social Proof */}
         <div className="text-center mb-12">
           <div className="flex justify-center gap-12 mb-8">
             <div>
-              <p className="text-3xl font-bold text-gray-900">5,000+</p>
+              <p className="text-3xl font-bold text-blue-600">5,000+</p>
               <p className="text-gray-600">Active Members</p>
             </div>
             <div>
-              <p className="text-3xl font-bold text-gray-900">10,000+</p>
+              <p className="text-3xl font-bold text-blue-600">10,000+</p>
               <p className="text-gray-600">Ideas Shared</p>
             </div>
           </div>
@@ -68,6 +71,7 @@ export const JoinCommunitySection = () => {
           </blockquote>
         </div>
 
+        {/* CTA */}
         <div className="text-center">
           <Link to="/signup">
             <Button

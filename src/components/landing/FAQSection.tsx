@@ -30,23 +30,23 @@ export const FAQSection = () => {
   ];
 
   return (
-    <section className="py-20 bg-gradient-to-br from-[#D3E4FD] to-white">
+    <section className="py-20 bg-gradient-to-br from-background to-accent/30">
       <div className="container mx-auto px-4">
-        <h2 className="text-4xl font-bold text-center mb-4 bg-clip-text text-transparent bg-gradient-to-r from-[#9b87f5] to-[#7E69AB]">
+        <h2 className="text-4xl font-bold text-center mb-4 bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-indigo-600">
           Frequently Asked Questions
         </h2>
-        <p className="text-gray-600 text-center mb-12 max-w-2xl mx-auto">
+        <p className="text-muted-foreground text-center mb-12 max-w-2xl mx-auto">
           Find answers to common questions about IdeaVault
         </p>
         
         <div className="max-w-3xl mx-auto">
           <Accordion type="single" collapsible className="w-full">
             {faqs.map((faq, index) => (
-              <AccordionItem key={index} value={`item-${index}`} className="border-[#9b87f5]/20">
-                <AccordionTrigger className="text-left hover:text-[#7E69AB]">
+              <AccordionItem key={index} value={`item-${index}`}>
+                <AccordionTrigger className="text-left">
                   {faq.question}
                 </AccordionTrigger>
-                <AccordionContent className="text-gray-600">
+                <AccordionContent className="text-muted-foreground">
                   {faq.answer}
                 </AccordionContent>
               </AccordionItem>
