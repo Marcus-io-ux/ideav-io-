@@ -7,6 +7,7 @@ import { ShareIdeaModal } from "@/components/community/ShareIdeaModal";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { useNavigate } from "react-router-dom";
 
 interface CommunityPost {
   id: string;
@@ -31,6 +32,19 @@ const Community = () => {
   const [posts, setPosts] = useState<CommunityPost[]>([]);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const { toast } = useToast();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const checkAuth = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        navigate('/');
+        return;
+      }
+    };
+    
+    checkAuth();
+  }, [navigate]);
 
   useEffect(() => {
     const fetchPosts = async () => {
@@ -88,13 +102,14 @@ const Community = () => {
     category: string;
     channel: string;
   }) => {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) {
       toast({
-        title: "Authentication required",
-        description: "Please sign in to post ideas",
+        title: "Session expired",
+        description: "Your session has expired. Please sign in again.",
         variant: "destructive",
       });
+      navigate('/');
       return;
     }
 
@@ -102,7 +117,7 @@ const Community = () => {
       title: idea.title,
       content: idea.content,
       channel: idea.channel,
-      user_id: user.id,
+      user_id: session.user.id,
     });
 
     if (error) {
