@@ -94,7 +94,6 @@
   * {
     @apply border-border;
   }
-
   body {
     @apply bg-background text-foreground;
   }
@@ -102,16 +101,22 @@
 
 @keyframes float {
   0% {
-    transform: translateY(0) rotate(0);
+    transform: translateY(0) translateX(0) rotate(0);
+  }
+  25% {
+    transform: translateY(-20px) translateX(20px) rotate(5deg);
   }
   50% {
-    transform: translateY(-20px) rotate(5deg);
+    transform: translateY(0) translateX(40px) rotate(0);
+  }
+  75% {
+    transform: translateY(20px) translateX(20px) rotate(-5deg);
   }
   100% {
-    transform: translateY(0) rotate(0);
+    transform: translateY(0) translateX(0) rotate(0);
   }
 }
 
 .animate-float {
-  animation: float 8s ease-in-out infinite;
+  animation: float 20s ease-in-out infinite;
 }

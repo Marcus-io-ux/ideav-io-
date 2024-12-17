@@ -18,8 +18,7 @@ export const HeroSection = () => {
                 height: `${Math.random() * 400 + 100}px`,
                 left: `${Math.random() * 100}%`,
                 top: `${Math.random() * 100}%`,
-                animationDelay: `${Math.random() * 5}s`,
-                animationDuration: `${Math.random() * 10 + 20}s`,
+                animationDelay: `${i * 2}s`,
               }}
             />
           ))}
