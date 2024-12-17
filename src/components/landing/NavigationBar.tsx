@@ -42,7 +42,7 @@ export const NavigationBar = () => {
               About Us
             </Link>
             <button 
-              onClick={() => scrollToSection('faq')}
+              onClick={() => scrollToSection('faq-section')}
               className="text-gray-600 hover:text-blue-500 transition-colors"
             >
               FAQ

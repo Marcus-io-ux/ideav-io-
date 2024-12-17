@@ -30,7 +30,7 @@ export const FAQSection = () => {
   ];
 
   return (
-    <section className="py-20 bg-gradient-to-br from-background to-accent/30">
+    <section className="py-20 bg-gradient-to-br from-background to-accent/30 faq-section">
       <div className="container mx-auto px-4">
         <h2 className="text-4xl font-bold text-center mb-4 bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-indigo-600">
           Frequently Asked Questions
