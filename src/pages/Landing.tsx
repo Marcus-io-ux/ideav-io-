@@ -20,9 +20,9 @@ const Landing = () => {
         </div>
         <div id="community">
           <JoinCommunitySection />
+          <TestimonialsCarousel />
         </div>
         <PricingSection />
-        <TestimonialsCarousel />
         <div id="faq">
           <FAQSection />
         </div>
