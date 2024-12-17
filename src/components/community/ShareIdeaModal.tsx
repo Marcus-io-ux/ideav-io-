@@ -64,13 +64,14 @@ export const ShareIdeaModal = ({ isOpen, onClose, onSubmit }: ShareIdeaModalProp
       isCollaborative,
     });
 
-    // Reset form
+    // Reset form and close modal
     setTitle("");
     setContent("");
     setCategory("");
     setFeedbackType("");
     setChannel("");
     setIsCollaborative(false);
+    onClose();
   };
 
   return (

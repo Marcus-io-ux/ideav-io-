@@ -6,6 +6,7 @@ import { Plus, Menu } from "lucide-react";
 import { ShareIdeaModal } from "@/components/community/ShareIdeaModal";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
 
 interface CommunityPost {
   id: string;
@@ -29,6 +30,7 @@ const Community = () => {
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
   const [posts, setPosts] = useState<CommunityPost[]>([]);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const { toast } = useToast();
 
   useEffect(() => {
     const fetchPosts = async () => {
@@ -87,7 +89,14 @@ const Community = () => {
     channel: string;
   }) => {
     const { data: { user } } = await supabase.auth.getUser();
-    if (!user) return;
+    if (!user) {
+      toast({
+        title: "Authentication required",
+        description: "Please sign in to post ideas",
+        variant: "destructive",
+      });
+      return;
+    }
 
     const { error } = await supabase.from("community_posts").insert({
       title: idea.title,
@@ -98,8 +107,18 @@ const Community = () => {
 
     if (error) {
       console.error("Error creating post:", error);
+      toast({
+        title: "Error",
+        description: "Failed to create post. Please try again.",
+        variant: "destructive",
+      });
       return;
     }
+
+    toast({
+      title: "Success",
+      description: "Your idea has been posted successfully!",
+    });
 
     setIsShareModalOpen(false);
     setActiveChannel(idea.channel);
