@@ -19,10 +19,10 @@ export const PlanTab = () => {
       const { data } = await supabase
         .from("user_memberships")
         .select("*, membership_tiers(*)")
-        .eq("user_id", user.id)
-        .single();
+        .eq("user_id", user.id);
       
-      return data;
+      // Return the first membership if exists, otherwise null
+      return data?.[0] || null;
     },
   });
 
@@ -38,7 +38,7 @@ export const PlanTab = () => {
       return data?.map(plan => ({
         ...plan,
         features: Array.isArray(plan.features) ? plan.features : []
-      }));
+      })) || [];
     },
   });
 
