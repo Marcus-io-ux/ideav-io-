@@ -1,10 +1,9 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { formatDistanceToNow } from "date-fns";
-import { Star, Pencil, Trash } from "lucide-react";
-import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { Checkbox } from "@/components/ui/checkbox";
 import { cn } from "@/lib/utils";
+import { CardHeaderActions } from "@/components/dashboard/CardHeaderActions";
 
 interface IdeaCardProps {
   id: string;
@@ -31,7 +30,6 @@ export const IdeaCard = ({
   onDelete,
   onToggleFavorite 
 }: IdeaCardProps) => {
-  const [isHovered, setIsHovered] = useState(false);
   const { toast } = useToast();
 
   const handleToggleFavorite = () => {
@@ -56,57 +54,26 @@ export const IdeaCard = ({
         "w-full hover:shadow-lg transition-shadow duration-300 animate-fade-in",
         isSelected && "border-primary"
       )}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
     >
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
         <div className="flex items-center gap-2">
+          <CardTitle className="text-xl font-semibold">{title}</CardTitle>
+          <CardHeaderActions
+            isFavorite={isFavorite}
+            onToggleFavorite={handleToggleFavorite}
+            onEdit={onEdit ? () => onEdit(id) : undefined}
+            onDelete={onDelete ? handleDelete : undefined}
+          />
+        </div>
+        <div className="flex items-center gap-4">
+          <span className="text-sm text-gray-500">
+            {formatDistanceToNow(createdAt, { addSuffix: true })}
+          </span>
           {onSelect && (
             <Checkbox
               checked={isSelected}
               onCheckedChange={() => onSelect(id)}
-              className="mr-2"
             />
-          )}
-          <CardTitle className="text-xl font-semibold">{title}</CardTitle>
-          <button
-            onClick={handleToggleFavorite}
-            className={cn(
-              "p-1 rounded-full transition-colors",
-              isFavorite ? "text-primary hover:bg-primary-light" : "text-gray-400 hover:bg-gray-100"
-            )}
-          >
-            <Star
-              className={cn(
-                "h-5 w-5 transition-colors",
-                isFavorite && "fill-primary"
-              )}
-            />
-          </button>
-        </div>
-        <div className="flex items-center gap-2">
-          <span className="text-sm text-gray-500">
-            {formatDistanceToNow(createdAt, { addSuffix: true })}
-          </span>
-          {isHovered && (
-            <div className="flex items-center gap-1">
-              {onEdit && (
-                <button
-                  onClick={() => onEdit(id)}
-                  className="p-1 rounded-full hover:bg-gray-100"
-                >
-                  <Pencil className="h-4 w-4 text-gray-500" />
-                </button>
-              )}
-              {onDelete && (
-                <button
-                  onClick={handleDelete}
-                  className="p-1 rounded-full hover:bg-gray-100"
-                >
-                  <Trash className="h-4 w-4 text-gray-500" />
-                </button>
-              )}
-            </div>
           )}
         </div>
       </CardHeader>
