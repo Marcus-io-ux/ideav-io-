@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { Heart, MessageCircle, UserPlus, MessageSquare } from "lucide-react";
+import { Heart, MessageCircle, UserPlus } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -10,9 +10,9 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import { useState } from "react";
 import { useCollaborationRequest } from "@/hooks/use-collaboration-request";
-import { DirectMessageDialog } from "./DirectMessageDialog";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { MessageButton } from "./messaging/MessageButton";
 
 interface IdeaCardActionsProps {
   postId: string;
@@ -38,7 +38,6 @@ export const IdeaCardActions = ({
   authorName,
 }: IdeaCardActionsProps) => {
   const [isCollaborateOpen, setIsCollaborateOpen] = useState(false);
-  const [isMessageDialogOpen, setIsMessageDialogOpen] = useState(false);
   const [isFavorite, setIsFavorite] = useState(false);
   const [message, setMessage] = useState("");
   const { sendCollaborationRequest, isLoading } = useCollaborationRequest();
@@ -131,17 +130,11 @@ export const IdeaCardActions = ({
           <Heart className={`h-4 w-4 ${isFavorite ? "fill-current" : ""}`} />
           <span>Favorite</span>
         </Button>
-        {currentUserId && currentUserId !== ownerId && (
-          <Button
-            variant="ghost"
-            size="sm"
-            className="gap-2"
-            onClick={() => setIsMessageDialogOpen(true)}
-          >
-            <MessageSquare className="h-4 w-4" />
-            <span>Message</span>
-          </Button>
-        )}
+        <MessageButton
+          currentUserId={currentUserId}
+          ownerId={ownerId}
+          authorName={authorName}
+        />
       </div>
 
       <Dialog open={isCollaborateOpen} onOpenChange={setIsCollaborateOpen}>
@@ -173,13 +166,6 @@ export const IdeaCardActions = ({
           </DialogFooter>
         </DialogContent>
       </Dialog>
-
-      <DirectMessageDialog
-        isOpen={isMessageDialogOpen}
-        onClose={() => setIsMessageDialogOpen(false)}
-        recipientId={ownerId}
-        recipientName={authorName}
-      />
     </>
   );
 };
