@@ -36,7 +36,7 @@ export const HeroSection = () => {
   return (
     <section className="relative min-h-[90vh] flex items-center justify-center overflow-hidden bg-gradient-to-br from-blue-50 to-indigo-50">
       {/* Animated background elements */}
-      <div className="absolute inset-0 overflow-hidden">
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute inset-0 opacity-20">
           {Array.from({ length: 5 }).map((_, i) => (
             <div
@@ -49,6 +49,7 @@ export const HeroSection = () => {
                 left: `${Math.random() * 100}%`,
                 top: `${Math.random() * 100}%`,
                 animationDelay: `${i * 2}s`,
+                willChange: 'transform'
               }}
             />
           ))}
