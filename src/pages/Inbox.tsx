@@ -1,60 +1,262 @@
-import { useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Mail, Search, Archive } from "lucide-react";
+import { useEffect, useState } from "react";
+import { ConversationList } from "@/components/inbox/ConversationList";
+import { MessageThread } from "@/components/inbox/MessageThread";
+import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
+
+interface Message {
+  id: string;
+  content: string;
+  timestamp: Date;
+  sender: {
+    id: string;
+    name: string;
+    avatar?: string;
+  };
+  isRead?: boolean;
+}
+
+interface Conversation {
+  id: string;
+  user: {
+    id: string;
+    name: string;
+    avatar?: string;
+  };
+  lastMessage: {
+    content: string;
+    timestamp: Date;
+    isRead: boolean;
+  };
+  isPinned?: boolean;
+}
 
 const Inbox = () => {
-  const [searchQuery, setSearchQuery] = useState("");
+  const [conversations, setConversations] = useState<Conversation[]>([]);
+  const [activeConversation, setActiveConversation] = useState<string | null>(null);
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [currentUser, setCurrentUser] = useState<any>(null);
+  const { toast } = useToast();
+
+  useEffect(() => {
+    const fetchCurrentUser = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        const { data: profile } = await supabase
+          .from("profiles")
+          .select("*")
+          .eq("user_id", user.id)
+          .single();
+
+        setCurrentUser({ ...user, profile });
+      }
+    };
+
+    fetchCurrentUser();
+  }, []);
+
+  useEffect(() => {
+    if (!currentUser) return;
+
+    const fetchConversations = async () => {
+      const { data: messages, error } = await supabase
+        .from("messages")
+        .select(`
+          *,
+          sender:sender_id(id, profile:profiles(*)),
+          recipient:recipient_id(id, profile:profiles(*))
+        `)
+        .or(`sender_id.eq.${currentUser.id},recipient_id.eq.${currentUser.id}`)
+        .order("created_at", { ascending: false });
+
+      if (error) {
+        toast({
+          title: "Error",
+          description: "Failed to load conversations",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      // Group messages by conversation
+      const conversationsMap = new Map();
+      messages?.forEach((message: any) => {
+        const otherUser =
+          message.sender.id === currentUser.id ? message.recipient : message.sender;
+        const conversationId = `${Math.min(
+          parseInt(message.sender.id),
+          parseInt(message.recipient.id)
+        )}-${Math.max(
+          parseInt(message.sender.id),
+          parseInt(message.recipient.id)
+        )}`;
+
+        if (!conversationsMap.has(conversationId)) {
+          conversationsMap.set(conversationId, {
+            id: conversationId,
+            user: {
+              id: otherUser.id,
+              name: otherUser.profile.username,
+              avatar: otherUser.profile.avatar_url,
+            },
+            lastMessage: {
+              content: message.content,
+              timestamp: new Date(message.created_at),
+              isRead: message.is_read,
+            },
+          });
+        }
+      });
+
+      setConversations(Array.from(conversationsMap.values()));
+    };
+
+    fetchConversations();
+
+    // Subscribe to new messages
+    const channel = supabase
+      .channel("messages")
+      .on(
+        "postgres_changes",
+        {
+          event: "*",
+          schema: "public",
+          table: "messages",
+        },
+        () => {
+          fetchConversations();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [currentUser, toast]);
+
+  useEffect(() => {
+    if (!currentUser || !activeConversation) return;
+
+    const fetchMessages = async () => {
+      const [user1Id, user2Id] = activeConversation.split("-");
+      const { data: messages, error } = await supabase
+        .from("messages")
+        .select(`
+          *,
+          sender:sender_id(id, profile:profiles(*))
+        `)
+        .or(
+          `and(sender_id.eq.${user1Id},recipient_id.eq.${user2Id}),and(sender_id.eq.${user2Id},recipient_id.eq.${user1Id})`
+        )
+        .order("created_at", { ascending: true });
+
+      if (error) {
+        toast({
+          title: "Error",
+          description: "Failed to load messages",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      setMessages(
+        messages?.map((message: any) => ({
+          id: message.id,
+          content: message.content,
+          timestamp: new Date(message.created_at),
+          sender: {
+            id: message.sender.id,
+            name: message.sender.profile.username,
+            avatar: message.sender.profile.avatar_url,
+          },
+          isRead: message.is_read,
+        })) || []
+      );
+    };
+
+    fetchMessages();
+
+    // Subscribe to new messages
+    const channel = supabase
+      .channel(`messages:${activeConversation}`)
+      .on(
+        "postgres_changes",
+        {
+          event: "*",
+          schema: "public",
+          table: "messages",
+        },
+        () => {
+          fetchMessages();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [currentUser, activeConversation, toast]);
+
+  const handleSendMessage = async (content: string) => {
+    if (!currentUser || !activeConversation) return;
+
+    const [user1Id, user2Id] = activeConversation.split("-");
+    const recipientId =
+      user1Id === currentUser.id.toString() ? user2Id : user1Id;
+
+    const { error } = await supabase.from("messages").insert({
+      sender_id: currentUser.id,
+      recipient_id: recipientId,
+      content,
+    });
+
+    if (error) {
+      toast({
+        title: "Error",
+        description: "Failed to send message",
+        variant: "destructive",
+      });
+    }
+  };
+
+  if (!currentUser) {
+    return (
+      <div className="flex min-h-screen items-center justify-center">
+        <p className="text-muted-foreground">Please sign in to view messages</p>
+      </div>
+    );
+  }
+
+  const activeConversationData = conversations.find(
+    (conv) => conv.id === activeConversation
+  );
 
   return (
-    <div className="min-h-screen bg-background">
-      <div className="container max-w-4xl py-8 space-y-8 animate-fade-in">
-        <div className="text-center space-y-4">
-          <h1 className="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary to-primary-light">
-            Your Messages
-          </h1>
-          <p className="text-muted-foreground text-lg">
-            Stay connected with your collaborators
-          </p>
-        </div>
-
-        <div className="flex gap-4 items-center">
-          <div className="relative flex-1">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
-            <Input
-              placeholder="Search messages..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10"
-            />
+    <div className="flex h-screen bg-background">
+      <div className="w-80 flex-shrink-0">
+        <ConversationList
+          conversations={conversations}
+          activeConversationId={activeConversation || undefined}
+          onConversationSelect={setActiveConversation}
+        />
+      </div>
+      <div className="flex-1">
+        {activeConversation && activeConversationData ? (
+          <MessageThread
+            currentUserId={currentUser.id}
+            recipientId={activeConversationData.user.id}
+            recipientName={activeConversationData.user.name}
+            recipientAvatar={activeConversationData.user.avatar}
+            messages={messages}
+            onSendMessage={handleSendMessage}
+          />
+        ) : (
+          <div className="flex h-full items-center justify-center">
+            <p className="text-muted-foreground">
+              Select a conversation to start messaging
+            </p>
           </div>
-          <Button variant="outline">
-            <Archive className="h-4 w-4 mr-2" />
-            Archive
-          </Button>
-        </div>
-
-        <div className="grid gap-4">
-          {[1, 2, 3].map((message) => (
-            <Card key={message} className="hover:shadow-md transition-shadow">
-              <CardHeader className="flex flex-row items-center gap-4">
-                <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center">
-                  <Mail className="h-5 w-5 text-primary" />
-                </div>
-                <div>
-                  <CardTitle className="text-lg">Message Title {message}</CardTitle>
-                  <p className="text-sm text-muted-foreground">From: User {message}</p>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <p className="text-muted-foreground">
-                  This is a placeholder message content. Real messages will be implemented soon.
-                </p>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
+        )}
       </div>
     </div>
   );
