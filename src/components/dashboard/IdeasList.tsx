@@ -60,14 +60,14 @@ export const IdeasList = ({
 
   return (
     <div>
-      <div className="flex justify-between items-center mb-4">
-        <div className="flex items-center gap-4">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 w-full sm:w-auto">
           {selectedIds.length > 0 && activeTab !== "trash" && (
             <Button
               variant="destructive"
               size="sm"
               onClick={handleBulkDelete}
-              className="flex items-center gap-2"
+              className="flex items-center gap-2 w-full sm:w-auto"
             >
               <Trash2 className="h-4 w-4" />
               Delete Selected ({selectedIds.length})
@@ -78,18 +78,18 @@ export const IdeasList = ({
               variant="default"
               size="sm"
               onClick={handleBulkRestore}
-              className="flex items-center gap-2"
+              className="flex items-center gap-2 w-full sm:w-auto"
             >
               <RotateCcw className="h-4 w-4" />
               Restore Selected ({selectedIds.length})
             </Button>
           )}
-          <div className="flex items-center gap-4 bg-white dark:bg-blue-900/20 rounded-lg px-4 py-2 border border-blue-100 dark:border-blue-800 shadow-lg hover:shadow-xl transition-all duration-300">
-            <span className="flex items-center gap-2 text-blue-700 dark:text-blue-300">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-4 bg-white dark:bg-blue-900/20 rounded-lg px-4 py-2 border border-blue-100 dark:border-blue-800 shadow-lg hover:shadow-xl transition-all duration-300 w-full sm:w-auto">
+            <span className="flex items-center gap-2 text-blue-700 dark:text-blue-300 whitespace-nowrap">
               <Lightbulb className="h-4 w-4" />
               {activeIdeas.length} Ideas
             </span>
-            <span className="flex items-center gap-2 text-blue-700 dark:text-blue-300">
+            <span className="flex items-center gap-2 text-blue-700 dark:text-blue-300 whitespace-nowrap">
               <Star className="h-4 w-4" />
               {favoriteIdeas.length} Favorites
             </span>
@@ -99,10 +99,10 @@ export const IdeasList = ({
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="mb-8">
-        <TabsList>
-          <TabsTrigger value="recent">Recent Ideas</TabsTrigger>
-          <TabsTrigger value="all">All Ideas</TabsTrigger>
-          <TabsTrigger value="trash">Trash</TabsTrigger>
+        <TabsList className="w-full sm:w-auto">
+          <TabsTrigger value="recent" className="flex-1 sm:flex-none">Recent Ideas</TabsTrigger>
+          <TabsTrigger value="all" className="flex-1 sm:flex-none">All Ideas</TabsTrigger>
+          <TabsTrigger value="trash" className="flex-1 sm:flex-none">Trash</TabsTrigger>
         </TabsList>
         
         <TabsContent value="recent">
