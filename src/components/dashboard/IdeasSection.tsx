@@ -29,17 +29,13 @@ export const IdeasSection = ({
   onRestoreIdeas,
 }: IdeasSectionProps) => {
   return (
-    <div className="space-y-8">
-      <div className="mt-8">
-        <IdeasList
-          ideas={ideas}
-          showFavoritesOnly={showFavoritesOnly}
-          onToggleFavorites={onToggleFavorites}
-          onEditIdea={onEditIdea}
-          onDeleteIdeas={onDeleteIdeas}
-          onRestoreIdeas={onRestoreIdeas}
-        />
-      </div>
-    </div>
+    <IdeasList
+      ideas={ideas}
+      showFavoritesOnly={showFavoritesOnly}
+      onToggleFavorites={onToggleFavorites}
+      onEditIdea={onEditIdea}
+      onDeleteIdeas={onDeleteIdeas}
+      onRestoreIdeas={onRestoreIdeas}
+    />
   );
 };
