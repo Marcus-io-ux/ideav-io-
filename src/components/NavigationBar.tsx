@@ -22,6 +22,13 @@ export const NavigationBar = () => {
       <div className="flex h-16 items-center px-4">
         <div className="mx-auto w-full max-w-6xl">
           <div className="flex justify-between items-center">
+            <Link 
+              to="/"
+              className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary to-primary-light hover:opacity-80 transition-opacity"
+            >
+              IdeaVault
+            </Link>
+
             {/* Desktop Navigation */}
             <div className="hidden md:flex space-x-6">
               {navItems.map((item) => (
