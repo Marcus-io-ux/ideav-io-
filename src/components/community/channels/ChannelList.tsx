@@ -13,7 +13,7 @@ interface Channel {
 
 const channels: Channel[] = [
   { id: "announcements", name: "Announcements", icon: <Megaphone className="h-4 w-4" /> },
-  { id: "community-ideas", name: "Community Ideas", icon: <MessageSquare className="h-4 w-4" /> },
+  { id: "general-ideas", name: "General Ideas", icon: <MessageSquare className="h-4 w-4" /> },
   { id: "startups-business", name: "Startups & Business Ideas", icon: <Lightbulb className="h-4 w-4" /> },
   { id: "tech-innovation", name: "Tech & Innovation", icon: <Laptop className="h-4 w-4" /> },
   { id: "lifestyle-wellness", name: "Lifestyle & Wellness", icon: <Heart className="h-4 w-4" /> },
