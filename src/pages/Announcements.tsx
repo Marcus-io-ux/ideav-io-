@@ -4,8 +4,9 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardHeader, CardContent, CardFooter } from "@/components/ui/card";
-import { Gear, Users, Lightbulb } from "lucide-react";
+import { Settings, Users, Lightbulb } from "lucide-react";
 import { format } from "date-fns";
+import { Link } from "react-router-dom";
 
 type Announcement = {
   id: string;
@@ -19,7 +20,7 @@ type Announcement = {
 type CategoryFilter = "all" | "platform_update" | "community_news" | "featured_idea";
 
 const categoryIcons = {
-  platform_update: <Gear className="h-4 w-4" />,
+  platform_update: <Settings className="h-4 w-4" />,
   community_news: <Users className="h-4 w-4" />,
   featured_idea: <Lightbulb className="h-4 w-4" />,
 };
@@ -105,7 +106,7 @@ export default function Announcements() {
           onClick={() => setSelectedCategory("platform_update")}
           className="flex items-center gap-2"
         >
-          <Gear className="h-4 w-4" />
+          <Settings className="h-4 w-4" />
           Platform Updates
         </Button>
         <Button
