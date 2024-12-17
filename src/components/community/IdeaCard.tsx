@@ -1,11 +1,19 @@
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { UserPlus, UserCheck } from "lucide-react";
+import { UserPlus, UserCheck, MessageSquare } from "lucide-react";
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { IdeaCardActions } from "./IdeaCardActions";
 import { IdeaComments } from "./IdeaComments";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Textarea } from "@/components/ui/textarea";
 
 interface Comment {
   id: string;
@@ -40,6 +48,7 @@ export const IdeaCard = ({ id, title, content, author, likes, comments: initialC
   const [showComments, setShowComments] = useState(false);
   const [newComment, setNewComment] = useState("");
   const [commentsList, setCommentsList] = useState<Comment[]>([]);
+  const [newMessage, setNewMessage] = useState("");
   const { toast } = useToast();
 
   const handleFollow = () => {
@@ -63,7 +72,6 @@ export const IdeaCard = ({ id, title, content, author, likes, comments: initialC
 
   const handleFavorite = () => {
     setIsFavorite(!isFavorite);
-    // In a real app, this would update the favorites in a global state or backend
     toast({
       title: isFavorite ? "Removed from favorites" : "Added to favorites",
       description: isFavorite 
@@ -79,6 +87,16 @@ export const IdeaCard = ({ id, title, content, author, likes, comments: initialC
     });
   };
 
+  const handleSendMessage = () => {
+    if (!newMessage.trim()) return;
+    
+    toast({
+      title: "Message Sent",
+      description: `Your message has been sent to ${author.name}`,
+    });
+    setNewMessage("");
+  };
+
   const handleAddComment = () => {
     if (!newComment.trim()) return;
 
@@ -86,7 +104,7 @@ export const IdeaCard = ({ id, title, content, author, likes, comments: initialC
       id: Date.now().toString(),
       content: newComment,
       author: {
-        name: "Current User", // In a real app, this would come from auth
+        name: "Current User",
         avatar: "/placeholder.svg",
       },
       createdAt: new Date(),
@@ -117,18 +135,47 @@ export const IdeaCard = ({ id, title, content, author, likes, comments: initialC
               <span className="text-sm text-gray-600">
                 {new Date(createdAt).toLocaleDateString()}
               </span>
-              <Button
-                variant="ghost"
-                size="sm"
-                className="ml-2 transition-transform hover:scale-105"
-                onClick={handleFollow}
-              >
-                {isFollowing ? (
-                  <UserCheck className="w-4 h-4 text-green-500" />
-                ) : (
-                  <UserPlus className="w-4 h-4" />
-                )}
-              </Button>
+              <div className="flex gap-2">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="transition-transform hover:scale-105"
+                  onClick={handleFollow}
+                >
+                  {isFollowing ? (
+                    <UserCheck className="w-4 h-4 text-green-500" />
+                  ) : (
+                    <UserPlus className="w-4 h-4" />
+                  )}
+                </Button>
+                <Dialog>
+                  <DialogTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="transition-transform hover:scale-105"
+                    >
+                      <MessageSquare className="w-4 h-4" />
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent>
+                    <DialogHeader>
+                      <DialogTitle>Send Message to {author.name}</DialogTitle>
+                    </DialogHeader>
+                    <div className="space-y-4 mt-4">
+                      <Textarea
+                        placeholder="Write your message..."
+                        value={newMessage}
+                        onChange={(e) => setNewMessage(e.target.value)}
+                        className="min-h-[100px]"
+                      />
+                      <Button onClick={handleSendMessage} className="w-full">
+                        Send Message
+                      </Button>
+                    </div>
+                  </DialogContent>
+                </Dialog>
+              </div>
             </div>
           </div>
         </div>
