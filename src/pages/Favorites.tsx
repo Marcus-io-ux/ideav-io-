@@ -4,6 +4,7 @@ import { IdeaCard as CommunityIdeaCard } from "@/components/community/IdeaCard";
 import { SearchBar } from "@/components/SearchBar";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { PostgrestResponse } from "@supabase/supabase-js";
 
 interface BaseIdea {
   id: string;
@@ -66,16 +67,16 @@ const Favorites = () => {
         .map(fav => fav.idea_id);
 
       // Fetch regular ideas
-      const regularIdeasPromise = regularIdeaIds.length > 0
+      const regularIdeasPromise: Promise<PostgrestResponse<any>> = regularIdeaIds.length > 0
         ? supabase
             .from('ideas')
             .select('*')
             .in('id', regularIdeaIds)
             .eq('deleted', false)
-        : Promise.resolve({ data: [] });
+        : Promise.resolve({ data: [], count: null, error: null, status: 200, statusText: 'OK' });
 
       // Fetch community posts
-      const communityPostsPromise = communityPostIds.length > 0
+      const communityPostsPromise: Promise<PostgrestResponse<any>> = communityPostIds.length > 0
         ? supabase
             .from('community_posts')
             .select(`
@@ -83,7 +84,7 @@ const Favorites = () => {
               author:profiles(username, avatar_url)
             `)
             .in('id', communityPostIds)
-        : Promise.resolve({ data: [] });
+        : Promise.resolve({ data: [], count: null, error: null, status: 200, statusText: 'OK' });
 
       const [regularIdeasResponse, communityPostsResponse] = await Promise.all([
         regularIdeasPromise,
