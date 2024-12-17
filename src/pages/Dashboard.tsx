@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { IdeaCard } from "@/components/IdeaCard";
-import { SearchBar } from "@/components/SearchBar";
 import { AddIdeaButton } from "@/components/AddIdeaButton";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
@@ -44,13 +43,8 @@ const Dashboard = () => {
   ]);
   
   const [newIdea, setNewIdea] = useState({ title: "", content: "", tags: "" });
-  const [searchQuery, setSearchQuery] = useState("");
   const [showFavoritesOnly, setShowFavoritesOnly] = useState(false);
   const { toast } = useToast();
-
-  const handleSearch = (query: string) => {
-    setSearchQuery(query.toLowerCase());
-  };
 
   const handleAddIdea = () => {
     if (!newIdea.title || !newIdea.content) {
@@ -81,14 +75,14 @@ const Dashboard = () => {
   };
 
   const filteredIdeas = ideas.filter(
-    (idea) =>
-      (showFavoritesOnly ? idea.isFavorite : true) &&
-      (idea.title.toLowerCase().includes(searchQuery) ||
-       idea.content.toLowerCase().includes(searchQuery) ||
-       idea.tags.some((tag) => tag.toLowerCase().includes(searchQuery)))
+    (idea) => showFavoritesOnly ? idea.isFavorite : true
   );
 
   const highPriorityCount = ideas.filter(idea => idea.priority === "high").length;
+
+  // Mock following counts for now
+  const followersCount = 128;
+  const followingCount = 89;
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -131,14 +125,13 @@ const Dashboard = () => {
             </Dialog>
           </div>
 
-          {/* Stats and Search Row */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-            <div className="col-span-2">
-              <SearchBar onSearch={handleSearch} />
-            </div>
+          {/* Stats Row */}
+          <div className="mb-8">
             <Stats
               totalIdeas={ideas.length}
               highPriorityCount={highPriorityCount}
+              followersCount={followersCount}
+              followingCount={followingCount}
             />
           </div>
 
