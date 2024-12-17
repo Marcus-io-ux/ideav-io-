@@ -1,10 +1,11 @@
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { Heart, MessageSquare, UserPlus, UserCheck, Share2, Bookmark, Send } from "lucide-react";
+import { UserPlus, UserCheck } from "lucide-react";
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
-import { Input } from "@/components/ui/input";
+import { IdeaCardActions } from "./IdeaCardActions";
+import { IdeaComments } from "./IdeaComments";
 
 interface Comment {
   id: string;
@@ -35,7 +36,7 @@ export const IdeaCard = ({ id, title, content, author, likes, comments: initialC
   const [isFollowing, setIsFollowing] = useState(false);
   const [isLiked, setIsLiked] = useState(false);
   const [likeCount, setLikeCount] = useState(likes);
-  const [isBookmarked, setIsBookmarked] = useState(false);
+  const [isFavorite, setIsFavorite] = useState(false);
   const [showComments, setShowComments] = useState(false);
   const [newComment, setNewComment] = useState("");
   const [commentsList, setCommentsList] = useState<Comment[]>([]);
@@ -60,18 +61,18 @@ export const IdeaCard = ({ id, title, content, author, likes, comments: initialC
     });
   };
 
-  const handleBookmark = () => {
-    setIsBookmarked(!isBookmarked);
+  const handleFavorite = () => {
+    setIsFavorite(!isFavorite);
+    // In a real app, this would update the favorites in a global state or backend
     toast({
-      title: isBookmarked ? "Removed from bookmarks" : "Bookmarked",
-      description: isBookmarked 
-        ? "This idea has been removed from your bookmarks" 
-        : "This idea has been added to your bookmarks",
+      title: isFavorite ? "Removed from favorites" : "Added to favorites",
+      description: isFavorite 
+        ? "This idea has been removed from your favorites" 
+        : "This idea has been added to your favorites and can be found in the Favorites page",
     });
   };
 
   const handleShare = () => {
-    // In a real app, this would open a share dialog
     toast({
       title: "Share",
       description: "Sharing functionality coming soon!",
@@ -144,86 +145,25 @@ export const IdeaCard = ({ id, title, content, author, likes, comments: initialC
             </span>
           ))}
         </div>
-        <div className="flex items-center justify-between sm:justify-start sm:gap-6 mt-4 border-t pt-4">
-          <Button 
-            variant="ghost" 
-            size="sm" 
-            className="group flex items-center gap-2 transition-transform hover:scale-105"
-            onClick={handleLike}
-          >
-            <Heart 
-              className={`w-5 h-5 transition-colors ${
-                isLiked ? 'fill-red-500 text-red-500' : 'group-hover:text-red-500'
-              }`} 
-            />
-            <span className="text-sm">{likeCount}</span>
-          </Button>
-          <Button 
-            variant="ghost" 
-            size="sm" 
-            className="group flex items-center gap-2 transition-transform hover:scale-105"
-            onClick={() => setShowComments(!showComments)}
-          >
-            <MessageSquare className="w-5 h-5 group-hover:text-primary" />
-            <span className="text-sm">{commentsList.length}</span>
-          </Button>
-          <Button 
-            variant="ghost" 
-            size="sm" 
-            className="group transition-transform hover:scale-105"
-            onClick={handleBookmark}
-          >
-            <Bookmark 
-              className={`w-5 h-5 transition-colors ${
-                isBookmarked ? 'fill-primary text-primary' : 'group-hover:text-primary'
-              }`} 
-            />
-          </Button>
-          <Button 
-            variant="ghost" 
-            size="sm" 
-            className="group transition-transform hover:scale-105"
-            onClick={handleShare}
-          >
-            <Share2 className="w-5 h-5 group-hover:text-primary" />
-          </Button>
-        </div>
+        
+        <IdeaCardActions
+          isLiked={isLiked}
+          likeCount={likeCount}
+          isFavorite={isFavorite}
+          commentsCount={commentsList.length}
+          onLike={handleLike}
+          onFavorite={handleFavorite}
+          onShare={handleShare}
+          onCommentClick={() => setShowComments(!showComments)}
+        />
 
         {showComments && (
-          <div className="mt-4 space-y-4">
-            <div className="max-h-48 overflow-y-auto space-y-2">
-              {commentsList.map((comment) => (
-                <div key={comment.id} className="bg-gray-50 p-3 rounded-lg">
-                  <div className="flex justify-between items-start">
-                    <div className="flex items-center gap-2">
-                      <Avatar className="w-6 h-6">
-                        <AvatarImage src={comment.author.avatar} />
-                        <AvatarFallback>{comment.author.name.charAt(0)}</AvatarFallback>
-                      </Avatar>
-                      <span className="font-medium text-sm">{comment.author.name}</span>
-                    </div>
-                    <span className="text-xs text-gray-500">
-                      {new Date(comment.createdAt).toLocaleDateString()}
-                    </span>
-                  </div>
-                  <p className="text-sm mt-1 ml-8">{comment.content}</p>
-                </div>
-              ))}
-            </div>
-            
-            <div className="flex gap-2">
-              <Input
-                placeholder="Write a comment..."
-                value={newComment}
-                onChange={(e) => setNewComment(e.target.value)}
-                onKeyPress={(e) => e.key === 'Enter' && handleAddComment()}
-                className="flex-1"
-              />
-              <Button onClick={handleAddComment} size="icon">
-                <Send className="h-4 w-4" />
-              </Button>
-            </div>
-          </div>
+          <IdeaComments
+            comments={commentsList}
+            newComment={newComment}
+            onNewCommentChange={setNewComment}
+            onAddComment={handleAddComment}
+          />
         )}
       </CardContent>
     </Card>
