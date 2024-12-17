@@ -37,9 +37,9 @@ export const PreferencesTab = () => {
 
       const formData = new FormData(e.target as HTMLFormElement);
       const updates = {
-        theme: formData.get("theme"),
-        language: formData.get("language"),
-        font_size: formData.get("font_size"),
+        theme: String(formData.get("theme") || ""),
+        language: String(formData.get("language") || ""),
+        font_size: String(formData.get("font_size") || ""),
       };
 
       const { error } = await supabase

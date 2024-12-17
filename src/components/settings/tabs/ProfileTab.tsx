@@ -37,9 +37,9 @@ export const ProfileTab = () => {
 
       const formData = new FormData(e.target as HTMLFormElement);
       const updates = {
-        username: formData.get("username"),
-        bio: formData.get("bio"),
-        location: formData.get("location"),
+        username: String(formData.get("username") || ""),
+        bio: String(formData.get("bio") || ""),
+        location: String(formData.get("location") || ""),
       };
 
       const { error } = await supabase
