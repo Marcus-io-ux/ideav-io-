@@ -67,6 +67,7 @@ const Favorites = () => {
             {filteredIdeas.map((idea) => (
               <IdeaCard
                 key={idea.id}
+                id={idea.id}
                 title={idea.title}
                 content={idea.content}
                 createdAt={idea.createdAt}
