@@ -6,6 +6,7 @@ import { CTASection } from "@/components/landing/CTASection";
 import { Footer } from "@/components/landing/Footer";
 import { NavigationBar } from "@/components/landing/NavigationBar";
 import { TestimonialsCarousel } from "@/components/testimonials/TestimonialsCarousel";
+import { FAQSection } from "@/components/landing/FAQSection";
 
 const Landing = () => {
   return (
@@ -21,6 +22,9 @@ const Landing = () => {
           <JoinCommunitySection />
         </div>
         <TestimonialsCarousel />
+        <div id="faq">
+          <FAQSection />
+        </div>
         <CTASection />
       </main>
       <Footer />
