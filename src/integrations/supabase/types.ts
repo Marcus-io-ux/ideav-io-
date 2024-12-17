@@ -146,11 +146,13 @@ export type Database = {
       }
       community_posts: {
         Row: {
+          category: string | null
           channel: string | null
           comments_count: number | null
           content: string
           created_at: string | null
           emoji_reactions: Json | null
+          feedback_type: string | null
           id: string
           is_pinned: boolean | null
           likes_count: number | null
@@ -160,11 +162,13 @@ export type Database = {
           user_id: string | null
         }
         Insert: {
+          category?: string | null
           channel?: string | null
           comments_count?: number | null
           content: string
           created_at?: string | null
           emoji_reactions?: Json | null
+          feedback_type?: string | null
           id?: string
           is_pinned?: boolean | null
           likes_count?: number | null
@@ -174,11 +178,13 @@ export type Database = {
           user_id?: string | null
         }
         Update: {
+          category?: string | null
           channel?: string | null
           comments_count?: number | null
           content?: string
           created_at?: string | null
           emoji_reactions?: Json | null
+          feedback_type?: string | null
           id?: string
           is_pinned?: boolean | null
           likes_count?: number | null
