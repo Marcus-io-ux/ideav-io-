@@ -1,36 +1,16 @@
 import { useState, useEffect } from "react";
 import { IdeaCard } from "@/components/IdeaCard";
-import { IdeaCard as CommunityIdeaCard } from "@/components/community/IdeaCard";
 import { SearchBar } from "@/components/SearchBar";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { PostgrestResponse } from "@supabase/supabase-js";
 
-interface BaseIdea {
+interface Idea {
   id: string;
   title: string;
   content: string;
   createdAt: Date;
   isFavorite: boolean;
 }
-
-interface RegularIdea extends BaseIdea {
-  type: 'idea';
-}
-
-interface CommunityIdea extends BaseIdea {
-  type: 'community_post';
-  author: {
-    id: string;
-    name: string;
-    avatar?: string;
-  };
-  likes: number;
-  comments: number;
-  tags: string[];
-}
-
-type Idea = RegularIdea | CommunityIdea;
 
 const Favorites = () => {
   const [ideas, setIdeas] = useState<Idea[]>([]);
@@ -46,89 +26,39 @@ const Favorites = () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
 
-      // Get all favorites for the user
-      const { data: favorites } = await supabase
+      // First, get all favorites for the user
+      const { data: favorites, error: favoritesError } = await supabase
         .from('favorites')
-        .select('idea_id, item_type')
-        .eq('user_id', user.id);
+        .select('idea_id')
+        .eq('user_id', user.id)
+        .eq('item_type', 'idea');
+
+      if (favoritesError) throw favoritesError;
 
       if (!favorites || favorites.length === 0) {
         setIdeas([]);
         return;
       }
 
-      // Separate IDs by type
-      const regularIdeaIds = favorites
-        .filter(fav => fav.item_type === 'idea')
-        .map(fav => fav.idea_id);
-      
-      const communityPostIds = favorites
-        .filter(fav => fav.item_type === 'community_post')
-        .map(fav => fav.idea_id);
+      // Then, get the actual ideas using the favorite idea_ids
+      const ideaIds = favorites.map(fav => fav.idea_id);
+      const { data: ideasData, error: ideasError } = await supabase
+        .from('ideas')
+        .select('*')
+        .in('id', ideaIds)
+        .eq('deleted', false);
 
-      // Fetch regular ideas
-      const regularIdeasPromise = regularIdeaIds.length > 0
-        ? supabase
-            .from('ideas')
-            .select('*')
-            .in('id', regularIdeaIds)
-            .eq('deleted', false)
-        : Promise.resolve({ data: [], count: null, error: null, status: 200, statusText: 'OK' }) as Promise<PostgrestResponse<any>>;
+      if (ideasError) throw ideasError;
 
-      // Fetch community posts
-      const communityPostsPromise = communityPostIds.length > 0
-        ? supabase
-            .from('community_posts')
-            .select(`
-              *,
-              author:profiles(username, avatar_url)
-            `)
-            .in('id', communityPostIds)
-        : Promise.resolve({ data: [], count: null, error: null, status: 200, statusText: 'OK' }) as Promise<PostgrestResponse<any>>;
-
-      const [regularIdeasResponse, communityPostsResponse] = await Promise.all([
-        regularIdeasPromise,
-        communityPostsPromise
-      ]);
-
-      if (regularIdeasResponse.error) {
-        throw new Error(regularIdeasResponse.error.message);
-      }
-
-      if (communityPostsResponse.error) {
-        throw new Error(communityPostsResponse.error.message);
-      }
-
-      // Format regular ideas
-      const formattedRegularIdeas: RegularIdea[] = (regularIdeasResponse.data || []).map(idea => ({
+      const formattedIdeas = ideasData?.map(idea => ({
         id: idea.id,
         title: idea.title,
         content: idea.content,
         createdAt: new Date(idea.created_at),
-        isFavorite: true,
-        type: 'idea'
-      }));
+        isFavorite: true
+      })) || [];
 
-      // Format community posts
-      const formattedCommunityPosts: CommunityIdea[] = (communityPostsResponse.data || []).map(post => ({
-        id: post.id,
-        title: post.title,
-        content: post.content,
-        createdAt: new Date(post.created_at),
-        isFavorite: true,
-        type: 'community_post',
-        author: {
-          id: post.user_id,
-          name: post.author?.username || 'Anonymous',
-          avatar: post.author?.avatar_url
-        },
-        likes: post.likes_count || 0,
-        comments: post.comments_count || 0,
-        tags: post.tags || []
-      }));
-
-      // Combine all ideas
-      setIdeas([...formattedRegularIdeas, ...formattedCommunityPosts]);
+      setIdeas(formattedIdeas);
     } catch (error) {
       console.error('Error fetching favorites:', error);
       toast({
@@ -150,45 +80,35 @@ const Favorites = () => {
   );
 
   return (
-    <div className="min-h-screen bg-background">
-      <div className="container max-w-4xl py-8 space-y-8 animate-fade-in">
-        <div className="text-center space-y-4">
-          <h1 className="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary to-primary-light">
-            Favorite Ideas
-          </h1>
-          <p className="text-muted-foreground text-lg">
-            Your collection of saved inspirations
-          </p>
-        </div>
-
-        <div className="mb-8">
-          <SearchBar onSearch={handleSearch} />
-        </div>
-
-        <div className="grid gap-6">
-          {filteredIdeas.map((idea) => (
-            idea.type === 'idea' ? (
-              <IdeaCard key={idea.id} {...idea} />
-            ) : (
-              <CommunityIdeaCard
-                key={idea.id}
-                id={idea.id}
-                title={idea.title}
-                content={idea.content}
-                author={idea.author}
-                likes={idea.likes}
-                comments={idea.comments}
-                tags={idea.tags}
-                createdAt={idea.createdAt}
-                emojiReactions={{}}
-              />
-            )
-          ))}
-          {filteredIdeas.length === 0 && (
-            <div className="text-center py-12">
-              <p className="text-muted-foreground">No favorite ideas found</p>
+    <div className="min-h-screen bg-gray-50">
+      <div className="p-8">
+        <div className="max-w-6xl mx-auto">
+          <div className="flex justify-between items-center mb-8">
+            <div>
+              <h1 className="text-3xl font-bold text-gray-900">Favorite Ideas</h1>
+              <p className="text-gray-600">
+                You have {filteredIdeas.length} favorite ideas
+              </p>
             </div>
-          )}
+          </div>
+
+          <div className="mb-8">
+            <SearchBar onSearch={handleSearch} />
+          </div>
+
+          <div className="grid gap-6">
+            {filteredIdeas.map((idea) => (
+              <IdeaCard
+                key={idea.id}
+                {...idea}
+              />
+            ))}
+            {filteredIdeas.length === 0 && (
+              <div className="text-center py-12">
+                <p className="text-gray-500">No favorite ideas found</p>
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </div>

@@ -52,30 +52,26 @@ export const IdeaCard = ({
       setCurrentUserId(user?.id || null);
 
       if (user) {
-        // Check if post is liked - using maybeSingle() instead of single()
-        const { data: likeData, error: likeError } = await supabase
+        // Check if post is liked
+        const { data: likeData } = await supabase
           .from("community_post_likes")
           .select()
           .eq("post_id", id)
           .eq("user_id", user.id)
-          .maybeSingle();
+          .single();
 
-        if (!likeError) {
-          setIsLiked(!!likeData);
-        }
+        setIsLiked(!!likeData);
 
-        // Check if post is favorited - using maybeSingle() instead of single()
-        const { data: favoriteData, error: favoriteError } = await supabase
+        // Check if post is favorited
+        const { data: favoriteData } = await supabase
           .from("favorites")
           .select()
           .eq("idea_id", id)
           .eq("user_id", user.id)
           .eq("item_type", 'community_post')
-          .maybeSingle();
+          .single();
 
-        if (!favoriteError) {
-          setIsFavorite(!!favoriteData);
-        }
+        setIsFavorite(!!favoriteData);
       }
     };
     getCurrentUser();

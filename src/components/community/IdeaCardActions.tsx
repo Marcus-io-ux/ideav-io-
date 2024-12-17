@@ -12,7 +12,7 @@ import { useState } from "react";
 import { useCollaborationRequest } from "@/hooks/use-collaboration-request";
 import { useToast } from "@/hooks/use-toast";
 import { MessageButton } from "./messaging/MessageButton";
-import { supabase } from "@/integrations/supabase/client";
+import { toggleFavorite } from "@/utils/favorites";
 
 interface IdeaCardActionsProps {
   postId: string;
@@ -53,58 +53,13 @@ export const IdeaCardActions = ({
   };
 
   const handleToggleFavorite = async () => {
-    if (!currentUserId) {
-      toast({
-        title: "Please sign in",
-        description: "You need to be signed in to favorite posts",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    try {
-      if (!isFavorite) {
-        const { error } = await supabase
-          .from("favorites")
-          .insert({ 
-            user_id: currentUserId, 
-            idea_id: postId,
-            item_type: 'community_post'
-          });
-
-        if (error) throw error;
-        onFavoriteChange(true);
-        
-        toast({
-          title: "Added to favorites",
-          description: "Post has been added to your favorites",
-        });
-      } else {
-        const { error } = await supabase
-          .from("favorites")
-          .delete()
-          .match({ 
-            user_id: currentUserId, 
-            idea_id: postId,
-            item_type: 'community_post'
-          });
-
-        if (error) throw error;
-        onFavoriteChange(false);
-        
-        toast({
-          title: "Removed from favorites",
-          description: "Post has been removed from your favorites",
-        });
-      }
-    } catch (error) {
-      console.error("Error toggling favorite:", error);
-      toast({
-        title: "Error",
-        description: "Failed to update favorites",
-        variant: "destructive",
-      });
-    }
+    const newState = await toggleFavorite(postId, 'community_post', currentUserId, isFavorite);
+    onFavoriteChange(newState);
+    
+    toast({
+      title: newState ? "Added to favorites" : "Removed from favorites",
+      description: `Post has been ${newState ? 'added to' : 'removed from'} your favorites`,
+    });
   };
 
   return (

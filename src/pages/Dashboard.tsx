@@ -5,6 +5,18 @@ import { AddIdeaDialog } from "@/components/dashboard/AddIdeaDialog";
 import { IdeasList } from "@/components/dashboard/IdeasList";
 import { supabase } from "@/integrations/supabase/client";
 
+// Database type from Supabase
+interface IdeaDB {
+  id: string;
+  title: string;
+  content: string;
+  user_id: string | null;
+  created_at: string;
+  deleted: boolean | null;
+  deleted_at: string | null;
+}
+
+// Frontend type for the UI
 interface Idea {
   id: string;
   title: string;
@@ -38,7 +50,7 @@ const Dashboard = () => {
       }
 
       if (data) {
-        const mappedIdeas: Idea[] = data.map((idea) => ({
+        const mappedIdeas: Idea[] = data.map((idea: IdeaDB) => ({
           id: idea.id,
           title: idea.title,
           content: idea.content,
@@ -130,6 +142,7 @@ const Dashboard = () => {
   };
 
   const handleEditIdea = async (id: string) => {
+    // This will be implemented in the next iteration
     toast({
       title: "Coming Soon",
       description: "Edit functionality will be available soon!",
@@ -205,27 +218,24 @@ const Dashboard = () => {
   const followingCount = 89; // This should be fetched from user_follows table
 
   return (
-    <div className="min-h-screen bg-background">
-      <div className="container max-w-4xl py-8 space-y-8 animate-fade-in">
-        <div className="text-center space-y-4">
-          <h1 className="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary to-primary-light">
-            Your Ideas Hub
-          </h1>
-          <p className="text-muted-foreground text-lg">
-            Capture, organize, and develop your creative thoughts
-          </p>
-        </div>
-
-        <div className="grid gap-6">
-          <Stats
-            totalIdeas={ideas.filter(i => !i.deleted).length}
-            highPriorityCount={highPriorityCount}
-            followersCount={followersCount}
-            followingCount={followingCount}
-          />
-
-          <div className="flex justify-end">
+    <div className="min-h-screen bg-gray-50">
+      <div className="p-8">
+        <div className="max-w-6xl mx-auto">
+          <div className="flex justify-between items-center mb-8">
+            <div>
+              <h1 className="text-3xl font-bold text-gray-900">Welcome back!</h1>
+              <p className="text-gray-600">You have {ideas.filter(i => !i.deleted).length} ideas stored</p>
+            </div>
             <AddIdeaDialog onIdeaSubmit={handleAddIdea} />
+          </div>
+
+          <div className="mb-8">
+            <Stats
+              totalIdeas={ideas.filter(i => !i.deleted).length}
+              highPriorityCount={highPriorityCount}
+              followersCount={followersCount}
+              followingCount={followingCount}
+            />
           </div>
 
           <IdeasList
