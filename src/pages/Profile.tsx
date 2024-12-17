@@ -22,19 +22,29 @@ const Profile = () => {
   const [isPublic, setIsPublic] = useState(false);
   const { toast } = useToast();
 
-  const { data: profile } = useQuery({
-    queryKey: ["profile"],
+  const { data: profileData } = useQuery({
+    queryKey: ["profile-data"],
     queryFn: async () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error("No user found");
       
-      const { data: profile } = await supabase
-        .from("profiles")
-        .select("*")
-        .eq("user_id", user.id)
-        .single();
+      const [{ data: profile }, { data: onboardingData }] = await Promise.all([
+        supabase
+          .from("profiles")
+          .select("*")
+          .eq("user_id", user.id)
+          .single(),
+        supabase
+          .from("onboarding_data")
+          .select("*")
+          .eq("user_id", user.id)
+          .single()
+      ]);
       
-      return profile;
+      return {
+        ...profile,
+        full_name: onboardingData?.full_name
+      };
     },
   });
 
@@ -63,11 +73,11 @@ const Profile = () => {
       <div className="max-w-6xl mx-auto px-4">
         <div className="space-y-8">
           <ProfileHeader
-            username={profile?.username || ""}
-            fullName={profile?.full_name}
-            location={profile?.location}
-            bio={profile?.bio}
-            avatarUrl={profile?.avatar_url}
+            username={profileData?.username || ""}
+            fullName={profileData?.full_name}
+            location={profileData?.location}
+            bio={profileData?.bio}
+            avatarUrl={profileData?.avatar_url}
           />
 
           <div className="flex items-center space-x-2 mb-6">
