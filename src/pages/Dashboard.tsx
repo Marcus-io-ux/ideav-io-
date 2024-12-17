@@ -52,11 +52,13 @@ const Dashboard = () => {
       if (!userPoints) {
         const { data: newPoints, error: insertError } = await supabase
           .from('user_points')
-          .insert([{ 
-            user_id: user.id,
-            current_streak: 0,
-            points: 0
-          }])
+          .insert([
+            { 
+              user_id: user.id,
+              current_streak: 0,
+              points: 0
+            }
+          ])
           .select('current_streak')
           .single();
 
