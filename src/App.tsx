@@ -38,7 +38,6 @@ const App = () => {
             <Route path="/profile" element={<Profile />} />
             <Route path="/inbox" element={<Inbox />} />
             <Route path="/tags" element={<Index />} />
-            <Route path="/settings" element={<Index />} />
           </Routes>
         </BrowserRouter>
       </TooltipProvider>
