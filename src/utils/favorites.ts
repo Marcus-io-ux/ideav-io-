@@ -1,5 +1,5 @@
 import { supabase } from "@/integrations/supabase/client";
-import { useToast } from "@/hooks/use-toast";
+import { toast } from "@/hooks/use-toast";
 
 export const toggleFavorite = async (
   itemId: string,
@@ -7,8 +7,6 @@ export const toggleFavorite = async (
   userId: string | null,
   isFavorite: boolean
 ) => {
-  const { toast } = useToast();
-  
   if (!userId) {
     toast({
       title: "Please sign in",
