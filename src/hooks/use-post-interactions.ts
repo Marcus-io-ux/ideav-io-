@@ -1,5 +1,8 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import type { Database } from "@/integrations/supabase/types";
+
+type CommunityPost = Database['public']['Tables']['community_posts']['Row'];
 
 export const usePostInteractions = (postId: string, userId: string | null) => {
   const [isLiked, setIsLiked] = useState(false);
@@ -42,8 +45,8 @@ export const usePostInteractions = (postId: string, userId: string | null) => {
         .single();
 
       if (post) {
-        setLikeCount(post.likes_count || 0);
-        setCommentCount(post.comments_count || 0);
+        setLikeCount(post.likes_count ?? 0);
+        setCommentCount(post.comments_count ?? 0);
       }
     };
 
@@ -60,9 +63,10 @@ export const usePostInteractions = (postId: string, userId: string | null) => {
           filter: `id=eq.${postId}`
         },
         (payload) => {
-          if (payload.new) {
-            setLikeCount(payload.new.likes_count || 0);
-            setCommentCount(payload.new.comments_count || 0);
+          const newPost = payload.new as CommunityPost;
+          if (newPost) {
+            setLikeCount(newPost.likes_count ?? 0);
+            setCommentCount(newPost.comments_count ?? 0);
           }
         }
       )
