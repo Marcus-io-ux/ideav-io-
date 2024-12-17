@@ -44,6 +44,18 @@
     --sidebar-ring: 217 91% 60%;
   }
 
+  @keyframes gradient {
+    0% {
+      background-position: 0% 50%;
+    }
+    50% {
+      background-position: 100% 50%;
+    }
+    100% {
+      background-position: 0% 50%;
+    }
+  }
+
   .dark {
     --background: 217 100% 10%;
     --foreground: 217 100% 98%;

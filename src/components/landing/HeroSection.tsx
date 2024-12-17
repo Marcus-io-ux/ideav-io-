@@ -34,27 +34,15 @@ export const HeroSection = () => {
   }, []);
 
   return (
-    <section className="relative min-h-[90vh] flex items-center justify-center overflow-hidden bg-gradient-to-br from-blue-50 to-indigo-50">
-      {/* Animated background elements */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute inset-0 opacity-20">
-          {Array.from({ length: 5 }).map((_, i) => (
-            <div
-              key={i}
-              className="absolute rounded-full mix-blend-multiply filter blur-xl animate-float"
-              style={{
-                background: "linear-gradient(90deg, #60A5FA, #818CF8)",
-                width: `${Math.random() * 400 + 100}px`,
-                height: `${Math.random() * 400 + 100}px`,
-                left: `${Math.random() * 100}%`,
-                top: `${Math.random() * 100}%`,
-                animationDelay: `${i * 2}s`,
-                willChange: 'transform'
-              }}
-            />
-          ))}
-        </div>
-      </div>
+    <section className="relative min-h-[90vh] flex items-center justify-center overflow-hidden">
+      {/* New gradient background */}
+      <div 
+        className="absolute inset-0 bg-gradient-to-br from-blue-50 via-indigo-50 to-white"
+        style={{
+          backgroundSize: '400% 400%',
+          animation: 'gradient 15s ease infinite',
+        }}
+      />
 
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-32 text-center">
         <div className="space-y-8">
