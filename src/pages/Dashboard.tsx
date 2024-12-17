@@ -1,16 +1,8 @@
 import { useState } from "react";
-import { IdeaCard } from "@/components/IdeaCard";
-import { AddIdeaButton } from "@/components/AddIdeaButton";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { Stats } from "@/components/dashboard/Stats";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { cn } from "@/lib/utils";
-import { Switch } from "@/components/ui/switch";
-import { Label } from "@/components/ui/label";
+import { AddIdeaDialog } from "@/components/dashboard/AddIdeaDialog";
+import { IdeasList } from "@/components/dashboard/IdeasList";
 
 interface Idea {
   id: string;
@@ -45,38 +37,51 @@ const Dashboard = () => {
     },
   ]);
   
-  const [newIdea, setNewIdea] = useState({ 
-    title: "", 
-    content: "", 
-    tags: "",
-    shareToCommunity: false 
-  });
   const [showFavoritesOnly, setShowFavoritesOnly] = useState(false);
   const { toast } = useToast();
 
-  const handleAddIdea = () => {
-    if (!newIdea.title || !newIdea.content) {
-      toast({
-        title: "Missing Information",
-        description: "Please fill in both title and content fields.",
-        variant: "destructive",
-      });
-      return;
-    }
-
+  const handleAddIdea = (newIdeaData: {
+    title: string;
+    content: string;
+    tags: string[];
+    shareToCommunity: boolean;
+  }) => {
     const idea: Idea = {
       id: Date.now().toString(),
-      title: newIdea.title,
-      content: newIdea.content,
-      tags: newIdea.tags.split(",").map(tag => tag.trim()).filter(tag => tag),
+      title: newIdeaData.title,
+      content: newIdeaData.content,
+      tags: newIdeaData.tags,
       createdAt: new Date(),
       isFavorite: false,
-      sharedToCommunity: newIdea.shareToCommunity
+      sharedToCommunity: newIdeaData.shareToCommunity,
     };
 
     setIdeas([idea, ...ideas]);
-    
-    if (newIdea.shareToCommunity) {
+
+    // Save to personal ideas
+    const personalIdeas = JSON.parse(localStorage.getItem("personalIdeas") || "[]");
+    localStorage.setItem("personalIdeas", JSON.stringify([idea, ...personalIdeas]));
+
+    // If sharing to community, save to community ideas as well
+    if (newIdeaData.shareToCommunity) {
+      const communityIdeas = JSON.parse(localStorage.getItem("communityIdeas") || "[]");
+      localStorage.setItem(
+        "communityIdeas",
+        JSON.stringify([
+          {
+            ...idea,
+            author: {
+              id: "current-user",
+              name: "Current User",
+              avatar: "/placeholder.svg",
+            },
+            likes: 0,
+            comments: 0,
+          },
+          ...communityIdeas,
+        ])
+      );
+
       toast({
         title: "Idea Shared!",
         description: "Your idea has been saved and shared to the community.",
@@ -87,15 +92,9 @@ const Dashboard = () => {
         description: "Your idea has been saved.",
       });
     }
-
-    setNewIdea({ title: "", content: "", tags: "", shareToCommunity: false });
   };
 
-  const filteredIdeas = ideas.filter(
-    (idea) => showFavoritesOnly ? idea.isFavorite : true
-  );
-
-  const highPriorityCount = ideas.filter(idea => idea.priority === "high").length;
+  const highPriorityCount = ideas.filter((idea) => idea.priority === "high").length;
   const followersCount = 128;
   const followingCount = 89;
 
@@ -108,47 +107,7 @@ const Dashboard = () => {
               <h1 className="text-3xl font-bold text-gray-900">Welcome back, John!</h1>
               <p className="text-gray-600">You have {ideas.length} ideas stored</p>
             </div>
-            
-            <Dialog>
-              <DialogTrigger asChild>
-                <AddIdeaButton onClick={() => {}} />
-              </DialogTrigger>
-              <DialogContent className="sm:max-w-[425px]">
-                <DialogHeader>
-                  <DialogTitle>Add New Idea</DialogTitle>
-                </DialogHeader>
-                <div className="grid gap-4 py-4">
-                  <Input
-                    placeholder="Title"
-                    value={newIdea.title}
-                    onChange={(e) => setNewIdea({ ...newIdea, title: e.target.value })}
-                    className="w-full"
-                  />
-                  <Textarea
-                    placeholder="Describe your idea..."
-                    value={newIdea.content}
-                    onChange={(e) => setNewIdea({ ...newIdea, content: e.target.value })}
-                    className="min-h-[100px]"
-                  />
-                  <Input
-                    placeholder="Tags (comma-separated)"
-                    value={newIdea.tags}
-                    onChange={(e) => setNewIdea({ ...newIdea, tags: e.target.value })}
-                  />
-                  <div className="flex items-center space-x-2">
-                    <Switch
-                      id="share-to-community"
-                      checked={newIdea.shareToCommunity}
-                      onCheckedChange={(checked) => 
-                        setNewIdea({ ...newIdea, shareToCommunity: checked })
-                      }
-                    />
-                    <Label htmlFor="share-to-community">Share to Community</Label>
-                  </div>
-                  <Button onClick={handleAddIdea}>Save Idea</Button>
-                </div>
-              </DialogContent>
-            </Dialog>
+            <AddIdeaDialog onIdeaSubmit={handleAddIdea} />
           </div>
 
           <div className="mb-8">
@@ -160,42 +119,11 @@ const Dashboard = () => {
             />
           </div>
 
-          <div>
-            <div className="flex justify-between items-center mb-4">
-              <h3 className="text-lg font-semibold">Your Ideas</h3>
-              <Button
-                variant="ghost"
-                onClick={() => setShowFavoritesOnly(!showFavoritesOnly)}
-                className={cn(
-                  "text-sm",
-                  showFavoritesOnly && "text-primary"
-                )}
-              >
-                {showFavoritesOnly ? "Show All" : "Show Favorites"}
-              </Button>
-            </div>
-
-            <Tabs defaultValue="recent" className="mb-8">
-              <TabsList>
-                <TabsTrigger value="recent">Recent Ideas</TabsTrigger>
-                <TabsTrigger value="all">All Ideas</TabsTrigger>
-              </TabsList>
-              <TabsContent value="recent">
-                <div className="grid gap-6">
-                  {filteredIdeas.slice(0, 5).map((idea) => (
-                    <IdeaCard key={idea.id} {...idea} />
-                  ))}
-                </div>
-              </TabsContent>
-              <TabsContent value="all">
-                <div className="grid gap-6">
-                  {filteredIdeas.map((idea) => (
-                    <IdeaCard key={idea.id} {...idea} />
-                  ))}
-                </div>
-              </TabsContent>
-            </Tabs>
-          </div>
+          <IdeasList
+            ideas={ideas}
+            showFavoritesOnly={showFavoritesOnly}
+            onToggleFavorites={() => setShowFavoritesOnly(!showFavoritesOnly)}
+          />
         </div>
       </div>
     </div>
