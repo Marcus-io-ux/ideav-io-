@@ -48,16 +48,30 @@ export const IdeaCard = ({
     });
   };
 
+  const handleEdit = () => {
+    if (onEdit) {
+      onEdit(id);
+    }
+  };
+
   return (
     <Card 
       className={cn(
-        "w-full hover:shadow-lg transition-shadow duration-300 animate-fade-in",
+        "w-full hover:shadow-lg transition-shadow duration-300 animate-fade-in group",
         isSelected && "border-primary"
       )}
     >
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
         <div className="flex items-center gap-2">
-          <CardTitle className="text-xl font-semibold">{title}</CardTitle>
+          <CardTitle 
+            onClick={handleEdit}
+            className={cn(
+              "text-xl font-semibold",
+              onEdit && "cursor-pointer hover:text-primary transition-colors"
+            )}
+          >
+            {title}
+          </CardTitle>
           <CardHeaderActions
             isFavorite={isFavorite}
             onToggleFavorite={handleToggleFavorite}
@@ -77,8 +91,14 @@ export const IdeaCard = ({
           )}
         </div>
       </CardHeader>
-      <CardContent>
-        <p className="text-gray-600">{content}</p>
+      <CardContent 
+        onClick={handleEdit}
+        className={cn(
+          "text-gray-600",
+          onEdit && "cursor-pointer hover:text-gray-900 transition-colors"
+        )}
+      >
+        <p>{content}</p>
       </CardContent>
     </Card>
   );
