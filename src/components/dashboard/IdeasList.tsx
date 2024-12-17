@@ -5,6 +5,16 @@ import { cn } from "@/lib/utils";
 import { Trash2, RotateCcw } from "lucide-react";
 import { useState } from "react";
 import { AddIdeaDialog } from "@/components/dashboard/AddIdeaDialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 interface Idea {
   id: string;
@@ -35,6 +45,7 @@ export const IdeasList = ({
 }: IdeasListProps) => {
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [activeTab, setActiveTab] = useState("recent");
+  const [isEmptyTrashDialogOpen, setIsEmptyTrashDialogOpen] = useState(false);
 
   const activeIdeas = ideas.filter(idea => !idea.deleted);
   const trashedIdeas = ideas.filter(idea => idea.deleted);
@@ -60,6 +71,7 @@ export const IdeasList = ({
   const handleEmptyTrash = () => {
     const trashedIds = trashedIdeas.map(idea => idea.id);
     onDeleteIdeas(trashedIds);
+    setIsEmptyTrashDialogOpen(false);
   };
 
   return (
@@ -95,7 +107,7 @@ export const IdeasList = ({
             <Button
               variant="destructive"
               size="sm"
-              onClick={handleEmptyTrash}
+              onClick={() => setIsEmptyTrashDialogOpen(true)}
               className="flex items-center justify-center gap-2"
             >
               <Trash2 className="h-4 w-4" />
@@ -104,6 +116,23 @@ export const IdeasList = ({
           )}
         </div>
       </div>
+
+      <AlertDialog open={isEmptyTrashDialogOpen} onOpenChange={setIsEmptyTrashDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Empty Trash?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This action cannot be undone. This will permanently delete all {trashedIdeas.length} items in the trash.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>No, keep items</AlertDialogCancel>
+            <AlertDialogAction onClick={handleEmptyTrash} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+              Yes, empty trash
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
         <TabsList className="w-full sm:w-auto grid grid-cols-3 h-auto p-1">
