@@ -64,8 +64,15 @@ export const TestimonialsCarousel = () => {
       loop: true,
       align: "start",
       skipSnaps: false,
+      duration: 50, // Smooth scrolling duration in milliseconds
     },
-    [Autoplay({ delay: 3000, stopOnInteraction: false })]
+    [
+      Autoplay({
+        delay: 5000, // Time between slides in milliseconds
+        stopOnInteraction: false, // Continue autoplay after user interaction
+        rootNode: (emblaRoot) => emblaRoot.parentElement, // Ensures autoplay works with container
+      })
+    ]
   );
 
   return (
