@@ -19,8 +19,7 @@ const channels: Channel[] = [
   { id: "lifestyle-wellness", name: "Lifestyle & Wellness", icon: <Heart className="h-4 w-4" /> },
   { id: "design-creativity", name: "Design & Creativity", icon: <Palette className="h-4 w-4" /> },
   { id: "apps-tech-tools", name: "Apps & Tech Tools", icon: <Smartphone className="h-4 w-4" /> },
-  { id: "shared-ideas", name: "Shared Ideas", icon: <Users className="h-4 w-4" /> },
-  { id: "feedback", name: "Feedback Requests", icon: <MessageCircleQuestion className="h-4 w-4" /> },
+  { id: "user-feedback", name: "User Feedback", icon: <MessageCircleQuestion className="h-4 w-4" /> },
   { id: "collaboration", name: "Collaboration Corner", icon: <Handshake className="h-4 w-4" /> },
   { id: "favorites", name: "Favorites", icon: <Bookmark className="h-4 w-4" /> },
 ];
