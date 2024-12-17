@@ -27,8 +27,8 @@ export const HeroSection = () => {
       setTimeout(() => {
         setCurrentHeadline((prev) => (prev + 1) % headlines.length);
         setIsFlipping(false);
-      }, 1000);
-    }, 4000);
+      }, 2000); // Increased flip animation duration
+    }, 6000); // Increased interval between changes
 
     return () => clearInterval(interval);
   }, []);
