@@ -48,7 +48,14 @@ export const IdeaCard = ({
     });
   };
 
-  const handleEdit = () => {
+  const handleEdit = (e: React.MouseEvent) => {
+    e.stopPropagation(); // Prevent event bubbling
+    if (onEdit) {
+      onEdit(id);
+    }
+  };
+
+  const handleCardClick = () => {
     if (onEdit) {
       onEdit(id);
     }
@@ -56,26 +63,21 @@ export const IdeaCard = ({
 
   return (
     <Card 
+      onClick={handleCardClick}
       className={cn(
         "w-full hover:shadow-lg transition-shadow duration-300 animate-fade-in group",
-        isSelected && "border-primary"
+        isSelected && "border-primary",
+        onEdit && "cursor-pointer hover:bg-gray-50"
       )}
     >
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
         <div className="flex items-center gap-2">
-          <CardTitle 
-            onClick={handleEdit}
-            className={cn(
-              "text-xl font-semibold",
-              onEdit && "cursor-pointer hover:text-primary transition-colors"
-            )}
-          >
+          <CardTitle className="text-xl font-semibold">
             {title}
           </CardTitle>
           <CardHeaderActions
             isFavorite={isFavorite}
             onToggleFavorite={handleToggleFavorite}
-            onEdit={onEdit ? () => onEdit(id) : undefined}
             onDelete={onDelete ? handleDelete : undefined}
           />
         </div>
@@ -87,17 +89,12 @@ export const IdeaCard = ({
             <Checkbox
               checked={isSelected}
               onCheckedChange={() => onSelect(id)}
+              onClick={(e) => e.stopPropagation()} // Prevent card click when selecting
             />
           )}
         </div>
       </CardHeader>
-      <CardContent 
-        onClick={handleEdit}
-        className={cn(
-          "text-gray-600",
-          onEdit && "cursor-pointer hover:text-gray-900 transition-colors"
-        )}
-      >
+      <CardContent className="text-gray-600">
         <p>{content}</p>
       </CardContent>
     </Card>
