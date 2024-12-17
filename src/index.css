@@ -84,6 +84,31 @@
   }
 }
 
+@keyframes flip {
+  0% {
+    transform: rotateX(0deg);
+    opacity: 1;
+  }
+  25% {
+    transform: rotateX(-90deg);
+    opacity: 0;
+  }
+  75% {
+    transform: rotateX(90deg);
+    opacity: 0;
+  }
+  100% {
+    transform: rotateX(0deg);
+    opacity: 1;
+  }
+}
+
+.animate-flip {
+  animation: flip 2s ease-in-out;
+  backface-visibility: hidden;
+  transform-style: preserve-3d;
+}
+
 @layer base {
   * {
     @apply border-border;

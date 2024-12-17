@@ -1,15 +1,37 @@
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
-import { TypeAnimation } from 'react-type-animation';
+import { useState, useEffect } from 'react';
 
 export const HeroSection = () => {
+  const [currentHeadline, setCurrentHeadline] = useState(0);
+  const [isFlipping, setIsFlipping] = useState(false);
+  
+  const headlines = [
+    'Store Your Ideas.',
+    'Share Your Vision.',
+    'Collaborate with Innovators.',
+    'Turn Thoughts Into Action.'
+  ];
+
   const scrollToPricing = () => {
     const pricingSection = document.querySelector('.pricing-section');
     if (pricingSection) {
       pricingSection.scrollIntoView({ behavior: 'smooth' });
     }
   };
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setIsFlipping(true);
+      setTimeout(() => {
+        setCurrentHeadline((prev) => (prev + 1) % headlines.length);
+        setIsFlipping(false);
+      }, 1000);
+    }, 4000);
+
+    return () => clearInterval(interval);
+  }, []);
 
   return (
     <section className="relative min-h-[90vh] flex items-center justify-center overflow-hidden bg-gradient-to-br from-blue-50 to-indigo-50">
@@ -38,22 +60,13 @@ export const HeroSection = () => {
           {/* Dynamic headline */}
           <h1 className="text-5xl md:text-6xl font-bold text-gray-900 mb-6">
             <span className="block mb-2">Welcome to IdeaVault</span>
-            <TypeAnimation
-              sequence={[
-                'Store Your Ideas.',
-                2000,
-                'Share Your Vision.',
-                2000,
-                'Collaborate with Innovators.',
-                2000,
-                'Turn Thoughts Into Action.',
-                2000,
-              ]}
-              wrapper="span"
-              speed={50}
-              className="bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-indigo-500"
-              repeat={Infinity}
-            />
+            <span
+              className={`block bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-indigo-500 ${
+                isFlipping ? 'animate-flip' : ''
+              }`}
+            >
+              {headlines[currentHeadline]}
+            </span>
           </h1>
 
           {/* Static supportive subheadline */}
