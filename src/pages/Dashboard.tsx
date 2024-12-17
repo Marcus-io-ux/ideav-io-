@@ -253,28 +253,21 @@ const Dashboard = () => {
             title={`Welcome back, ${userName}!`}
             description={`"${dailyQuote}"`}
           />
-
           <div className="space-y-8">
             <h3 className="text-lg font-semibold">Your Ideas</h3>
-            
-            <div className="flex flex-col md:flex-row gap-8">
-              <div className="md:w-64">
-                <Stats
-                  totalIdeas={ideas.filter(i => !i.deleted).length}
-                  favoritesCount={ideas.filter((idea) => idea.isFavorite).length}
-                />
-              </div>
-
-              <div className="flex-1">
-                <IdeasList
-                  ideas={ideas}
-                  showFavoritesOnly={showFavoritesOnly}
-                  onToggleFavorites={handleToggleFavorites}
-                  onEditIdea={handleEditIdea}
-                  onDeleteIdeas={handleDeleteIdeas}
-                  onRestoreIdeas={handleRestoreIdeas}
-                />
-              </div>
+            <Stats
+              totalIdeas={ideas.filter(i => !i.deleted).length}
+              favoritesCount={ideas.filter((idea) => idea.isFavorite).length}
+            />
+            <div className="mt-8">
+              <IdeasList
+                ideas={ideas}
+                showFavoritesOnly={showFavoritesOnly}
+                onToggleFavorites={handleToggleFavorites}
+                onEditIdea={handleEditIdea}
+                onDeleteIdeas={handleDeleteIdeas}
+                onRestoreIdeas={handleRestoreIdeas}
+              />
             </div>
           </div>
         </div>
