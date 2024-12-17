@@ -28,17 +28,17 @@ const Index = () => {
           }}
         />
         {/* Floating Shapes */}
-        <div className="absolute inset-0 overflow-hidden">
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
           {[...Array(3)].map((_, i) => (
             <div
               key={i}
-              className={`absolute rounded-full bg-blue-200/20 backdrop-blur-3xl
+              className={`absolute rounded-full bg-blue-300/30 backdrop-blur-xl
                          animate-float-${i + 1}`}
               style={{
-                width: `${Math.random() * 200 + 100}px`,
-                height: `${Math.random() * 200 + 100}px`,
-                left: `${Math.random() * 100}%`,
-                top: `${Math.random() * 100}%`,
+                width: `${Math.random() * 300 + 150}px`,
+                height: `${Math.random() * 300 + 150}px`,
+                left: `${Math.random() * 80}%`,
+                top: `${Math.random() * 80}%`,
                 animationDelay: `${i * 2}s`,
               }}
             />
