@@ -17,14 +17,25 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
-      <nav className="container mx-auto px-4 py-6 flex justify-between items-center">
-        <h1 className="text-2xl font-bold text-primary">IdeaVault</h1>
+    <div className="min-h-screen relative">
+      {/* Animated Background */}
+      <div 
+        className="fixed inset-0 z-0 bg-gradient-to-br from-blue-50 via-white to-blue-100"
+        style={{
+          animation: "gradient 15s ease infinite",
+          backgroundSize: "200% 200%",
+        }}
+      />
+      
+      <nav className="container mx-auto px-4 py-6 flex justify-between items-center relative z-10 bg-white/80 backdrop-blur-sm">
+        <h1 className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-blue-700">
+          IdeaVault
+        </h1>
         <div className="flex gap-4 items-center">
           <Button
             variant="ghost"
             onClick={scrollToFAQ}
-            className="flex items-center gap-2"
+            className="flex items-center gap-2 text-blue-700 hover:text-blue-800 font-medium"
           >
             <HelpCircle className="w-4 h-4" />
             FAQ
@@ -32,7 +43,7 @@ const Index = () => {
           <Button
             variant="outline"
             onClick={() => navigate("/dashboard")}
-            className="flex items-center gap-2"
+            className="flex items-center gap-2 border-blue-500 text-blue-700 hover:bg-blue-50"
           >
             <LogIn className="w-4 h-4" />
             Log In
@@ -40,7 +51,7 @@ const Index = () => {
         </div>
       </nav>
 
-      <main className="container mx-auto px-4">
+      <main className="container mx-auto px-4 relative z-10">
         {/* Hero Section */}
         <div className="text-center mb-16 pt-16">
           <h1 className="text-5xl md:text-6xl font-bold text-gray-900 mb-6">
@@ -51,7 +62,7 @@ const Index = () => {
           </p>
           <Button
             onClick={() => navigate("/dashboard")}
-            className="bg-primary hover:bg-primary-hover text-white px-8 py-6 text-lg rounded-full shadow-lg hover:shadow-xl transition-all duration-300"
+            className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-6 text-lg rounded-full shadow-lg hover:shadow-xl transition-all duration-300"
           >
             Get Started
             <ArrowRight className="ml-2" size={20} />
@@ -60,24 +71,24 @@ const Index = () => {
 
         {/* Features Section */}
         <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto mb-16">
-          <div className="bg-white p-8 rounded-xl shadow-md hover:shadow-lg transition-shadow">
-            <Brain className="w-12 h-12 text-primary mb-4" />
+          <div className="bg-white/80 backdrop-blur-sm p-8 rounded-xl shadow-md hover:shadow-lg transition-shadow">
+            <Brain className="w-12 h-12 text-blue-600 mb-4" />
             <h3 className="text-xl font-semibold mb-3">Effortless Capture</h3>
             <p className="text-gray-600">
               Quickly save your ideas with our intuitive interface. Add tags, notes, and attachments.
             </p>
           </div>
 
-          <div className="bg-white p-8 rounded-xl shadow-md hover:shadow-lg transition-shadow">
-            <Search className="w-12 h-12 text-primary mb-4" />
+          <div className="bg-white/80 backdrop-blur-sm p-8 rounded-xl shadow-md hover:shadow-lg transition-shadow">
+            <Search className="w-12 h-12 text-blue-600 mb-4" />
             <h3 className="text-xl font-semibold mb-3">Smart Organization</h3>
             <p className="text-gray-600">
               Powerful search and filtering tools help you find and organize your ideas effortlessly.
             </p>
           </div>
 
-          <div className="bg-white p-8 rounded-xl shadow-md hover:shadow-lg transition-shadow">
-            <Lock className="w-12 h-12 text-primary mb-4" />
+          <div className="bg-white/80 backdrop-blur-sm p-8 rounded-xl shadow-md hover:shadow-lg transition-shadow">
+            <Lock className="w-12 h-12 text-blue-600 mb-4" />
             <h3 className="text-xl font-semibold mb-3">Secure & Private</h3>
             <p className="text-gray-600">
               Your ideas are precious. We ensure they stay private and secure.
@@ -121,6 +132,20 @@ const Index = () => {
           </Accordion>
         </div>
       </main>
+
+      <style jsx global>{`
+        @keyframes gradient {
+          0% {
+            background-position: 0% 50%;
+          }
+          50% {
+            background-position: 100% 50%;
+          }
+          100% {
+            background-position: 0% 50%;
+          }
+        }
+      `}</style>
     </div>
   );
 };
