@@ -1,6 +1,5 @@
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { HelpCircle, Settings } from "lucide-react";
 
 export const NavigationBar = () => {
   return (
@@ -16,16 +15,14 @@ export const NavigationBar = () => {
           <div className="hidden md:flex items-center space-x-8">
             <Link 
               to="#how-it-works" 
-              className="text-gray-600 hover:text-blue-500 transition-colors flex items-center gap-2"
+              className="text-gray-600 hover:text-blue-500 transition-colors"
             >
-              <Settings className="w-4 h-4" />
               How it Works
             </Link>
             <Link 
               to="#faq" 
-              className="text-gray-600 hover:text-blue-500 transition-colors flex items-center gap-2"
+              className="text-gray-600 hover:text-blue-500 transition-colors"
             >
-              <HelpCircle className="w-4 h-4" />
               FAQ
             </Link>
             <Link to="#community" className="text-gray-600 hover:text-blue-500 transition-colors">
