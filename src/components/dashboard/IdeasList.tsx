@@ -5,7 +5,6 @@ import { cn } from "@/lib/utils";
 import { Trash2, RotateCcw } from "lucide-react";
 import { useState } from "react";
 import { AddIdeaDialog } from "@/components/dashboard/AddIdeaDialog";
-import { Stats } from "@/components/dashboard/Stats";
 
 interface Idea {
   id: string;
@@ -86,10 +85,6 @@ export const IdeasList = ({
           )}
           <AddIdeaDialog onIdeaSubmit={() => {}} />
         </div>
-        <Stats
-          totalIdeas={activeIdeas.length}
-          favoritesCount={ideas.filter((idea) => idea.isFavorite).length}
-        />
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="mb-8">
