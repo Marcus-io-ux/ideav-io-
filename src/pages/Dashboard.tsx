@@ -4,6 +4,7 @@ import { Stats } from "@/components/dashboard/Stats";
 import { AddIdeaDialog } from "@/components/dashboard/AddIdeaDialog";
 import { IdeasList } from "@/components/dashboard/IdeasList";
 import { supabase } from "@/integrations/supabase/client";
+import { PageHeader } from "@/components/ui/page-header";
 
 // Database type from Supabase
 interface IdeaDB {
@@ -219,24 +220,23 @@ const Dashboard = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <div className="p-8">
-        <div className="max-w-6xl mx-auto">
-          <div className="flex justify-between items-center mb-8">
-            <div>
-              <h1 className="text-3xl font-bold text-gray-900">Welcome back!</h1>
-              <p className="text-gray-600">You have {ideas.filter(i => !i.deleted).length} ideas stored</p>
-            </div>
+      <div className="container max-w-6xl mx-auto p-8">
+        <div className="space-y-8">
+          <PageHeader
+            title="Welcome back!"
+            description={`You have ${ideas.filter(i => !i.deleted).length} ideas stored`}
+          />
+
+          <div className="flex justify-end">
             <AddIdeaDialog onIdeaSubmit={handleAddIdea} />
           </div>
 
-          <div className="mb-8">
-            <Stats
-              totalIdeas={ideas.filter(i => !i.deleted).length}
-              highPriorityCount={highPriorityCount}
-              followersCount={followersCount}
-              followingCount={followingCount}
-            />
-          </div>
+          <Stats
+            totalIdeas={ideas.filter(i => !i.deleted).length}
+            highPriorityCount={highPriorityCount}
+            followersCount={followersCount}
+            followingCount={followingCount}
+          />
 
           <IdeasList
             ideas={ideas}

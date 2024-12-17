@@ -3,6 +3,7 @@ import { IdeaCard } from "@/components/IdeaCard";
 import { SearchBar } from "@/components/SearchBar";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { PageHeader } from "@/components/ui/page-header";
 
 interface Idea {
   id: string;
@@ -80,12 +81,10 @@ const Favorites = () => {
   return (
     <div className="container mx-auto py-8 px-4">
       <div className="max-w-4xl mx-auto space-y-8 animate-fade-in">
-        <div>
-          <h1 className="text-4xl font-bold mb-2">Favorite Ideas</h1>
-          <p className="text-muted-foreground text-lg">
-            You have {filteredIdeas.length} favorite ideas
-          </p>
-        </div>
+        <PageHeader
+          title="Favorite Ideas"
+          description={`You have ${filteredIdeas.length} favorite ideas`}
+        />
 
         <SearchBar onSearch={handleSearch} />
 
