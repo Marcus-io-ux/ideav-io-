@@ -1,10 +1,13 @@
 import { Link, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Home, Star, Users, MessageSquare, Settings, LogOut, UserCircle } from "lucide-react";
+import { Home, Star, Users, MessageSquare, Settings, LogOut, UserCircle, Menu, X } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useState } from "react";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 
 export const NavigationBar = () => {
   const location = useLocation();
+  const [isOpen, setIsOpen] = useState(false);
 
   const navItems = [
     { label: "Ideas", icon: Home, path: "/dashboard" },
@@ -19,7 +22,8 @@ export const NavigationBar = () => {
       <div className="flex h-16 items-center px-4">
         <div className="mx-auto w-full max-w-6xl">
           <div className="flex justify-between items-center">
-            <div className="flex space-x-6">
+            {/* Desktop Navigation */}
+            <div className="hidden md:flex space-x-6">
               {navItems.map((item) => (
                 <Link
                   key={item.label}
@@ -36,6 +40,37 @@ export const NavigationBar = () => {
                 </Link>
               ))}
             </div>
+
+            {/* Mobile Navigation */}
+            <Sheet>
+              <SheetTrigger asChild className="md:hidden">
+                <Button variant="ghost" size="icon">
+                  <Menu className="h-5 w-5" />
+                </Button>
+              </SheetTrigger>
+              <SheetContent side="left" className="w-[240px] sm:w-[280px]">
+                <div className="flex flex-col space-y-4 py-4">
+                  {navItems.map((item) => (
+                    <Link
+                      key={item.label}
+                      to={item.path}
+                      className={cn(
+                        "flex items-center space-x-2 px-2 py-1.5 text-sm font-medium rounded-md",
+                        location.pathname === item.path
+                          ? "bg-primary text-white"
+                          : "text-muted-foreground hover:bg-accent"
+                      )}
+                      onClick={() => setIsOpen(false)}
+                    >
+                      <item.icon className="h-4 w-4" />
+                      <span>{item.label}</span>
+                    </Link>
+                  ))}
+                </div>
+              </SheetContent>
+            </Sheet>
+
+            {/* Profile and Logout Buttons */}
             <div className="flex items-center space-x-4">
               <Button
                 variant="ghost"
@@ -49,7 +84,7 @@ export const NavigationBar = () => {
               </Button>
               <Button
                 variant="ghost"
-                className="flex items-center space-x-2 text-sm font-medium text-muted-foreground hover:text-primary"
+                className="hidden md:flex items-center space-x-2 text-sm font-medium text-muted-foreground hover:text-primary"
                 onClick={() => {
                   console.log("Logging out...");
                 }}
