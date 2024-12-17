@@ -26,6 +26,7 @@ const Favorites = () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
 
+      // First, get all favorites for the user
       const { data: favorites, error: favoritesError } = await supabase
         .from('favorites')
         .select('idea_id')
@@ -39,6 +40,7 @@ const Favorites = () => {
         return;
       }
 
+      // Then, get the actual ideas using the favorite idea_ids
       const ideaIds = favorites.map(fav => fav.idea_id);
       const { data: ideasData, error: ideasError } = await supabase
         .from('ideas')
@@ -78,15 +80,13 @@ const Favorites = () => {
   );
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-accent to-background">
+    <div className="min-h-screen bg-gray-50">
       <div className="p-8">
         <div className="max-w-6xl mx-auto">
           <div className="flex justify-between items-center mb-8">
             <div>
-              <h1 className="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary to-primary-light">
-                Favorite Ideas
-              </h1>
-              <p className="text-secondary mt-2">
+              <h1 className="text-3xl font-bold text-gray-900">Favorite Ideas</h1>
+              <p className="text-gray-600">
                 You have {filteredIdeas.length} favorite ideas
               </p>
             </div>
@@ -104,8 +104,8 @@ const Favorites = () => {
               />
             ))}
             {filteredIdeas.length === 0 && (
-              <div className="text-center py-12 bg-accent rounded-lg shadow-sm">
-                <p className="text-secondary">No favorite ideas found</p>
+              <div className="text-center py-12">
+                <p className="text-gray-500">No favorite ideas found</p>
               </div>
             )}
           </div>
