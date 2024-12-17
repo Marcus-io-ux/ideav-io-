@@ -19,6 +19,8 @@ interface CommunityPost {
   comments_count: number;
   is_pinned: boolean;
   emoji_reactions: Record<string, number>;
+  category?: string;
+  feedback_type?: string;
   author: {
     username: string | null;
     avatar_url: string | null;
@@ -141,6 +143,7 @@ const Community = () => {
     content: string;
     category: string;
     channel: string;
+    feedbackType: string;
   }) => {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) {
@@ -156,6 +159,8 @@ const Community = () => {
       title: idea.title,
       content: idea.content,
       channel: idea.channel,
+      category: idea.category,
+      feedback_type: idea.feedbackType,
       user_id: user.id,
     });
 
@@ -230,6 +235,8 @@ const Community = () => {
               likes={post.likes_count}
               comments={post.comments_count}
               tags={[]}
+              category={post.category}
+              feedbackType={post.feedback_type}
               createdAt={new Date(post.created_at)}
               isPinned={post.is_pinned}
               emojiReactions={post.emoji_reactions}
