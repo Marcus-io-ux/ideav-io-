@@ -137,7 +137,6 @@ export const IdeaCardActions = ({
             size="sm"
             className="gap-2"
             onClick={() => setIsMessageDialogOpen(true)}
-            title="Send direct message"
           >
             <MessageSquare className="h-4 w-4" />
             <span>Message</span>
