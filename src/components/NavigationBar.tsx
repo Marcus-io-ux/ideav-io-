@@ -1,6 +1,6 @@
 import { Link, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Home, Users, Inbox, Settings, LogOut, UserCircle, Menu } from "lucide-react";
+import { Home, Users, Inbox, Settings, LogOut, Menu } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useState, useEffect } from "react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
@@ -47,7 +47,6 @@ export const NavigationBar = () => {
   const navItems = [
     { label: "Ideas", icon: Home, path: "/dashboard" },
     { label: "Community", icon: Users, path: "/community" },
-    { label: "Profile", icon: UserCircle, path: "/profile" },
     { 
       label: "Inbox", 
       icon: Inbox, 
@@ -63,7 +62,7 @@ export const NavigationBar = () => {
         <div className="mx-auto w-full max-w-6xl">
           <div className="flex justify-between items-center">
             <Link 
-              to="/"
+              to="/" 
               className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary to-primary-light hover:opacity-80 transition-opacity"
             >
               IdeaVault
@@ -123,33 +122,31 @@ export const NavigationBar = () => {
                       )}
                     </Link>
                   ))}
+                  <Button
+                    variant="ghost"
+                    className="w-full justify-start px-2 py-1.5"
+                    onClick={() => {
+                      console.log("Logging out...");
+                    }}
+                  >
+                    <LogOut className="h-4 w-4 mr-2" />
+                    <span>Logout</span>
+                  </Button>
                 </div>
               </SheetContent>
             </Sheet>
 
-            {/* Profile and Logout Buttons */}
-            <div className="flex items-center space-x-4">
-              <Button
-                variant="ghost"
-                size="icon"
-                className="rounded-full"
-                onClick={() => {
-                  console.log("Profile clicked");
-                }}
-              >
-                <UserCircle className="h-5 w-5" />
-              </Button>
-              <Button
-                variant="ghost"
-                className="hidden md:flex items-center space-x-2 text-sm font-medium text-muted-foreground hover:text-primary"
-                onClick={() => {
-                  console.log("Logging out...");
-                }}
-              >
-                <LogOut className="h-4 w-4" />
-                <span>Logout</span>
-              </Button>
-            </div>
+            {/* Logout Button */}
+            <Button
+              variant="ghost"
+              className="hidden md:flex items-center space-x-2 text-sm font-medium text-muted-foreground hover:text-primary"
+              onClick={() => {
+                console.log("Logging out...");
+              }}
+            >
+              <LogOut className="h-4 w-4" />
+              <span>Logout</span>
+            </Button>
           </div>
         </div>
       </div>

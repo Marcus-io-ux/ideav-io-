@@ -3,8 +3,9 @@ import { ChannelList } from "@/components/community/channels/ChannelList";
 import { ActiveUsersList } from "@/components/community/users/ActiveUsersList";
 import { IdeaCard } from "@/components/community/IdeaCard";
 import { Button } from "@/components/ui/button";
-import { Plus } from "lucide-react";
+import { Plus, Menu } from "lucide-react";
 import { ShareIdeaModal } from "@/components/community/ShareIdeaModal";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { supabase } from "@/integrations/supabase/client";
 
 interface CommunityPost {
@@ -28,6 +29,8 @@ const Community = () => {
   const [activeChannel, setActiveChannel] = useState("general");
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
   const [posts, setPosts] = useState<CommunityPost[]>([]);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [isUsersListOpen, setIsUsersListOpen] = useState(false);
 
   useEffect(() => {
     const fetchPosts = async () => {
@@ -106,25 +109,62 @@ const Community = () => {
 
   return (
     <div className="flex h-screen">
-      {/* Left Sidebar - Channels */}
-      <div className="w-64 border-r bg-background">
+      {/* Mobile Channel List Sidebar */}
+      <Sheet open={isSidebarOpen} onOpenChange={setIsSidebarOpen}>
+        <SheetContent side="left" className="p-0 w-[240px]">
+          <ChannelList activeChannel={activeChannel} onChannelSelect={(channel) => {
+            setActiveChannel(channel);
+            setIsSidebarOpen(false);
+          }} />
+        </SheetContent>
+      </Sheet>
+
+      {/* Mobile Active Users List Sidebar */}
+      <Sheet open={isUsersListOpen} onOpenChange={setIsUsersListOpen}>
+        <SheetContent side="right" className="p-0 w-[240px]">
+          <ActiveUsersList />
+        </SheetContent>
+      </Sheet>
+
+      {/* Desktop Channel List */}
+      <div className="hidden md:block w-64 border-r bg-background">
         <ChannelList activeChannel={activeChannel} onChannelSelect={setActiveChannel} />
       </div>
 
       {/* Main Content Area */}
       <div className="flex-1 flex flex-col">
         <div className="border-b p-4 flex items-center justify-between bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-          <h1 className="text-2xl font-bold">#{activeChannel}</h1>
-          <Button
-            onClick={() => setIsShareModalOpen(true)}
-            className="gap-2"
-          >
-            <Plus className="h-4 w-4" />
-            Share Idea
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button
+              variant="ghost"
+              size="icon"
+              className="md:hidden"
+              onClick={() => setIsSidebarOpen(true)}
+            >
+              <Menu className="h-5 w-5" />
+            </Button>
+            <h1 className="text-2xl font-bold">#{activeChannel}</h1>
+          </div>
+          <div className="flex items-center gap-2">
+            <Button
+              onClick={() => setIsShareModalOpen(true)}
+              className="gap-2"
+            >
+              <Plus className="h-4 w-4" />
+              <span className="hidden sm:inline">Share Idea</span>
+            </Button>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="md:hidden"
+              onClick={() => setIsUsersListOpen(true)}
+            >
+              <Users className="h-5 w-5" />
+            </Button>
+          </div>
         </div>
 
-        <div className="flex-1 overflow-y-auto p-6 space-y-4">
+        <div className="flex-1 overflow-y-auto p-2 sm:p-6 space-y-4">
           {posts.map((post) => (
             <IdeaCard
               key={post.id}
@@ -147,8 +187,8 @@ const Community = () => {
         </div>
       </div>
 
-      {/* Right Sidebar - Active Users */}
-      <div className="w-64 border-l bg-background">
+      {/* Desktop Active Users List */}
+      <div className="hidden md:block w-64 border-l bg-background">
         <ActiveUsersList />
       </div>
 
