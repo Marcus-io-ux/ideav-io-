@@ -26,7 +26,7 @@ interface CommunityPost {
 }
 
 const Community = () => {
-  const [activeChannel, setActiveChannel] = useState("general");
+  const [activeChannel, setActiveChannel] = useState("community-ideas");
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
   const [posts, setPosts] = useState<CommunityPost[]>([]);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
