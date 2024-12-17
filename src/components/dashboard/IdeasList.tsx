@@ -61,10 +61,6 @@ export const IdeasList = ({
   return (
     <div>
       <div className="flex justify-between items-center mb-4">
-        <Stats
-          totalIdeas={activeIdeas.length}
-          favoritesCount={ideas.filter((idea) => idea.isFavorite).length}
-        />
         <div className="flex items-center gap-2">
           {selectedIds.length > 0 && activeTab !== "trash" && (
             <Button
@@ -90,6 +86,10 @@ export const IdeasList = ({
           )}
           <AddIdeaDialog onIdeaSubmit={() => {}} />
         </div>
+        <Stats
+          totalIdeas={activeIdeas.length}
+          favoritesCount={ideas.filter((idea) => idea.isFavorite).length}
+        />
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="mb-8">
