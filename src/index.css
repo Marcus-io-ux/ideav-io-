@@ -90,6 +90,30 @@
   }
 }
 
+@keyframes gradient {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+.animate-gradient {
+  background: linear-gradient(-45deg, #1EAEDB, #33C3F0, #0FA0CE, #0EA5E9);
+  background-size: 400% 400%;
+  animation: gradient 15s ease infinite;
+}
+
+.animate-gradient-slow {
+  background: linear-gradient(-45deg, #1EAEDB55, #33C3F055, #0FA0CE55, #0EA5E955);
+  background-size: 400% 400%;
+  animation: gradient 20s ease infinite;
+}
+
 @layer base {
   * {
     @apply border-border;

@@ -4,8 +4,7 @@ import { Link } from "react-router-dom";
 
 export const HeroSection = () => {
   return (
-    <section className="relative min-h-[90vh] flex items-center justify-center overflow-hidden bg-gradient-to-br from-[#E5DEFF] to-[#D3E4FD]">
-      {/* Animated background */}
+    <section className="relative min-h-[90vh] flex items-center justify-center overflow-hidden animate-gradient">
       <div className="absolute inset-0 overflow-hidden">
         <div className="absolute inset-0 opacity-20">
           {Array.from({ length: 5 }).map((_, i) => (
@@ -13,7 +12,7 @@ export const HeroSection = () => {
               key={i}
               className="absolute rounded-full mix-blend-multiply filter blur-xl animate-float"
               style={{
-                background: "linear-gradient(90deg, #9b87f5, #6E59A5)",
+                background: "linear-gradient(90deg, #1EAEDB, #0EA5E9)",
                 width: `${Math.random() * 400 + 100}px`,
                 height: `${Math.random() * 400 + 100}px`,
                 left: `${Math.random() * 100}%`,
@@ -26,20 +25,20 @@ export const HeroSection = () => {
       </div>
 
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-32 text-center">
-        <h1 className="text-5xl md:text-6xl font-bold text-gray-900 mb-6 animate-fade-in">
+        <h1 className="text-5xl md:text-6xl font-bold text-white mb-6 animate-fade-in">
           Store Your Ideas.{" "}
-          <span className="bg-clip-text text-transparent bg-gradient-to-r from-[#9b87f5] to-[#7E69AB]">
+          <span className="bg-clip-text text-transparent bg-gradient-to-r from-white to-blue-100">
             Share Your Vision.
           </span>
         </h1>
-        <p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto animate-fade-in">
+        <p className="text-xl text-white/90 mb-8 max-w-2xl mx-auto animate-fade-in">
           Turn your thoughts into reality. Save ideas privately or share them with a community ready to collaborate and inspire.
         </p>
         <div className="flex flex-col sm:flex-row items-center justify-center gap-4 animate-fade-in">
           <Link to="/signup">
             <Button
               size="lg"
-              className="bg-[#9b87f5] hover:bg-[#7E69AB] text-white px-8 py-6 rounded-full 
+              className="bg-white hover:bg-blue-50 text-[#1EAEDB] px-8 py-6 rounded-full 
                        shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-300"
             >
               Start for Free
@@ -50,7 +49,7 @@ export const HeroSection = () => {
             <Button
               variant="outline"
               size="lg"
-              className="px-8 py-6 rounded-full border-2 border-[#9b87f5] hover:bg-[#E5DEFF]/20"
+              className="px-8 py-6 rounded-full border-2 border-white text-white hover:bg-white/10"
             >
               Explore Community
             </Button>
