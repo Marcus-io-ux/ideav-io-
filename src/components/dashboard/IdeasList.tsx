@@ -59,8 +59,7 @@ export const IdeasList = ({
 
   return (
     <div>
-      <div className="flex justify-between items-center mb-4">
-        <h3 className="text-lg font-semibold">Your Ideas</h3>
+      <div className="flex justify-end items-center mb-4">
         <div className="flex items-center gap-2">
           {selectedIds.length > 0 && activeTab !== "trash" && (
             <Button
