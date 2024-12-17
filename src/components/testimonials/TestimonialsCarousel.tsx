@@ -60,11 +60,11 @@ const testimonials = [
 ];
 
 export const TestimonialsCarousel = () => {
-  const autoplayOptions = {
+  const autoplayPlugin = Autoplay({
     delay: 5000,
     stopOnInteraction: false,
     rootNode: (emblaRoot: any) => emblaRoot.parentElement,
-  };
+  });
 
   const [emblaRef, emblaApi] = useEmblaCarousel(
     { 
@@ -73,14 +73,15 @@ export const TestimonialsCarousel = () => {
       skipSnaps: false,
       duration: 50,
     },
-    [Autoplay(autoplayOptions)]
+    [autoplayPlugin]
   );
 
   useEffect(() => {
     if (emblaApi) {
-      emblaApi.play(); // Explicitly start autoplay when component mounts
+      // Start autoplay when component mounts
+      autoplayPlugin.play();
     }
-  }, [emblaApi]);
+  }, [emblaApi, autoplayPlugin]);
 
   return (
     <section className="py-20 bg-gradient-to-br from-accent/30 to-background">
