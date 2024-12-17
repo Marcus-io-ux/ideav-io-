@@ -19,9 +19,9 @@ interface CommunityPost {
   is_pinned: boolean;
   emoji_reactions: Record<string, number>;
   author: {
-    username: string;
-    avatar_url: string;
-  };
+    username: string | null;
+    avatar_url: string | null;
+  } | null;
 }
 
 const Community = () => {
@@ -35,10 +35,7 @@ const Community = () => {
         .from("community_posts")
         .select(`
           *,
-          author:profiles!community_posts_user_id_fkey (
-            username,
-            avatar_url
-          )
+          author:profiles(username, avatar_url)
         `)
         .eq("channel", activeChannel)
         .order("is_pinned", { ascending: false })
@@ -55,10 +52,6 @@ const Community = () => {
         emoji_reactions: typeof post.emoji_reactions === 'string' 
           ? JSON.parse(post.emoji_reactions) 
           : post.emoji_reactions || {},
-        author: {
-          username: post.author?.username || "Anonymous",
-          avatar_url: post.author?.avatar_url || "",
-        }
       }));
 
       setPosts(parsedPosts || []);
@@ -141,7 +134,7 @@ const Community = () => {
               author={{
                 id: post.user_id,
                 name: post.author?.username || "Anonymous",
-                avatar: post.author?.avatar_url,
+                avatar: post.author?.avatar_url || undefined,
               }}
               likes={post.likes_count}
               comments={post.comments_count}
