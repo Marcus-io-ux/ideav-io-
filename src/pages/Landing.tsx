@@ -3,6 +3,7 @@ import { HowItWorksSection } from "@/components/landing/HowItWorksSection";
 import { KeyFeaturesSection } from "@/components/landing/KeyFeaturesSection";
 import { JoinCommunitySection } from "@/components/landing/JoinCommunitySection";
 import { PricingSection } from "@/components/landing/PricingSection";
+import { AboutUsSection } from "@/components/landing/AboutUsSection";
 import { Footer } from "@/components/landing/Footer";
 import { NavigationBar } from "@/components/landing/NavigationBar";
 import { TestimonialsCarousel } from "@/components/testimonials/TestimonialsCarousel";
@@ -18,12 +19,17 @@ const Landing = () => {
           <HowItWorksSection />
           <KeyFeaturesSection />
         </div>
+        <div id="about-us">
+          <AboutUsSection />
+        </div>
         <div id="community">
           <JoinCommunitySection />
           <TestimonialsCarousel />
         </div>
-        <PricingSection />
-        <div id="faq">
+        <div id="pricing" className="pricing-section">
+          <PricingSection />
+        </div>
+        <div id="faq" className="faq-section">
           <FAQSection />
         </div>
       </main>
