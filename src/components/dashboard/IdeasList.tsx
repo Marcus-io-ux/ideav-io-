@@ -5,6 +5,7 @@ import { cn } from "@/lib/utils";
 import { Trash2, RotateCcw } from "lucide-react";
 import { useState } from "react";
 import { AddIdeaDialog } from "@/components/dashboard/AddIdeaDialog";
+import { supabase } from "@/integrations/supabase/client";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -68,10 +69,24 @@ export const IdeasList = ({
     setSelectedIds([]);
   };
 
-  const handleEmptyTrash = () => {
-    const trashedIds = trashedIdeas.map(idea => idea.id);
-    onDeleteIdeas(trashedIds);
-    setIsEmptyTrashDialogOpen(false);
+  const handleEmptyTrash = async () => {
+    try {
+      const trashedIds = trashedIdeas.map(idea => idea.id);
+      
+      // Delete from Supabase
+      const { error } = await supabase
+        .from('ideas')
+        .delete()
+        .in('id', trashedIds);
+
+      if (error) throw error;
+
+      // Delete from UI
+      onDeleteIdeas(trashedIds);
+      setIsEmptyTrashDialogOpen(false);
+    } catch (error) {
+      console.error('Error emptying trash:', error);
+    }
   };
 
   return (
