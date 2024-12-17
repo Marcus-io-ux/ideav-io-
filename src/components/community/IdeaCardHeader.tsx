@@ -56,6 +56,7 @@ export const IdeaCardHeader = ({
             size="icon"
             onClick={() => setIsMessageDialogOpen(true)}
             className="text-gray-600 hover:text-gray-900"
+            title="Send message"
           >
             <MessageSquare className="h-4 w-4" />
           </Button>
@@ -66,6 +67,7 @@ export const IdeaCardHeader = ({
             size="icon"
             className="text-destructive hover:text-destructive/90"
             onClick={onDelete}
+            title="Delete post"
           >
             <Trash2 className="h-4 w-4" />
           </Button>
