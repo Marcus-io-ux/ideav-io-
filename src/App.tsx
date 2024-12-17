@@ -13,6 +13,7 @@ import Pricing from "./pages/Pricing";
 import AboutUs from "./pages/AboutUs";
 import Onboarding from "./pages/Onboarding";
 import Favorites from "./pages/Favorites";
+import Inbox from "./pages/Inbox";
 
 const queryClient = new QueryClient();
 
@@ -35,7 +36,7 @@ const App = () => {
             <Route path="/about" element={<AboutUs />} />
             <Route path="/onboarding" element={<Onboarding />} />
             <Route path="/favorites" element={<Favorites />} />
-            <Route path="/inbox" element={<Index />} />
+            <Route path="/inbox" element={<Inbox />} />
             <Route path="/tags" element={<Index />} />
             <Route path="/settings" element={<Index />} />
           </Routes>
