@@ -26,27 +26,35 @@ const Favorites = () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
 
-      const { data: favorites, error } = await supabase
+      // First, get all favorites for the user
+      const { data: favorites, error: favoritesError } = await supabase
         .from('favorites')
-        .select(`
-          idea_id,
-          ideas (
-            id,
-            title,
-            content,
-            created_at
-          )
-        `)
+        .select('idea_id')
         .eq('user_id', user.id)
         .eq('item_type', 'idea');
 
-      if (error) throw error;
+      if (favoritesError) throw favoritesError;
 
-      const formattedIdeas = favorites?.map(fav => ({
-        id: fav.ideas.id,
-        title: fav.ideas.title,
-        content: fav.ideas.content,
-        createdAt: new Date(fav.ideas.created_at),
+      if (!favorites || favorites.length === 0) {
+        setIdeas([]);
+        return;
+      }
+
+      // Then, get the actual ideas using the favorite idea_ids
+      const ideaIds = favorites.map(fav => fav.idea_id);
+      const { data: ideasData, error: ideasError } = await supabase
+        .from('ideas')
+        .select('*')
+        .in('id', ideaIds)
+        .eq('deleted', false);
+
+      if (ideasError) throw ideasError;
+
+      const formattedIdeas = ideasData?.map(idea => ({
+        id: idea.id,
+        title: idea.title,
+        content: idea.content,
+        createdAt: new Date(idea.created_at),
         isFavorite: true
       })) || [];
 
