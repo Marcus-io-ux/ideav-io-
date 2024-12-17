@@ -32,7 +32,7 @@ export const Sidebar = () => {
 
       <nav className="space-y-2">
         <Button variant="ghost" className="w-full justify-start" onClick={() => navigate("/dashboard")}>
-          <Home className="mr-2 h-4 w-4" /> Dashboard
+          <Home className="mr-2 h-4 w-4" /> Ideas
         </Button>
         <Button variant="ghost" className="w-full justify-start">
           <Star className="mr-2 h-4 w-4" /> Favorites

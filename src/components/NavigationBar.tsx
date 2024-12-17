@@ -7,7 +7,7 @@ export const NavigationBar = () => {
   const location = useLocation();
 
   const navItems = [
-    { label: "Dashboard", icon: Home, path: "/dashboard" },
+    { label: "Ideas", icon: Home, path: "/dashboard" },
     { label: "Favorites", icon: Star, path: "/favorites" },
     { label: "Community", icon: Users, path: "/community" },
     { label: "Chat", icon: MessageSquare, path: "/chat" },
