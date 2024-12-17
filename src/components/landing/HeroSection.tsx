@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 
 export const HeroSection = () => {
   return (
-    <section className="relative min-h-[90vh] flex items-center justify-center overflow-hidden bg-gradient-to-br from-blue-50 to-indigo-50">
+    <section className="relative min-h-[90vh] flex items-center justify-center overflow-hidden bg-gradient-to-br from-[#E5DEFF] to-[#D3E4FD]">
       {/* Animated background */}
       <div className="absolute inset-0 overflow-hidden">
         <div className="absolute inset-0 opacity-20">
@@ -13,7 +13,7 @@ export const HeroSection = () => {
               key={i}
               className="absolute rounded-full mix-blend-multiply filter blur-xl animate-float"
               style={{
-                background: "linear-gradient(90deg, #60A5FA, #818CF8)",
+                background: "linear-gradient(90deg, #9b87f5, #6E59A5)",
                 width: `${Math.random() * 400 + 100}px`,
                 height: `${Math.random() * 400 + 100}px`,
                 left: `${Math.random() * 100}%`,
@@ -28,7 +28,7 @@ export const HeroSection = () => {
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-32 text-center">
         <h1 className="text-5xl md:text-6xl font-bold text-gray-900 mb-6 animate-fade-in">
           Store Your Ideas.{" "}
-          <span className="bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-indigo-500">
+          <span className="bg-clip-text text-transparent bg-gradient-to-r from-[#9b87f5] to-[#7E69AB]">
             Share Your Vision.
           </span>
         </h1>
@@ -39,7 +39,7 @@ export const HeroSection = () => {
           <Link to="/signup">
             <Button
               size="lg"
-              className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-6 rounded-full 
+              className="bg-[#9b87f5] hover:bg-[#7E69AB] text-white px-8 py-6 rounded-full 
                        shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-300"
             >
               Start for Free
@@ -50,7 +50,7 @@ export const HeroSection = () => {
             <Button
               variant="outline"
               size="lg"
-              className="px-8 py-6 rounded-full border-2 hover:bg-gray-50"
+              className="px-8 py-6 rounded-full border-2 border-[#9b87f5] hover:bg-[#E5DEFF]/20"
             >
               Explore Community
             </Button>
