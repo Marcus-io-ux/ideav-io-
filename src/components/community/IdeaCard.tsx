@@ -30,15 +30,16 @@ export const IdeaCard = ({
   content,
   author,
   likes,
-  comments,
+  comments: initialComments,
   tags,
   createdAt,
   isPinned,
   emojiReactions = {},
 }: IdeaCardProps) => {
   const [isLiked, setIsLiked] = useState(false);
+  const [isFavorite, setIsFavorite] = useState(false);
   const [likeCount, setLikeCount] = useState(likes);
-  const [commentCount, setCommentCount] = useState(comments);
+  const [commentCount, setCommentCount] = useState(initialComments);
   const [showComments, setShowComments] = useState(false);
   const [commentsList, setCommentsList] = useState<any[]>([]);
   const [newComment, setNewComment] = useState("");
@@ -49,56 +50,32 @@ export const IdeaCard = ({
     const getCurrentUser = async () => {
       const { data: { user } } = await supabase.auth.getUser();
       setCurrentUserId(user?.id || null);
+
+      if (user) {
+        // Check if post is liked
+        const { data: likeData } = await supabase
+          .from("community_post_likes")
+          .select()
+          .eq("post_id", id)
+          .eq("user_id", user.id)
+          .single();
+
+        setIsLiked(!!likeData);
+
+        // Check if post is favorited
+        const { data: favoriteData } = await supabase
+          .from("favorites")
+          .select()
+          .eq("idea_id", id)
+          .eq("user_id", user.id)
+          .eq("item_type", 'community_post')
+          .single();
+
+        setIsFavorite(!!favoriteData);
+      }
     };
     getCurrentUser();
-
-    // Subscribe to real-time updates for likes and comments
-    const channel = supabase
-      .channel(`post_${id}_updates`)
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'community_post_likes',
-          filter: `post_id=eq.${id}`
-        },
-        (payload) => {
-          if (payload.eventType === 'INSERT') {
-            setLikeCount(prev => prev + 1);
-          } else if (payload.eventType === 'DELETE') {
-            setLikeCount(prev => Math.max(0, prev - 1));
-          }
-        }
-      )
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'community_comments',
-          filter: `post_id=eq.${id}`
-        },
-        (payload) => {
-          if (payload.eventType === 'INSERT') {
-            setCommentCount(prev => prev + 1);
-            if (showComments) {
-              fetchComments();
-            }
-          } else if (payload.eventType === 'DELETE') {
-            setCommentCount(prev => Math.max(0, prev - 1));
-            if (showComments) {
-              fetchComments();
-            }
-          }
-        }
-      )
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  }, [id, showComments]);
+  }, [id]);
 
   const handleLike = async () => {
     const { data: { user } } = await supabase.auth.getUser();
@@ -136,37 +113,6 @@ export const IdeaCard = ({
         setIsLiked(true);
         setLikeCount(prev => prev + 1);
       }
-    }
-  };
-
-  const handleDelete = async () => {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user || user.id !== author.id) {
-      toast({
-        title: "Unauthorized",
-        description: "You can only delete your own posts",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    const { error } = await supabase
-      .from("community_posts")
-      .delete()
-      .match({ id });
-
-    if (error) {
-      console.error("Error deleting post:", error);
-      toast({
-        title: "Error",
-        description: "Failed to delete post",
-        variant: "destructive",
-      });
-    } else {
-      toast({
-        title: "Success",
-        description: "Post deleted successfully",
-      });
     }
   };
 
@@ -261,7 +207,7 @@ export const IdeaCard = ({
           createdAt={createdAt}
           isPinned={isPinned}
           currentUserId={currentUserId}
-          onDelete={handleDelete}
+          onDelete={() => {}}
         />
       </CardHeader>
       <CardContent>
@@ -286,6 +232,8 @@ export const IdeaCard = ({
           }}
           currentUserId={currentUserId}
           authorName={author.name}
+          isFavorite={isFavorite}
+          onFavoriteChange={setIsFavorite}
         />
 
         {showComments && (

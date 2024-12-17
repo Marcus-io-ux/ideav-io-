@@ -202,29 +202,24 @@ export type Database = {
           created_at: string | null
           id: string
           idea_id: string | null
+          item_type: string
           user_id: string | null
         }
         Insert: {
           created_at?: string | null
           id?: string
           idea_id?: string | null
+          item_type?: string
           user_id?: string | null
         }
         Update: {
           created_at?: string | null
           id?: string
           idea_id?: string | null
+          item_type?: string
           user_id?: string | null
         }
-        Relationships: [
-          {
-            foreignKeyName: "favorites_idea_id_fkey"
-            columns: ["idea_id"]
-            isOneToOne: false
-            referencedRelation: "ideas"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       ideas: {
         Row: {
