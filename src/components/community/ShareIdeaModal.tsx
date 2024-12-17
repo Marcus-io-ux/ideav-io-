@@ -71,7 +71,6 @@ export const ShareIdeaModal = ({ isOpen, onClose, onSubmit }: ShareIdeaModalProp
     setFeedbackType("");
     setChannel("");
     setIsCollaborative(false);
-    onClose();
   };
 
   return (
@@ -109,7 +108,6 @@ export const ShareIdeaModal = ({ isOpen, onClose, onSubmit }: ShareIdeaModalProp
                   <SelectValue placeholder="Select channel" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="announcements">Announcements</SelectItem>
                   <SelectItem value="general-ideas">General Ideas</SelectItem>
                   <SelectItem value="startups-business">Startups & Business</SelectItem>
                   <SelectItem value="tech-innovation">Tech & Innovation</SelectItem>
