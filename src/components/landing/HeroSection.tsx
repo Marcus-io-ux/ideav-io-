@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, ChevronDown } from "lucide-react";
 import { Link } from "react-router-dom";
+import { TypeAnimation } from 'react-type-animation';
 
 export const HeroSection = () => {
   const scrollToPricing = () => {
@@ -10,9 +11,16 @@ export const HeroSection = () => {
     }
   };
 
+  const scrollToLearnMore = () => {
+    const howItWorksSection = document.querySelector('.how-it-works');
+    if (howItWorksSection) {
+      howItWorksSection.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
   return (
     <section className="relative min-h-[90vh] flex items-center justify-center overflow-hidden bg-gradient-to-br from-blue-50 to-indigo-50">
-      {/* Animated background */}
+      {/* Animated background elements */}
       <div className="absolute inset-0 overflow-hidden">
         <div className="absolute inset-0 opacity-20">
           {Array.from({ length: 5 }).map((_, i) => (
@@ -32,28 +40,80 @@ export const HeroSection = () => {
         </div>
       </div>
 
+      {/* Floating icons */}
+      <div className="absolute inset-0 pointer-events-none">
+        <div className="relative w-full h-full">
+          {['💡', '✨', '🚀', '⭐'].map((emoji, index) => (
+            <div
+              key={index}
+              className="absolute text-2xl animate-float opacity-50"
+              style={{
+                left: `${index * 25}%`,
+                top: `${Math.random() * 70}%`,
+                animationDelay: `${index * 1.5}s`,
+              }}
+            >
+              {emoji}
+            </div>
+          ))}
+        </div>
+      </div>
+
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-32 text-center">
-        <h1 className="text-5xl md:text-6xl font-bold text-gray-900 mb-6 animate-fade-in">
-          Store Your Ideas.{" "}
-          <span className="bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-indigo-500">
-            Share Your Vision.
-          </span>
-        </h1>
-        <p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto animate-fade-in">
-          Turn your thoughts into reality. Save ideas privately or share them with a community ready to collaborate and inspire.
-        </p>
-        <div className="flex justify-center animate-fade-in">
-          <Link to="/signup">
+        <div className="space-y-8">
+          {/* Dynamic headline */}
+          <h1 className="text-5xl md:text-6xl font-bold text-gray-900 mb-6">
+            <span className="block mb-2">Welcome to IdeaVault</span>
+            <TypeAnimation
+              sequence={[
+                'Store Your Ideas.',
+                2000,
+                'Share Your Vision.',
+                2000,
+                'Collaborate with Innovators.',
+                2000,
+                'Turn Thoughts Into Action.',
+                2000,
+              ]}
+              wrapper="span"
+              speed={50}
+              className="bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-indigo-500"
+              repeat={Infinity}
+            />
+          </h1>
+
+          {/* Static supportive subheadline */}
+          <p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto animate-fade-in">
+            A space to capture, organize, and share your ideas effortlessly. Join our community of innovators and bring your ideas to life.
+          </p>
+
+          {/* CTAs */}
+          <div className="flex flex-col sm:flex-row justify-center items-center gap-4 animate-fade-in">
             <Button
               size="lg"
               className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-6 rounded-full 
                        shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-300"
               onClick={scrollToPricing}
             >
-              Start for Free
+              Get Started for Free
               <ArrowRight className="ml-2 w-5 h-5" />
             </Button>
-          </Link>
+            
+            <Button
+              variant="outline"
+              size="lg"
+              className="px-8 py-6 rounded-full hover:bg-blue-50 transition-colors duration-300"
+              onClick={scrollToLearnMore}
+            >
+              Learn More
+              <ChevronDown className="ml-2 w-5 h-5" />
+            </Button>
+          </div>
+        </div>
+
+        {/* Scroll indicator */}
+        <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 animate-bounce">
+          <ChevronDown className="w-6 h-6 text-gray-400" />
         </div>
       </div>
     </section>
