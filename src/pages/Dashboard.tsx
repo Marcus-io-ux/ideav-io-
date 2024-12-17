@@ -44,11 +44,11 @@ const Dashboard = () => {
         .from('user_points')
         .select('current_streak')
         .eq('user_id', user.id)
-        .maybeSingle(); // Use maybeSingle instead of single to handle no rows case
+        .maybeSingle();
 
       if (error) throw error;
       
-      // If no points record exists, create one
+      // If no points record exists, create one with the user_id
       if (!userPoints) {
         const { data: newPoints, error: insertError } = await supabase
           .from('user_points')
@@ -67,6 +67,11 @@ const Dashboard = () => {
       setCurrentStreak(userPoints?.current_streak || 0);
     } catch (error) {
       console.error('Error fetching user streak:', error);
+      toast({
+        title: "Error",
+        description: "Failed to fetch streak data. Please try again.",
+        variant: "destructive",
+      });
     }
   };
 
@@ -80,7 +85,7 @@ const Dashboard = () => {
         .from('onboarding_data')
         .select('full_name')
         .eq('user_id', user.id)
-        .maybeSingle(); // Use maybeSingle() instead of single()
+        .maybeSingle();
 
       // If no profile exists, create one
       if (!profile) {
