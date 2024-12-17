@@ -1,9 +1,8 @@
 import { useState, useEffect } from "react";
 import { ChannelList } from "@/components/community/channels/ChannelList";
-import { ActiveUsersList } from "@/components/community/users/ActiveUsersList";
 import { IdeaCard } from "@/components/community/IdeaCard";
 import { Button } from "@/components/ui/button";
-import { Plus, Menu, Users } from "lucide-react";
+import { Plus, Menu } from "lucide-react";
 import { ShareIdeaModal } from "@/components/community/ShareIdeaModal";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { supabase } from "@/integrations/supabase/client";
@@ -30,7 +29,6 @@ const Community = () => {
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
   const [posts, setPosts] = useState<CommunityPost[]>([]);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const [isUsersListOpen, setIsUsersListOpen] = useState(false);
 
   useEffect(() => {
     const fetchPosts = async () => {
@@ -49,7 +47,6 @@ const Community = () => {
         return;
       }
 
-      // Parse emoji_reactions from JSON to Record<string, number>
       const parsedPosts = data?.map(post => ({
         ...post,
         emoji_reactions: typeof post.emoji_reactions === 'string' 
@@ -62,7 +59,6 @@ const Community = () => {
 
     fetchPosts();
 
-    // Subscribe to real-time updates
     const channel = supabase
       .channel("community_updates")
       .on(
@@ -119,13 +115,6 @@ const Community = () => {
         </SheetContent>
       </Sheet>
 
-      {/* Mobile Active Users List Sidebar */}
-      <Sheet open={isUsersListOpen} onOpenChange={setIsUsersListOpen}>
-        <SheetContent side="right" className="p-0 w-[240px]">
-          <ActiveUsersList />
-        </SheetContent>
-      </Sheet>
-
       {/* Desktop Channel List */}
       <div className="hidden md:block w-64 border-r bg-background">
         <ChannelList activeChannel={activeChannel} onChannelSelect={setActiveChannel} />
@@ -145,23 +134,13 @@ const Community = () => {
             </Button>
             <h1 className="text-2xl font-bold">#{activeChannel}</h1>
           </div>
-          <div className="flex items-center gap-2">
-            <Button
-              onClick={() => setIsShareModalOpen(true)}
-              className="gap-2"
-            >
-              <Plus className="h-4 w-4" />
-              <span className="hidden sm:inline">Share Idea</span>
-            </Button>
-            <Button
-              variant="ghost"
-              size="icon"
-              className="md:hidden"
-              onClick={() => setIsUsersListOpen(true)}
-            >
-              <Users className="h-5 w-5" />
-            </Button>
-          </div>
+          <Button
+            onClick={() => setIsShareModalOpen(true)}
+            className="gap-2"
+          >
+            <Plus className="h-4 w-4" />
+            <span className="hidden sm:inline">Share Idea</span>
+          </Button>
         </div>
 
         <div className="flex-1 overflow-y-auto p-2 sm:p-6 space-y-4">
@@ -185,11 +164,6 @@ const Community = () => {
             />
           ))}
         </div>
-      </div>
-
-      {/* Desktop Active Users List */}
-      <div className="hidden md:block w-64 border-l bg-background">
-        <ActiveUsersList />
       </div>
 
       <ShareIdeaModal
