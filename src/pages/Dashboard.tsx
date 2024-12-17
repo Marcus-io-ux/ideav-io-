@@ -31,13 +31,36 @@ interface Idea {
 const Dashboard = () => {
   const [ideas, setIdeas] = useState<Idea[]>([]);
   const [userName, setUserName] = useState("");
+  const [currentStreak, setCurrentStreak] = useState(0);
   const [dailyQuote] = useState("The best way to predict the future is to create it.");
   const { toast } = useToast();
 
   useEffect(() => {
     fetchIdeas();
     fetchUserProfile();
+    fetchUserStreak();
   }, []);
+
+  const fetchUserStreak = async () => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      const { data: userPoints, error } = await supabase
+        .from('user_points')
+        .select('current_streak')
+        .eq('user_id', user.id)
+        .single();
+
+      if (error) throw error;
+      
+      if (userPoints) {
+        setCurrentStreak(userPoints.current_streak || 0);
+      }
+    } catch (error) {
+      console.error('Error fetching user streak:', error);
+    }
+  };
 
   const fetchUserProfile = async () => {
     try {
@@ -251,7 +274,6 @@ const Dashboard = () => {
   };
 
   const favoritesCount = ideas.filter((idea) => idea.isFavorite).length;
-  const followersCount = 128;
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -265,7 +287,7 @@ const Dashboard = () => {
           <Stats
             totalIdeas={ideas.filter(i => !i.deleted).length}
             favoritesCount={favoritesCount}
-            followersCount={followersCount}
+            currentStreak={currentStreak}
           />
 
           <IdeasList
