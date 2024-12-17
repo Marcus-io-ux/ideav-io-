@@ -1,19 +1,12 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Heart, MessageSquare, Bookmark, Share, UserPlus, UserCheck } from "lucide-react";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { useState } from "react";
+import { Plus } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import {
-  NavigationMenu,
-  NavigationMenuContent,
-  NavigationMenuItem,
-  NavigationMenuLink,
-  NavigationMenuList,
-  NavigationMenuTrigger,
-} from "@/components/ui/navigation-menu";
+import { NavigationMenu, NavigationMenuContent, NavigationMenuItem, NavigationMenuLink, NavigationMenuList, NavigationMenuTrigger } from "@/components/ui/navigation-menu";
 import { Link } from "react-router-dom";
+import { ShareIdeaModal } from "@/components/community/ShareIdeaModal";
+import { IdeaCard } from "@/components/community/IdeaCard";
 
 interface CommunityPost {
   id: string;
@@ -62,24 +55,38 @@ const SAMPLE_POSTS: CommunityPost[] = [
 ];
 
 const Community = () => {
-  const [followedUsers, setFollowedUsers] = useState<string[]>([]);
+  const [isShareModalOpen, setIsShareModalOpen] = useState(false);
   const { toast } = useToast();
 
-  const handleFollow = (userId: string, userName: string) => {
-    setFollowedUsers((prev) => {
-      const isFollowing = prev.includes(userId);
-      const newFollowedUsers = isFollowing
-        ? prev.filter((id) => id !== userId)
-        : [...prev, userId];
+  const handleIdeaSubmit = (idea: {
+    title: string;
+    content: string;
+    category: string;
+    feedbackType: string;
+    isCollaborative: boolean;
+  }) => {
+    // In a real app, this would make an API call to save the idea
+    const newIdea: CommunityPost = {
+      id: Date.now().toString(),
+      title: idea.title,
+      content: idea.content,
+      author: {
+        id: "current-user",
+        name: "Current User",
+        avatar: "/placeholder.svg",
+      },
+      likes: 0,
+      comments: 0,
+      tags: [idea.category, idea.feedbackType],
+      createdAt: new Date(),
+    };
 
-      toast({
-        title: isFollowing ? "Unfollowed" : "Following",
-        description: isFollowing
-          ? `You have unfollowed ${userName}`
-          : `You are now following ${userName}`,
-      });
+    // Add the new idea to the list (in a real app, this would be handled by a state management solution)
+    SAMPLE_POSTS.unshift(newIdea);
 
-      return newFollowedUsers;
+    toast({
+      title: "Idea shared!",
+      description: "Your idea has been shared with the community",
     });
   };
 
@@ -135,11 +142,6 @@ const Community = () => {
                   </div>
                 </NavigationMenuContent>
               </NavigationMenuItem>
-              <NavigationMenuItem>
-                <Link to="/dashboard">
-                  <Button variant="ghost">My Dashboard</Button>
-                </Link>
-              </NavigationMenuItem>
             </NavigationMenuList>
           </NavigationMenu>
         </div>
@@ -151,7 +153,12 @@ const Community = () => {
             <h1 className="text-3xl font-bold text-gray-900">Community Ideas</h1>
             <p className="text-gray-600">Explore and share ideas with the community</p>
           </div>
-          <Button size="lg" className="gap-2">
+          <Button
+            size="lg"
+            onClick={() => setIsShareModalOpen(true)}
+            className="gap-2 bg-primary hover:bg-primary-hover text-white"
+          >
+            <Plus className="h-5 w-5" />
             Share Your Idea
           </Button>
         </div>
@@ -159,61 +166,17 @@ const Community = () => {
         <ScrollArea className="h-[calc(100vh-12rem)]">
           <div className="space-y-6">
             {SAMPLE_POSTS.map((post) => (
-              <Card key={post.id} className="hover:shadow-lg transition-shadow duration-300">
-                <CardHeader className="flex flex-row items-start justify-between space-y-0">
-                  <div className="flex items-start gap-4">
-                    <Avatar>
-                      <AvatarImage src={post.author.avatar} />
-                      <AvatarFallback>{post.author.name.charAt(0)}</AvatarFallback>
-                    </Avatar>
-                    <div className="flex flex-col">
-                      <CardTitle className="text-xl">{post.title}</CardTitle>
-                      <div className="flex items-center gap-2 mt-1">
-                        <span className="text-sm text-gray-600">{post.author.name}</span>
-                        <span className="text-sm text-gray-400">•</span>
-                        <span className="text-sm text-gray-600">
-                          {new Date(post.createdAt).toLocaleDateString()}
-                        </span>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          className="ml-2"
-                          onClick={() => handleFollow(post.author.id, post.author.name)}
-                        >
-                          {followedUsers.includes(post.author.id) ? (
-                            <UserCheck className="w-4 h-4 text-green-500" />
-                          ) : (
-                            <UserPlus className="w-4 h-4" />
-                          )}
-                        </Button>
-                      </div>
-                    </div>
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-gray-600 mb-4">{post.content}</p>
-                  <div className="flex items-center gap-6">
-                    <Button variant="ghost" size="sm" className="gap-2">
-                      <Heart className="w-4 h-4" />
-                      <span>{post.likes}</span>
-                    </Button>
-                    <Button variant="ghost" size="sm" className="gap-2">
-                      <MessageSquare className="w-4 h-4" />
-                      <span>{post.comments}</span>
-                    </Button>
-                    <Button variant="ghost" size="sm">
-                      <Bookmark className="w-4 h-4" />
-                    </Button>
-                    <Button variant="ghost" size="sm">
-                      <Share className="w-4 h-4" />
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
+              <IdeaCard key={post.id} {...post} />
             ))}
           </div>
         </ScrollArea>
       </div>
+
+      <ShareIdeaModal
+        isOpen={isShareModalOpen}
+        onClose={() => setIsShareModalOpen(false)}
+        onSubmit={handleIdeaSubmit}
+      />
     </div>
   );
 };
