@@ -1,39 +1,48 @@
-import { Lock, MessageSquare, Users, Share } from "lucide-react";
+import { Brain, Users, Tag, Layout } from "lucide-react";
 
 export const KeyFeaturesSection = () => {
   return (
-    <section className="py-20 bg-gray-50">
+    <section className="py-20 bg-gradient-to-br from-accent to-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <h2 className="text-3xl font-bold text-center mb-12">Key Features</h2>
+        <h2 className="text-4xl font-bold text-center mb-4 bg-gradient-to-r from-primary to-primary-hover bg-clip-text text-transparent">
+          Key Features
+        </h2>
+        <p className="text-center text-gray-600 mb-12 max-w-2xl mx-auto">
+          Everything you need to manage and grow your ideas
+        </p>
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
           {[
             {
-              icon: Lock,
-              title: "Private Vault",
-              description: "Save your ideas securely and organize them effortlessly.",
-            },
-            {
-              icon: MessageSquare,
-              title: "Community Feedback",
-              description: "Get insights, likes, and comments from real people.",
+              icon: Brain,
+              title: "Idea Vault",
+              description: "Securely store and organize all your creative ideas in one place.",
             },
             {
               icon: Users,
-              title: "Collaboration Tools",
-              description: "Request to collaborate and turn ideas into projects.",
+              title: "Community Collaboration",
+              description: "Connect with like-minded creators and get valuable feedback.",
             },
             {
-              icon: Share,
-              title: "Easy Sharing",
-              description: "Share ideas publicly or invite specific people to view them.",
+              icon: Tag,
+              title: "Smart Organization",
+              description: "Tag and categorize your ideas for easy access and management.",
+            },
+            {
+              icon: Layout,
+              title: "Personal Dashboard",
+              description: "Track your progress and manage your ideas efficiently.",
             },
           ].map((feature) => (
             <div
               key={feature.title}
-              className="bg-white p-6 rounded-xl shadow-md hover:shadow-lg transition-shadow"
+              className="group bg-white/80 backdrop-blur-sm p-8 rounded-xl shadow-lg 
+                       hover:shadow-xl transition-all transform hover:-translate-y-1 
+                       duration-300 border border-accent/20"
             >
-              <feature.icon className="w-12 h-12 text-blue-600 mb-4" />
-              <h3 className="text-xl font-semibold mb-2">{feature.title}</h3>
+              <div className="mb-6 transform group-hover:scale-110 transition-transform duration-300">
+                <feature.icon className="w-12 h-12 text-primary" />
+              </div>
+              <h3 className="text-xl font-semibold mb-3 text-gray-900">{feature.title}</h3>
               <p className="text-gray-600">{feature.description}</p>
             </div>
           ))}
