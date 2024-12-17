@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
-import { Stats } from "@/components/dashboard/Stats";
 import { IdeasList } from "@/components/dashboard/IdeasList";
 import { supabase } from "@/integrations/supabase/client";
 import { PageHeader } from "@/components/ui/page-header";
@@ -243,8 +242,6 @@ const Dashboard = () => {
     setShowFavoritesOnly(!showFavoritesOnly);
   };
 
-  const favoritesCount = ideas.filter((idea) => idea.isFavorite).length;
-
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="container max-w-6xl mx-auto p-8">
@@ -255,10 +252,6 @@ const Dashboard = () => {
           />
           <div className="space-y-8">
             <h3 className="text-lg font-semibold">Your Ideas</h3>
-            <Stats
-              totalIdeas={ideas.filter(i => !i.deleted).length}
-              favoritesCount={ideas.filter((idea) => idea.isFavorite).length}
-            />
             <div className="mt-8">
               <IdeasList
                 ideas={ideas}
