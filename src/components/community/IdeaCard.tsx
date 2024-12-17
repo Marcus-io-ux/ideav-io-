@@ -134,37 +134,49 @@ export const IdeaCard = ({
   };
 
   const fetchComments = async () => {
-    const { data, error } = await supabase
-      .from("community_comments")
-      .select(`
-        id,
-        content,
-        created_at,
-        user_id,
-        author:profiles(
-          username,
-          avatar_url
-        )
-      `)
-      .eq("post_id", id)
-      .order("created_at", { ascending: true });
+    try {
+      // First, get comments with user_id
+      const { data: commentsData, error: commentsError } = await supabase
+        .from("community_comments")
+        .select(`
+          id,
+          content,
+          created_at,
+          user_id
+        `)
+        .eq("post_id", id)
+        .order("created_at", { ascending: true });
 
-    if (error) {
-      console.error("Error fetching comments:", error);
-      return;
-    }
-
-    const formattedComments = data?.map(comment => ({
-      id: comment.id,
-      content: comment.content,
-      createdAt: new Date(comment.created_at),
-      author: {
-        name: comment.author?.username || "Anonymous",
-        avatar: comment.author?.avatar_url
+      if (commentsError) {
+        console.error("Error fetching comments:", commentsError);
+        return;
       }
-    })) || [];
 
-    setCommentsList(formattedComments);
+      // Then, for each comment, get the author's profile
+      const commentsWithAuthors = await Promise.all(
+        commentsData.map(async (comment) => {
+          const { data: profileData } = await supabase
+            .from("profiles")
+            .select("username, avatar_url")
+            .eq("user_id", comment.user_id)
+            .single();
+
+          return {
+            id: comment.id,
+            content: comment.content,
+            createdAt: new Date(comment.created_at),
+            author: {
+              name: profileData?.username || "Anonymous",
+              avatar: profileData?.avatar_url
+            }
+          };
+        })
+      );
+
+      setCommentsList(commentsWithAuthors);
+    } catch (error) {
+      console.error("Error processing comments:", error);
+    }
   };
 
   const handleAddComment = async () => {
