@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { ArrowRight, ChevronDown } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
 import { TypeAnimation } from 'react-type-animation';
 
@@ -8,13 +8,6 @@ export const HeroSection = () => {
     const pricingSection = document.querySelector('.pricing-section');
     if (pricingSection) {
       pricingSection.scrollIntoView({ behavior: 'smooth' });
-    }
-  };
-
-  const scrollToLearnMore = () => {
-    const howItWorksSection = document.querySelector('.how-it-works');
-    if (howItWorksSection) {
-      howItWorksSection.scrollIntoView({ behavior: 'smooth' });
     }
   };
 
@@ -36,25 +29,6 @@ export const HeroSection = () => {
                 animationDelay: `${i * 2}s`,
               }}
             />
-          ))}
-        </div>
-      </div>
-
-      {/* Floating icons */}
-      <div className="absolute inset-0 pointer-events-none">
-        <div className="relative w-full h-full">
-          {['💡', '✨', '🚀', '⭐'].map((emoji, index) => (
-            <div
-              key={index}
-              className="absolute text-2xl animate-float opacity-50"
-              style={{
-                left: `${index * 25}%`,
-                top: `${Math.random() * 70}%`,
-                animationDelay: `${index * 1.5}s`,
-              }}
-            >
-              {emoji}
-            </div>
           ))}
         </div>
       </div>
@@ -88,7 +62,7 @@ export const HeroSection = () => {
           </p>
 
           {/* CTAs */}
-          <div className="flex flex-col sm:flex-row justify-center items-center gap-4 animate-fade-in">
+          <div className="flex justify-center items-center gap-4 animate-fade-in">
             <Button
               size="lg"
               className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-6 rounded-full 
@@ -98,22 +72,7 @@ export const HeroSection = () => {
               Get Started for Free
               <ArrowRight className="ml-2 w-5 h-5" />
             </Button>
-            
-            <Button
-              variant="outline"
-              size="lg"
-              className="px-8 py-6 rounded-full hover:bg-blue-50 transition-colors duration-300"
-              onClick={scrollToLearnMore}
-            >
-              Learn More
-              <ChevronDown className="ml-2 w-5 h-5" />
-            </Button>
           </div>
-        </div>
-
-        {/* Scroll indicator */}
-        <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 animate-bounce">
-          <ChevronDown className="w-6 h-6 text-gray-400" />
         </div>
       </div>
     </section>
