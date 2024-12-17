@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 
 export const NavigationBar = () => {
   const scrollToSection = (sectionId: string) => {
-    const element = document.getElementById(sectionId);
+    const element = document.querySelector(`.${sectionId}`);
     if (element) {
       element.scrollIntoView({ behavior: 'smooth' });
     }
