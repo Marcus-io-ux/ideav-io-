@@ -4,6 +4,8 @@ import { IdeasList } from "@/components/dashboard/IdeasList";
 import { supabase } from "@/integrations/supabase/client";
 import { PageHeader } from "@/components/ui/page-header";
 import { Tables } from "@/integrations/supabase/types";
+import { FeedbackButton } from "@/components/feedback/FeedbackButton";
+import { FeedbackModal } from "@/components/feedback/FeedbackModal";
 
 type IdeaDB = Tables<"ideas">;
 
@@ -23,6 +25,7 @@ const Dashboard = () => {
   const [userName, setUserName] = useState("");
   const [showFavoritesOnly, setShowFavoritesOnly] = useState(false);
   const [dailyQuote] = useState("The best way to predict the future is to create it.");
+  const [isFeedbackModalOpen, setIsFeedbackModalOpen] = useState(false);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -262,6 +265,11 @@ const Dashboard = () => {
           </div>
         </div>
       </div>
+      <FeedbackButton onClick={() => setIsFeedbackModalOpen(true)} />
+      <FeedbackModal 
+        isOpen={isFeedbackModalOpen}
+        onClose={() => setIsFeedbackModalOpen(false)}
+      />
     </div>
   );
 };
