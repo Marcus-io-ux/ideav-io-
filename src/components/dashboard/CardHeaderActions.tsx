@@ -6,32 +6,25 @@ interface CardHeaderActionsProps {
   onToggleFavorite: () => void;
   onEdit?: () => void;
   onDelete?: () => void;
-  size?: "default" | "sm";
 }
 
 export const CardHeaderActions = ({
   isFavorite,
   onToggleFavorite,
   onDelete,
-  size = "default",
 }: CardHeaderActionsProps) => {
-  const iconSize = size === "sm" ? "h-4 w-4" : "h-5 w-5";
-  const buttonSize = size === "sm" ? "p-0.5" : "p-1";
-  
   return (
     <div className="flex items-center gap-1">
       <button
         onClick={onToggleFavorite}
         className={cn(
-          buttonSize,
-          "rounded-full transition-colors",
+          "p-1 rounded-full transition-colors",
           isFavorite ? "text-primary hover:bg-primary-light" : "text-gray-400 hover:bg-gray-100"
         )}
       >
         <Star
           className={cn(
-            iconSize,
-            "transition-colors",
+            "h-5 w-5 transition-colors",
             isFavorite && "fill-primary"
           )}
         />
@@ -39,9 +32,9 @@ export const CardHeaderActions = ({
       {onDelete && (
         <button
           onClick={onDelete}
-          className={cn(buttonSize, "rounded-full hover:bg-gray-100")}
+          className="p-1 rounded-full hover:bg-gray-100"
         >
-          <Trash className={cn(iconSize, "text-gray-500")} />
+          <Trash className="h-4 w-4 text-gray-500" />
         </button>
       )}
     </div>
