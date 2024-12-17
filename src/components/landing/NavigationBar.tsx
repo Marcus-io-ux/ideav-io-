@@ -13,9 +13,6 @@ export const NavigationBar = () => {
             IdeaVault
           </Link>
           <div className="hidden md:flex items-center space-x-8">
-            <Link to="#features" className="text-gray-600 hover:text-blue-500 transition-colors">
-              Features
-            </Link>
             <Link to="#community" className="text-gray-600 hover:text-blue-500 transition-colors">
               Community
             </Link>
