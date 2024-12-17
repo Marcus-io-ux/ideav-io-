@@ -49,7 +49,7 @@ export const IdeaCard = ({
   };
 
   const handleEdit = (e: React.MouseEvent) => {
-    e.stopPropagation(); // Prevent event bubbling
+    e.stopPropagation();
     if (onEdit) {
       onEdit(id);
     }
@@ -67,7 +67,7 @@ export const IdeaCard = ({
       className={cn(
         "w-full hover:shadow-lg transition-shadow duration-300 animate-fade-in group",
         isSelected && "border-primary",
-        onEdit && "cursor-pointer hover:bg-gray-50"
+        onEdit && "cursor-pointer hover:bg-accent/50"
       )}
     >
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -82,19 +82,19 @@ export const IdeaCard = ({
           />
         </div>
         <div className="flex items-center gap-4">
-          <span className="text-sm text-gray-500">
+          <span className="text-sm text-muted-foreground">
             {formatDistanceToNow(createdAt, { addSuffix: true })}
           </span>
           {onSelect && (
             <Checkbox
               checked={isSelected}
               onCheckedChange={() => onSelect(id)}
-              onClick={(e) => e.stopPropagation()} // Prevent card click when selecting
+              onClick={(e) => e.stopPropagation()}
             />
           )}
         </div>
       </CardHeader>
-      <CardContent className="text-gray-600">
+      <CardContent className="text-muted-foreground">
         <p>{content}</p>
       </CardContent>
     </Card>
