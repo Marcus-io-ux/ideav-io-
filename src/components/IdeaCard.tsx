@@ -1,5 +1,5 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { formatDistanceToNow } from "date-fns";
+import { format } from "date-fns";
 import { useToast } from "@/hooks/use-toast";
 import { Checkbox } from "@/components/ui/checkbox";
 import { cn } from "@/lib/utils";
@@ -83,7 +83,7 @@ export const IdeaCard = ({
         </div>
         <div className="flex items-center gap-4">
           <span className="text-sm text-muted-foreground">
-            {formatDistanceToNow(createdAt, { addSuffix: true })}
+            {format(createdAt, 'MMM d, yyyy')}
           </span>
           {onSelect && (
             <Checkbox
