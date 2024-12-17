@@ -218,13 +218,17 @@ const Dashboard = () => {
   const followingCount = 89; // This should be fetched from user_follows table
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gradient-to-b from-accent to-background">
       <div className="p-8">
         <div className="max-w-6xl mx-auto">
           <div className="flex justify-between items-center mb-8">
             <div>
-              <h1 className="text-3xl font-bold text-gray-900">Welcome back!</h1>
-              <p className="text-gray-600">You have {ideas.filter(i => !i.deleted).length} ideas stored</p>
+              <h1 className="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary to-primary-light">
+                Welcome back!
+              </h1>
+              <p className="text-secondary mt-2">
+                You have {ideas.filter(i => !i.deleted).length} ideas stored
+              </p>
             </div>
             <AddIdeaDialog onIdeaSubmit={handleAddIdea} />
           </div>

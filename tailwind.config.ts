@@ -25,13 +25,13 @@ export default {
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
         primary: {
-          DEFAULT: "#3B82F6", // blue-500
-          hover: "#6366F1", // indigo-500
-          light: "#93C5FD", // blue-300
+          DEFAULT: "#9b87f5", // Primary Purple
+          hover: "#7E69AB", // Secondary Purple
+          light: "#D6BCFA", // Light Purple
         },
         secondary: {
-          DEFAULT: "#1D4ED8", // blue-700
-          foreground: "#1E3A8A", // blue-900
+          DEFAULT: "#6E59A5", // Tertiary Purple
+          foreground: "#1A1F2C", // Dark Purple
         },
         destructive: {
           DEFAULT: "hsl(var(--destructive))",
@@ -42,8 +42,8 @@ export default {
           foreground: "hsl(var(--muted-foreground))",
         },
         accent: {
-          DEFAULT: "#EFF6FF", // blue-50
-          foreground: "#1D4ED8", // blue-700
+          DEFAULT: "#F5F3FF", // Very Light Purple
+          foreground: "#6E59A5", // Tertiary Purple
         },
       },
       borderRadius: {
