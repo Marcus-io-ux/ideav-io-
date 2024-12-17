@@ -2,6 +2,13 @@ import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 
 export const NavigationBar = () => {
+  const scrollToSection = (sectionId: string) => {
+    const element = document.getElementById(sectionId);
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-sm border-b border-gray-100 shadow-sm">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
@@ -13,18 +20,18 @@ export const NavigationBar = () => {
             IdeaVault
           </Link>
           <div className="hidden md:flex items-center space-x-8">
-            <Link 
-              to="#how-it-works" 
+            <button 
+              onClick={() => scrollToSection('how-it-works')}
               className="text-gray-600 hover:text-blue-500 transition-colors"
             >
               How it Works
-            </Link>
-            <Link 
-              to="#faq" 
+            </button>
+            <button 
+              onClick={() => scrollToSection('faq')}
               className="text-gray-600 hover:text-blue-500 transition-colors"
             >
               FAQ
-            </Link>
+            </button>
             <Link to="#community" className="text-gray-600 hover:text-blue-500 transition-colors">
               Community
             </Link>

@@ -13,8 +13,10 @@ const Landing = () => {
       <NavigationBar />
       <main>
         <HeroSection />
-        <HowItWorksSection />
-        <KeyFeaturesSection />
+        <div id="how-it-works">
+          <HowItWorksSection />
+          <KeyFeaturesSection />
+        </div>
         <JoinCommunitySection />
         <TestimonialsCarousel />
         <CTASection />
