@@ -2,7 +2,7 @@ import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { MessageCircle, Heart, UserPlus, Pin, Trash2 } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { IdeaComments } from "./IdeaComments";
@@ -41,7 +41,16 @@ export const IdeaCard = ({
   const [showComments, setShowComments] = useState(false);
   const [commentsList, setCommentsList] = useState<any[]>([]);
   const [newComment, setNewComment] = useState("");
+  const [currentUserId, setCurrentUserId] = useState<string | null>(null);
   const { toast } = useToast();
+
+  useEffect(() => {
+    const getCurrentUser = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      setCurrentUserId(user?.id || null);
+    };
+    getCurrentUser();
+  }, []);
 
   const handleLike = async () => {
     const { data: { user } } = await supabase.auth.getUser();
@@ -110,7 +119,6 @@ export const IdeaCard = ({
         title: "Success",
         description: "Post deleted successfully",
       });
-      // You might want to trigger a refresh of the posts list here
     }
   };
 
@@ -157,7 +165,6 @@ export const IdeaCard = ({
       });
     } else {
       setNewComment("");
-      // Refresh comments
       fetchComments();
       toast({
         title: "Success",
@@ -209,7 +216,7 @@ export const IdeaCard = ({
             </div>
           </div>
         </div>
-        {author.id === (async () => (await supabase.auth.getUser()).data.user?.id)() && (
+        {currentUserId === author.id && (
           <Button
             variant="ghost"
             size="icon"
