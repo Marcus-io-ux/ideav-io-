@@ -1,7 +1,7 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Pin, Trash2 } from "lucide-react";
-import { format } from "date-fns";
+import { formatDistanceToNow } from "date-fns";
 
 interface IdeaCardHeaderProps {
   title: string;
@@ -40,7 +40,7 @@ export const IdeaCardHeader = ({
             <span className="text-sm text-gray-600">{author.name}</span>
             <span className="text-sm text-gray-400">•</span>
             <span className="text-sm text-gray-600">
-              {format(createdAt, "PPpp")}
+              {formatDistanceToNow(createdAt, { addSuffix: true })}
             </span>
           </div>
         </div>
