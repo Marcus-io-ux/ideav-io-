@@ -6,7 +6,6 @@ import { IdeasList } from "@/components/dashboard/IdeasList";
 import { supabase } from "@/integrations/supabase/client";
 import { PageHeader } from "@/components/ui/page-header";
 
-// Database type from Supabase
 interface IdeaDB {
   id: string;
   title: string;
@@ -32,12 +31,33 @@ interface Idea {
 
 const Dashboard = () => {
   const [ideas, setIdeas] = useState<Idea[]>([]);
-  const [showFavoritesOnly, setShowFavoritesOnly] = useState(false);
+  const [userName, setUserName] = useState("");
+  const [dailyQuote] = useState("The best way to predict the future is to create it.");
   const { toast } = useToast();
 
   useEffect(() => {
     fetchIdeas();
+    fetchUserProfile();
   }, []);
+
+  const fetchUserProfile = async () => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        const { data: profile } = await supabase
+          .from('onboarding_data')
+          .select('full_name')
+          .eq('user_id', user.id)
+          .single();
+        
+        if (profile?.full_name) {
+          setUserName(profile.full_name.split(' ')[0]);
+        }
+      }
+    } catch (error) {
+      console.error('Error fetching user profile:', error);
+    }
+  };
 
   const fetchIdeas = async () => {
     try {
@@ -223,13 +243,9 @@ const Dashboard = () => {
       <div className="container max-w-6xl mx-auto p-8">
         <div className="space-y-8">
           <PageHeader
-            title="Welcome back!"
-            description={`You have ${ideas.filter(i => !i.deleted).length} ideas stored`}
+            title={`Welcome back, ${userName}!`}
+            description={`"${dailyQuote}"\n\nYou have ${ideas.filter(i => !i.deleted).length} ideas stored`}
           />
-
-          <div className="flex justify-end">
-            <AddIdeaDialog onIdeaSubmit={handleAddIdea} />
-          </div>
 
           <Stats
             totalIdeas={ideas.filter(i => !i.deleted).length}
@@ -240,12 +256,16 @@ const Dashboard = () => {
 
           <IdeasList
             ideas={ideas}
-            showFavoritesOnly={showFavoritesOnly}
-            onToggleFavorites={() => setShowFavoritesOnly(!showFavoritesOnly)}
+            showFavoritesOnly={false}
+            onToggleFavorites={() => {}}
             onEditIdea={handleEditIdea}
             onDeleteIdeas={handleDeleteIdeas}
             onRestoreIdeas={handleRestoreIdeas}
           />
+
+          <div className="flex justify-center mt-8">
+            <AddIdeaDialog onIdeaSubmit={handleAddIdea} />
+          </div>
         </div>
       </div>
     </div>

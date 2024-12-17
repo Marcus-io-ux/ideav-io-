@@ -41,6 +41,7 @@ const Favorites = () => {
       }
 
       const ideaIds = favorites.map(fav => fav.idea_id);
+
       const { data: ideasData, error: ideasError } = await supabase
         .from('ideas')
         .select('*')
@@ -93,6 +94,7 @@ const Favorites = () => {
             <IdeaCard
               key={idea.id}
               {...idea}
+              onToggleFavorite={() => fetchFavorites()}
             />
           ))}
           {filteredIdeas.length === 0 && (
