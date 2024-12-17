@@ -4,23 +4,25 @@ import { Link } from "react-router-dom";
 
 export const PricingSection = () => {
   return (
-    <section className="py-24 bg-gradient-to-br from-white to-blue-50 pricing-section">
+    <section className="py-24 bg-gradient-to-br from-blue-50 to-indigo-50 pricing-section">
       {/* Section Header */}
       <div className="text-center mb-16">
-        <h2 className="text-4xl font-bold mb-4">Choose Your Plan. Start Building Today.</h2>
-        <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+        <h2 className="text-4xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-indigo-500">
+          Choose Your Plan. Start Building Today.
+        </h2>
+        <p className="text-xl text-blue-600/80 max-w-3xl mx-auto">
           Save your ideas for free or unlock powerful tools to share, collaborate, and bring your ideas to life.
         </p>
       </div>
 
       {/* Pricing Cards */}
-      <div className="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto">
+      <div className="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto px-4">
         {/* Starter Plan */}
-        <div className="bg-white p-8 rounded-xl border border-gray-200 hover:border-blue-200 transition-all duration-300 hover:shadow-lg">
-          <h3 className="text-2xl font-bold mb-4">Starter</h3>
+        <div className="bg-white/70 backdrop-blur-sm p-8 rounded-xl border border-blue-100 hover:border-blue-200 transition-all duration-300 hover:shadow-lg">
+          <h3 className="text-2xl font-bold mb-4 text-blue-900">Starter</h3>
           <div className="mb-6">
-            <span className="text-4xl font-bold">$0</span>
-            <span className="text-gray-600">/month</span>
+            <span className="text-4xl font-bold text-blue-600">$0</span>
+            <span className="text-blue-600/60">/month</span>
           </div>
           <ul className="space-y-4 mb-8">
             {[
@@ -29,8 +31,8 @@ export const PricingSection = () => {
               "Browse and explore community ideas",
             ].map((feature) => (
               <li key={feature} className="flex items-center gap-3">
-                <Check className="w-5 h-5 text-green-500" />
-                <span className="text-gray-600">{feature}</span>
+                <Check className="w-5 h-5 text-blue-500" />
+                <span className="text-blue-600/80">{feature}</span>
               </li>
             ))}
           </ul>
@@ -38,7 +40,7 @@ export const PricingSection = () => {
             <Button
               variant="outline"
               size="lg"
-              className="w-full py-6 text-lg hover:bg-blue-50"
+              className="w-full py-6 text-lg border-blue-200 hover:bg-blue-50 text-blue-600"
             >
               Start for Free
             </Button>
@@ -46,15 +48,15 @@ export const PricingSection = () => {
         </div>
 
         {/* Pro Plan */}
-        <div className="bg-white p-8 rounded-xl border-2 border-blue-200 shadow-xl hover:shadow-2xl transition-all duration-300 relative">
-          <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 bg-blue-600 text-white px-4 py-1 rounded-full flex items-center gap-1">
+        <div className="bg-white/70 backdrop-blur-sm p-8 rounded-xl border-2 border-blue-200 shadow-xl hover:shadow-2xl transition-all duration-300 relative">
+          <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-4 py-1 rounded-full flex items-center gap-1">
             <Award className="w-4 h-4" />
             <span className="text-sm font-medium">Best Value</span>
           </div>
-          <h3 className="text-2xl font-bold mb-4">Pro</h3>
+          <h3 className="text-2xl font-bold mb-4 text-blue-900">Pro</h3>
           <div className="mb-6">
-            <span className="text-4xl font-bold">$10</span>
-            <span className="text-gray-600">/month</span>
+            <span className="text-4xl font-bold text-blue-600">$10</span>
+            <span className="text-blue-600/60">/month</span>
           </div>
           <ul className="space-y-4 mb-8">
             {[
@@ -64,15 +66,15 @@ export const PricingSection = () => {
               "Priority support for Pro members",
             ].map((feature) => (
               <li key={feature} className="flex items-center gap-3">
-                <Check className="w-5 h-5 text-green-500" />
-                <span className="text-gray-600">{feature}</span>
+                <Check className="w-5 h-5 text-blue-500" />
+                <span className="text-blue-600/80">{feature}</span>
               </li>
             ))}
           </ul>
           <Link to="/signup?plan=pro">
             <Button
               size="lg"
-              className="w-full bg-blue-600 hover:bg-blue-700 text-white py-6 text-lg"
+              className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white py-6 text-lg"
             >
               Upgrade to Pro
             </Button>
@@ -82,12 +84,12 @@ export const PricingSection = () => {
 
       {/* Trust Signals */}
       <div className="mt-12 text-center space-y-4">
-        <p className="text-gray-600">No credit card required for Starter Plan • Upgrade anytime, risk-free</p>
-        <div className="max-w-2xl mx-auto bg-blue-50 p-6 rounded-lg">
-          <p className="text-gray-700 italic">
+        <p className="text-blue-600/80">No credit card required for Starter Plan • Upgrade anytime, risk-free</p>
+        <div className="max-w-2xl mx-auto bg-blue-50/50 backdrop-blur-sm p-6 rounded-lg">
+          <p className="text-blue-600/90 italic">
             "Pro helped me collaborate and launch my idea faster than ever!"
           </p>
-          <p className="text-gray-600 mt-2">– Sarah, Innovator</p>
+          <p className="text-blue-600/70 mt-2">– Sarah, Innovator</p>
         </div>
       </div>
     </section>
