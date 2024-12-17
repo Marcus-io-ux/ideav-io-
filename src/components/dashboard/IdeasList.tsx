@@ -57,6 +57,11 @@ export const IdeasList = ({
     setSelectedIds([]);
   };
 
+  const handleEmptyTrash = () => {
+    const trashedIds = trashedIdeas.map(idea => idea.id);
+    onDeleteIdeas(trashedIds);
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row justify-between items-stretch sm:items-center gap-4">
@@ -84,7 +89,20 @@ export const IdeasList = ({
             </Button>
           )}
         </div>
-        <AddIdeaDialog onIdeaSubmit={() => {}} />
+        <div className="flex flex-col gap-2">
+          <AddIdeaDialog onIdeaSubmit={() => {}} />
+          {activeTab === "trash" && trashedIdeas.length > 0 && (
+            <Button
+              variant="destructive"
+              size="sm"
+              onClick={handleEmptyTrash}
+              className="flex items-center justify-center gap-2"
+            >
+              <Trash2 className="h-4 w-4" />
+              Empty Trash ({trashedIdeas.length})
+            </Button>
+          )}
+        </div>
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
