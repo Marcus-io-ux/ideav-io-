@@ -260,7 +260,7 @@ const Dashboard = () => {
         <div className="space-y-8">
           <PageHeader
             title={`Welcome back, ${userName}!`}
-            description={`"${dailyQuote}"\n\nYou have ${ideas.filter(i => !i.deleted).length} ideas stored`}
+            description={`"${dailyQuote}"`}
           />
 
           <Stats
@@ -278,10 +278,6 @@ const Dashboard = () => {
             onDeleteIdeas={handleDeleteIdeas}
             onRestoreIdeas={handleRestoreIdeas}
           />
-
-          <div className="flex justify-center mt-8">
-            <AddIdeaDialog onIdeaSubmit={handleAddIdea} />
-          </div>
         </div>
       </div>
     </div>

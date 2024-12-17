@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { Trash2, RotateCcw } from "lucide-react";
 import { useState } from "react";
+import { AddIdeaDialog } from "@/components/dashboard/AddIdeaDialog";
 
 interface Idea {
   id: string;
@@ -28,8 +29,6 @@ interface IdeasListProps {
 
 export const IdeasList = ({
   ideas,
-  showFavoritesOnly,
-  onToggleFavorites,
   onEditIdea,
   onDeleteIdeas,
   onRestoreIdeas,
@@ -39,10 +38,6 @@ export const IdeasList = ({
 
   const activeIdeas = ideas.filter(idea => !idea.deleted);
   const trashedIdeas = ideas.filter(idea => idea.deleted);
-  
-  const filteredIdeas = activeIdeas.filter((idea) =>
-    showFavoritesOnly ? idea.isFavorite : true
-  );
 
   const handleSelect = (id: string) => {
     setSelectedIds(prev => 
@@ -89,13 +84,7 @@ export const IdeasList = ({
               Restore Selected ({selectedIds.length})
             </Button>
           )}
-          <Button
-            variant="ghost"
-            onClick={onToggleFavorites}
-            className={cn("text-sm", showFavoritesOnly && "text-primary")}
-          >
-            {showFavoritesOnly ? "Show All" : "Show Favorites"}
-          </Button>
+          <AddIdeaDialog onIdeaSubmit={() => {}} />
         </div>
       </div>
 
@@ -108,7 +97,7 @@ export const IdeasList = ({
         
         <TabsContent value="recent">
           <div className="grid gap-6">
-            {filteredIdeas.slice(0, 5).map((idea) => (
+            {activeIdeas.slice(0, 5).map((idea) => (
               <IdeaCard
                 key={idea.id}
                 {...idea}
@@ -123,7 +112,7 @@ export const IdeasList = ({
         
         <TabsContent value="all">
           <div className="grid gap-6">
-            {filteredIdeas.map((idea) => (
+            {activeIdeas.map((idea) => (
               <IdeaCard
                 key={idea.id}
                 {...idea}
