@@ -11,6 +11,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { useState } from "react";
 import { useCollaborationRequest } from "@/hooks/use-collaboration-request";
 import { DirectMessageDialog } from "./DirectMessageDialog";
+import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 
 interface IdeaCardActionsProps {
   postId: string;
@@ -37,13 +39,62 @@ export const IdeaCardActions = ({
 }: IdeaCardActionsProps) => {
   const [isCollaborateOpen, setIsCollaborateOpen] = useState(false);
   const [isMessageDialogOpen, setIsMessageDialogOpen] = useState(false);
+  const [isFavorite, setIsFavorite] = useState(false);
   const [message, setMessage] = useState("");
   const { sendCollaborationRequest, isLoading } = useCollaborationRequest();
+  const { toast } = useToast();
 
   const handleCollaborate = async () => {
     await sendCollaborationRequest(postId, ownerId, message);
     setMessage("");
     setIsCollaborateOpen(false);
+  };
+
+  const handleToggleFavorite = async () => {
+    if (!currentUserId) {
+      toast({
+        title: "Please sign in",
+        description: "You need to be signed in to favorite posts",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    try {
+      if (!isFavorite) {
+        const { error } = await supabase
+          .from("favorites")
+          .insert({ user_id: currentUserId, idea_id: postId });
+
+        if (error) throw error;
+
+        setIsFavorite(true);
+        toast({
+          title: "Added to favorites",
+          description: "Post has been added to your favorites",
+        });
+      } else {
+        const { error } = await supabase
+          .from("favorites")
+          .delete()
+          .match({ user_id: currentUserId, idea_id: postId });
+
+        if (error) throw error;
+
+        setIsFavorite(false);
+        toast({
+          title: "Removed from favorites",
+          description: "Post has been removed from your favorites",
+        });
+      }
+    } catch (error) {
+      console.error("Error toggling favorite:", error);
+      toast({
+        title: "Error",
+        description: "Failed to update favorites",
+        variant: "destructive",
+      });
+    }
   };
 
   return (
@@ -70,6 +121,15 @@ export const IdeaCardActions = ({
         >
           <UserPlus className="h-4 w-4" />
           <span>Collaborate</span>
+        </Button>
+        <Button
+          variant="ghost"
+          size="sm"
+          className={`gap-2 ${isFavorite ? "text-yellow-500" : ""}`}
+          onClick={handleToggleFavorite}
+        >
+          <Heart className={`h-4 w-4 ${isFavorite ? "fill-current" : ""}`} />
+          <span>Favorite</span>
         </Button>
         {currentUserId && currentUserId !== ownerId && (
           <Button
