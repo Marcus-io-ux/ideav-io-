@@ -1,38 +1,65 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { IdeaCard } from "@/components/IdeaCard";
 import { SearchBar } from "@/components/SearchBar";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
 
 interface Idea {
   id: string;
   title: string;
   content: string;
-  tags: string[];
   createdAt: Date;
   isFavorite: boolean;
 }
 
 const Favorites = () => {
-  // Mock data - in a real app, this would come from your backend
-  const [ideas] = useState<Idea[]>([
-    {
-      id: "1",
-      title: "Build a Personal Website",
-      content: "Create a portfolio website using React and Three.js for 3D animations",
-      tags: ["web", "portfolio", "3D"],
-      createdAt: new Date("2024-02-20"),
-      isFavorite: true,
-    },
-    {
-      id: "2",
-      title: "Learn Machine Learning",
-      content: "Start with Python basics and move on to TensorFlow and PyTorch",
-      tags: ["AI", "programming", "learning"],
-      createdAt: new Date("2024-02-21"),
-      isFavorite: true,
-    },
-  ]);
-
+  const [ideas, setIdeas] = useState<Idea[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
+  const { toast } = useToast();
+
+  useEffect(() => {
+    fetchFavorites();
+  }, []);
+
+  const fetchFavorites = async () => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      const { data: favorites, error } = await supabase
+        .from('favorites')
+        .select(`
+          idea_id,
+          ideas (
+            id,
+            title,
+            content,
+            created_at
+          )
+        `)
+        .eq('user_id', user.id)
+        .eq('item_type', 'idea');
+
+      if (error) throw error;
+
+      const formattedIdeas = favorites?.map(fav => ({
+        id: fav.ideas.id,
+        title: fav.ideas.title,
+        content: fav.ideas.content,
+        createdAt: new Date(fav.ideas.created_at),
+        isFavorite: true
+      })) || [];
+
+      setIdeas(formattedIdeas);
+    } catch (error) {
+      console.error('Error fetching favorites:', error);
+      toast({
+        title: "Error",
+        description: "Failed to load favorites. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
 
   const handleSearch = (query: string) => {
     setSearchQuery(query.toLowerCase());
@@ -40,10 +67,8 @@ const Favorites = () => {
 
   const filteredIdeas = ideas.filter(
     (idea) =>
-      idea.isFavorite &&
-      (idea.title.toLowerCase().includes(searchQuery) ||
-        idea.content.toLowerCase().includes(searchQuery) ||
-        idea.tags.some((tag) => tag.toLowerCase().includes(searchQuery)))
+      idea.title.toLowerCase().includes(searchQuery) ||
+      idea.content.toLowerCase().includes(searchQuery)
   );
 
   return (
@@ -67,11 +92,7 @@ const Favorites = () => {
             {filteredIdeas.map((idea) => (
               <IdeaCard
                 key={idea.id}
-                id={idea.id}
-                title={idea.title}
-                content={idea.content}
-                createdAt={idea.createdAt}
-                isFavorite={idea.isFavorite}
+                {...idea}
               />
             ))}
             {filteredIdeas.length === 0 && (

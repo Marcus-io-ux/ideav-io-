@@ -17,6 +17,7 @@ import Inbox from "./pages/Inbox";
 import Settings from "./pages/Settings";
 import Announcements from "./pages/Announcements";
 import Login from "./pages/Login";
+import Favorites from "./pages/Favorites";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -40,10 +41,6 @@ const App = () => {
 
     return () => subscription.unsubscribe();
   }, []);
-
-  if (isAuthenticated === null) {
-    return null; // or a loading spinner
-  }
 
   return (
     <QueryClientProvider client={queryClient}>
@@ -104,6 +101,12 @@ const App = () => {
               path="/inbox"
               element={
                 isAuthenticated ? <Inbox /> : <Navigate to="/login" replace />
+              }
+            />
+            <Route
+              path="/favorites"
+              element={
+                isAuthenticated ? <Favorites /> : <Navigate to="/login" replace />
               }
             />
             <Route
