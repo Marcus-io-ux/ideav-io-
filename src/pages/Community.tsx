@@ -25,7 +25,7 @@ interface CommunityPost {
 }
 
 const Community = () => {
-  const [activeChannel, setActiveChannel] = useState("community-ideas");
+  const [activeChannel, setActiveChannel] = useState("general-ideas");
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
   const [posts, setPosts] = useState<CommunityPost[]>([]);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -84,6 +84,7 @@ const Community = () => {
     title: string;
     content: string;
     category: string;
+    channel: string;
   }) => {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return;
@@ -91,7 +92,7 @@ const Community = () => {
     const { error } = await supabase.from("community_posts").insert({
       title: idea.title,
       content: idea.content,
-      channel: activeChannel,
+      channel: idea.channel,
       user_id: user.id,
     });
 
@@ -101,11 +102,11 @@ const Community = () => {
     }
 
     setIsShareModalOpen(false);
+    setActiveChannel(idea.channel);
   };
 
   return (
     <div className="flex h-screen">
-      {/* Mobile Channel List Sidebar */}
       <Sheet open={isSidebarOpen} onOpenChange={setIsSidebarOpen}>
         <SheetContent side="left" className="p-0 w-[240px]">
           <ChannelList activeChannel={activeChannel} onChannelSelect={(channel) => {
@@ -115,12 +116,10 @@ const Community = () => {
         </SheetContent>
       </Sheet>
 
-      {/* Desktop Channel List */}
       <div className="hidden md:block w-64 border-r bg-background">
         <ChannelList activeChannel={activeChannel} onChannelSelect={setActiveChannel} />
       </div>
 
-      {/* Main Content Area */}
       <div className="flex-1 flex flex-col">
         <div className="border-b p-4 flex items-center justify-between bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
           <div className="flex items-center gap-2">

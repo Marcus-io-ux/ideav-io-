@@ -22,6 +22,7 @@ interface ShareIdeaModalProps {
     content: string;
     category: string;
     feedbackType: string;
+    channel: string;
     isCollaborative: boolean;
   }) => void;
 }
@@ -31,6 +32,7 @@ export const ShareIdeaModal = ({ isOpen, onClose, onSubmit }: ShareIdeaModalProp
   const [content, setContent] = useState("");
   const [category, setCategory] = useState("");
   const [feedbackType, setFeedbackType] = useState("");
+  const [channel, setChannel] = useState("");
   const [isCollaborative, setIsCollaborative] = useState(false);
   const { toast } = useToast();
 
@@ -44,11 +46,21 @@ export const ShareIdeaModal = ({ isOpen, onClose, onSubmit }: ShareIdeaModalProp
       return;
     }
 
+    if (!channel) {
+      toast({
+        title: "Channel Required",
+        description: "Please select a channel for your idea",
+        variant: "destructive",
+      });
+      return;
+    }
+
     onSubmit({
       title,
       content,
       category,
       feedbackType,
+      channel,
       isCollaborative,
     });
 
@@ -57,6 +69,7 @@ export const ShareIdeaModal = ({ isOpen, onClose, onSubmit }: ShareIdeaModalProp
     setContent("");
     setCategory("");
     setFeedbackType("");
+    setChannel("");
     setIsCollaborative(false);
     onClose();
   };
@@ -90,6 +103,25 @@ export const ShareIdeaModal = ({ isOpen, onClose, onSubmit }: ShareIdeaModalProp
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
+              <Label htmlFor="channel">Channel</Label>
+              <Select value={channel} onValueChange={setChannel}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select channel" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="announcements">Announcements</SelectItem>
+                  <SelectItem value="general-ideas">General Ideas</SelectItem>
+                  <SelectItem value="startups-business">Startups & Business</SelectItem>
+                  <SelectItem value="tech-innovation">Tech & Innovation</SelectItem>
+                  <SelectItem value="lifestyle-wellness">Lifestyle & Wellness</SelectItem>
+                  <SelectItem value="design-creativity">Design & Creativity</SelectItem>
+                  <SelectItem value="apps-tech-tools">Apps & Tech Tools</SelectItem>
+                  <SelectItem value="user-feedback">User Feedback</SelectItem>
+                  <SelectItem value="collaboration">Collaboration Corner</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
               <Label htmlFor="category">Category</Label>
               <Select value={category} onValueChange={setCategory}>
                 <SelectTrigger>
@@ -104,19 +136,19 @@ export const ShareIdeaModal = ({ isOpen, onClose, onSubmit }: ShareIdeaModalProp
                 </SelectContent>
               </Select>
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="feedbackType">Feedback Type</Label>
-              <Select value={feedbackType} onValueChange={setFeedbackType}>
-                <SelectTrigger>
-                  <SelectValue placeholder="What feedback?" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="improvement">Ideas for improvement</SelectItem>
-                  <SelectItem value="collaboration">Looking for collaborators</SelectItem>
-                  <SelectItem value="feedback">General feedback</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="feedbackType">Feedback Type</Label>
+            <Select value={feedbackType} onValueChange={setFeedbackType}>
+              <SelectTrigger>
+                <SelectValue placeholder="What feedback?" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="improvement">Ideas for improvement</SelectItem>
+                <SelectItem value="collaboration">Looking for collaborators</SelectItem>
+                <SelectItem value="feedback">General feedback</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
         </div>
         <DialogFooter className="flex justify-between sm:justify-between">
