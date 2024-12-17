@@ -2,19 +2,58 @@ import { Link, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Home, Users, Inbox, Settings, LogOut, UserCircle, Menu } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { Badge } from "@/components/ui/badge";
+import { supabase } from "@/integrations/supabase/client";
 
 export const NavigationBar = () => {
   const location = useLocation();
   const [isOpen, setIsOpen] = useState(false);
+  const [unreadCount, setUnreadCount] = useState(0);
+
+  useEffect(() => {
+    const fetchUnreadCount = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        const { count } = await supabase
+          .from('messages')
+          .select('*', { count: 'exact', head: true })
+          .eq('recipient_id', user.id)
+          .eq('is_read', false);
+        
+        setUnreadCount(count || 0);
+      }
+    };
+
+    fetchUnreadCount();
+
+    // Subscribe to realtime changes
+    const channel = supabase
+      .channel('messages_channel')
+      .on('postgres_changes', 
+        { event: '*', schema: 'public', table: 'messages' },
+        () => {
+          fetchUnreadCount();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      channel.unsubscribe();
+    };
+  }, []);
 
   const navItems = [
     { label: "Ideas", icon: Home, path: "/dashboard" },
     { label: "Community", icon: Users, path: "/community" },
     { label: "Profile", icon: UserCircle, path: "/profile" },
-    { label: "About Us", icon: Users, path: "/about" },
-    { label: "Inbox", icon: Inbox, path: "/inbox" },
+    { 
+      label: "Inbox", 
+      icon: Inbox, 
+      path: "/inbox",
+      badge: unreadCount > 0 ? unreadCount : null
+    },
     { label: "Settings", icon: Settings, path: "/settings" },
   ];
 
@@ -45,6 +84,11 @@ export const NavigationBar = () => {
                 >
                   <item.icon className="h-4 w-4" />
                   <span>{item.label}</span>
+                  {item.badge && (
+                    <Badge variant="destructive" className="ml-1">
+                      {item.badge}
+                    </Badge>
+                  )}
                 </Link>
               ))}
             </div>
@@ -72,6 +116,11 @@ export const NavigationBar = () => {
                     >
                       <item.icon className="h-4 w-4" />
                       <span>{item.label}</span>
+                      {item.badge && (
+                        <Badge variant="destructive" className="ml-1">
+                          {item.badge}
+                        </Badge>
+                      )}
                     </Link>
                   ))}
                 </div>
