@@ -6,16 +6,6 @@ import { IdeasList } from "@/components/dashboard/IdeasList";
 import { supabase } from "@/integrations/supabase/client";
 import { PageHeader } from "@/components/ui/page-header";
 
-interface IdeaDB {
-  id: string;
-  title: string;
-  content: string;
-  user_id: string | null;
-  created_at: string;
-  deleted: boolean | null;
-  deleted_at: string | null;
-}
-
 interface Idea {
   id: string;
   title: string;
@@ -32,6 +22,7 @@ const Dashboard = () => {
   const [ideas, setIdeas] = useState<Idea[]>([]);
   const [userName, setUserName] = useState("");
   const [currentStreak, setCurrentStreak] = useState(0);
+  const [showFavoritesOnly, setShowFavoritesOnly] = useState(false);
   const [dailyQuote] = useState("The best way to predict the future is to create it.");
   const { toast } = useToast();
 
@@ -46,17 +37,32 @@ const Dashboard = () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
 
-      const { data: userPoints, error } = await supabase
+      // First try to get the user's points
+      let { data: userPoints, error } = await supabase
         .from('user_points')
         .select('current_streak')
         .eq('user_id', user.id)
-        .single();
+        .maybeSingle(); // Use maybeSingle instead of single to handle no rows case
 
       if (error) throw error;
       
-      if (userPoints) {
-        setCurrentStreak(userPoints.current_streak || 0);
+      // If no points record exists, create one
+      if (!userPoints) {
+        const { data: newPoints, error: insertError } = await supabase
+          .from('user_points')
+          .insert([{ 
+            user_id: user.id,
+            current_streak: 0,
+            points: 0
+          }])
+          .select('current_streak')
+          .single();
+
+        if (insertError) throw insertError;
+        userPoints = newPoints;
       }
+
+      setCurrentStreak(userPoints?.current_streak || 0);
     } catch (error) {
       console.error('Error fetching user streak:', error);
     }
@@ -273,6 +279,10 @@ const Dashboard = () => {
     }
   };
 
+  const handleToggleFavorites = () => {
+    setShowFavoritesOnly(!showFavoritesOnly);
+  };
+
   const favoritesCount = ideas.filter((idea) => idea.isFavorite).length;
 
   return (
@@ -292,6 +302,8 @@ const Dashboard = () => {
 
           <IdeasList
             ideas={ideas}
+            showFavoritesOnly={showFavoritesOnly}
+            onToggleFavorites={handleToggleFavorites}
             onEditIdea={handleEditIdea}
             onDeleteIdeas={handleDeleteIdeas}
             onRestoreIdeas={handleRestoreIdeas}
