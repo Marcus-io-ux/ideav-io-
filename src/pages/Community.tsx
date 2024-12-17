@@ -32,47 +32,101 @@ const Community = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const { toast } = useToast();
 
+  const fetchPosts = async () => {
+    const { data, error } = await supabase
+      .from("community_posts")
+      .select(`
+        *,
+        author:profiles(username, avatar_url)
+      `)
+      .eq("channel", activeChannel)
+      .order("is_pinned", { ascending: false })
+      .order("created_at", { ascending: false });
+
+    if (error) {
+      console.error("Error fetching posts:", error);
+      return;
+    }
+
+    const parsedPosts = data?.map(post => ({
+      ...post,
+      emoji_reactions: typeof post.emoji_reactions === 'string' 
+        ? JSON.parse(post.emoji_reactions) 
+        : post.emoji_reactions || {},
+    }));
+
+    setPosts(parsedPosts || []);
+  };
+
   useEffect(() => {
-    const fetchPosts = async () => {
-      const { data, error } = await supabase
-        .from("community_posts")
-        .select(`
-          *,
-          author:profiles(username, avatar_url)
-        `)
-        .eq("channel", activeChannel)
-        .order("is_pinned", { ascending: false })
-        .order("created_at", { ascending: false });
-
-      if (error) {
-        console.error("Error fetching posts:", error);
-        return;
-      }
-
-      const parsedPosts = data?.map(post => ({
-        ...post,
-        emoji_reactions: typeof post.emoji_reactions === 'string' 
-          ? JSON.parse(post.emoji_reactions) 
-          : post.emoji_reactions || {},
-      }));
-
-      setPosts(parsedPosts || []);
-    };
-
     fetchPosts();
 
+    // Subscribe to all changes in community_posts table for the active channel
     const channel = supabase
-      .channel("community_updates")
+      .channel('public:community_posts')
       .on(
-        "postgres_changes",
+        'postgres_changes',
         {
-          event: "*",
-          schema: "public",
-          table: "community_posts",
+          event: '*', // Listen to all events (INSERT, UPDATE, DELETE)
+          schema: 'public',
+          table: 'community_posts',
           filter: `channel=eq.${activeChannel}`,
         },
-        () => {
-          fetchPosts();
+        async (payload) => {
+          console.log('Real-time update received:', payload);
+          
+          if (payload.eventType === 'INSERT') {
+            // Fetch the complete post data including author information
+            const { data: newPost } = await supabase
+              .from("community_posts")
+              .select(`
+                *,
+                author:profiles(username, avatar_url)
+              `)
+              .eq('id', payload.new.id)
+              .single();
+
+            if (newPost) {
+              setPosts(currentPosts => [
+                {
+                  ...newPost,
+                  emoji_reactions: typeof newPost.emoji_reactions === 'string'
+                    ? JSON.parse(newPost.emoji_reactions)
+                    : newPost.emoji_reactions || {},
+                },
+                ...currentPosts
+              ]);
+            }
+          } else if (payload.eventType === 'DELETE') {
+            setPosts(currentPosts => 
+              currentPosts.filter(post => post.id !== payload.old.id)
+            );
+          } else if (payload.eventType === 'UPDATE') {
+            // Fetch the updated post data
+            const { data: updatedPost } = await supabase
+              .from("community_posts")
+              .select(`
+                *,
+                author:profiles(username, avatar_url)
+              `)
+              .eq('id', payload.new.id)
+              .single();
+
+            if (updatedPost) {
+              setPosts(currentPosts =>
+                currentPosts.map(post =>
+                  post.id === payload.new.id
+                    ? {
+                        ...updatedPost,
+                        emoji_reactions: typeof updatedPost.emoji_reactions === 'string'
+                          ? JSON.parse(updatedPost.emoji_reactions)
+                          : updatedPost.emoji_reactions || {},
+                      }
+                    : post
+                )
+              );
+            }
+          }
         }
       )
       .subscribe();
