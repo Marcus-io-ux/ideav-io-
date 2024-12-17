@@ -87,9 +87,9 @@ export const PricingSection = () => {
         <p className="text-blue-600/80">No credit card required for Starter Plan • Upgrade anytime, risk-free</p>
         <div className="max-w-2xl mx-auto bg-blue-50/50 backdrop-blur-sm p-6 rounded-lg">
           <p className="text-blue-600/90 italic">
-            "Pro helped me collaborate and launch my idea faster than ever!"
+            "Pro helped me collaborate and launch my ideas faster than ever!"
           </p>
-          <p className="text-blue-600/70 mt-2">– Sarah, Innovator</p>
+          <p className="text-blue-600/70 mt-2">– Michael, Innovator</p>
         </div>
       </div>
     </section>
