@@ -133,8 +133,11 @@ export const IdeaCard = ({
     const { data, error } = await supabase
       .from("community_comments")
       .select(`
-        *,
-        profiles:user_id (
+        id,
+        content,
+        created_at,
+        user_id,
+        author:profiles!community_comments_user_id_fkey(
           username,
           avatar_url
         )
@@ -147,7 +150,17 @@ export const IdeaCard = ({
       return;
     }
 
-    setCommentsList(data || []);
+    const formattedComments = data.map(comment => ({
+      id: comment.id,
+      content: comment.content,
+      createdAt: new Date(comment.created_at),
+      author: {
+        name: comment.author?.username || "Anonymous",
+        avatar: comment.author?.avatar_url
+      }
+    }));
+
+    setCommentsList(formattedComments);
   };
 
   const handleAddComment = async () => {
