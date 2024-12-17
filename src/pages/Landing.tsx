@@ -5,6 +5,7 @@ import { JoinCommunitySection } from "@/components/landing/JoinCommunitySection"
 import { CTASection } from "@/components/landing/CTASection";
 import { Footer } from "@/components/landing/Footer";
 import { NavigationBar } from "@/components/landing/NavigationBar";
+import { TestimonialsCarousel } from "@/components/testimonials/TestimonialsCarousel";
 
 const Landing = () => {
   return (
@@ -15,6 +16,7 @@ const Landing = () => {
         <HowItWorksSection />
         <KeyFeaturesSection />
         <JoinCommunitySection />
+        <TestimonialsCarousel />
         <CTASection />
       </main>
       <Footer />
