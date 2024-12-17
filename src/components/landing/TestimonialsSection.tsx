@@ -6,12 +6,7 @@ export const TestimonialsSection = () => {
         <div className="grid md:grid-cols-3 gap-8">
           {[
             {
-              quote: "This platform has completely transformed how I manage my creative projects.",
-              author: "Sarah J.",
-              role: "Product Designer",
-            },
-            {
-              quote: "The community feedback has been invaluable for refining my ideas.",
+              quote: "The platform has completely transformed how I manage my creative projects.",
               author: "Michael R.",
               role: "Entrepreneur",
             },
@@ -19,6 +14,11 @@ export const TestimonialsSection = () => {
               quote: "Finally, a place where I can organize all my thoughts effectively.",
               author: "Lisa M.",
               role: "Content Creator",
+            },
+            {
+              quote: "The collaborative features have been game-changing for my work.",
+              author: "David K.",
+              role: "Product Manager",
             },
           ].map((testimonial) => (
             <div key={testimonial.author} className="bg-gray-50 p-6 rounded-lg">

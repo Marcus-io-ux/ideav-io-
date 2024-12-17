@@ -9,10 +9,10 @@ import Autoplay from "embla-carousel-autoplay";
 
 const testimonials = [
   {
-    content: "IdeaVault transformed how I organize and develop my startup concepts. The collaborative features are game-changing!",
-    author: "Sarah Chen",
+    content: "The platform transformed how I organize and develop my startup concepts. The collaborative features are game-changing!",
+    author: "James Foster",
     role: "Tech Entrepreneur",
-    avatar: "https://i.pravatar.cc/150?u=sarah",
+    avatar: "https://i.pravatar.cc/150?u=james",
   },
   {
     content: "The community feedback has been invaluable. I've refined my ideas through insightful discussions and collaborations.",
@@ -40,9 +40,9 @@ const testimonials = [
   },
   {
     content: "IdeaVault helped me turn my rough concepts into well-structured projects. The feedback system is phenomenal!",
-    author: "James Foster",
+    author: "Alex Rivera",
     role: "Product Manager",
-    avatar: "https://i.pravatar.cc/150?u=james",
+    avatar: "https://i.pravatar.cc/150?u=alex",
   },
   {
     content: "As a creative professional, having a dedicated space for idea development has been transformative.",
@@ -52,9 +52,9 @@ const testimonials = [
   },
   {
     content: "The collaboration features have connected me with brilliant minds across the globe. Truly revolutionary!",
-    author: "Alex Rivera",
+    author: "Thomas Chen",
     role: "Tech Innovator",
-    avatar: "https://i.pravatar.cc/150?u=alex",
+    avatar: "https://i.pravatar.cc/150?u=thomas",
   }
 ];
 

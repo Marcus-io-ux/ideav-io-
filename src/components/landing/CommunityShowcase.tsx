@@ -31,16 +31,16 @@ export const CommunityShowcase = () => {
               avatar: "https://i.pravatar.cc/150?u=john",
             },
             {
-              quote: "The community feedback has been invaluable for developing my creative projects.",
-              author: "Sarah Chen",
-              role: "Product Designer",
-              avatar: "https://i.pravatar.cc/150?u=sarah",
-            },
-            {
               quote: "I've found incredible collaborators here who helped bring my ideas to life.",
               author: "Michael Rodriguez",
               role: "Creative Director",
               avatar: "https://i.pravatar.cc/150?u=michael",
+            },
+            {
+              quote: "The platform's collaborative features transformed how I develop projects.",
+              author: "Emma Thompson",
+              role: "Product Designer",
+              avatar: "https://i.pravatar.cc/150?u=emma",
             },
           ].map((testimonial) => (
             <div
