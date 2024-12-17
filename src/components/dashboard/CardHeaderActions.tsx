@@ -19,7 +19,7 @@ export const CardHeaderActions = ({
         onClick={onToggleFavorite}
         className={cn(
           "p-1 rounded-full transition-colors",
-          isFavorite ? "text-primary hover:bg-primary-light/20" : "text-muted-foreground hover:bg-muted"
+          isFavorite ? "text-primary hover:bg-primary-light" : "text-gray-400 hover:bg-gray-100"
         )}
       >
         <Star
@@ -32,9 +32,9 @@ export const CardHeaderActions = ({
       {onDelete && (
         <button
           onClick={onDelete}
-          className="p-1 rounded-full hover:bg-destructive/10 text-destructive/80 hover:text-destructive transition-colors"
+          className="p-1 rounded-full hover:bg-gray-100"
         >
-          <Trash className="h-4 w-4" />
+          <Trash className="h-4 w-4 text-gray-500" />
         </button>
       )}
     </div>

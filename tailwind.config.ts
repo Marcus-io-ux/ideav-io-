@@ -25,31 +25,26 @@ export default {
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
         primary: {
-          DEFAULT: "#9b87f5", // Primary Purple
-          hover: "#7E69AB", // Secondary Purple
-          light: "#D6BCFA", // Light Purple
+          DEFAULT: "#3B82F6", // blue-500
+          hover: "#6366F1", // indigo-500
+          light: "#93C5FD", // blue-300
         },
         secondary: {
-          DEFAULT: "#6E59A5", // Tertiary Purple
-          foreground: "#1A1F2C", // Dark Purple
+          DEFAULT: "#1D4ED8", // blue-700
+          foreground: "#1E3A8A", // blue-900
         },
         destructive: {
           DEFAULT: "hsl(var(--destructive))",
           foreground: "hsl(var(--destructive-foreground))",
         },
         muted: {
-          DEFAULT: "#F1F0FB", // Soft Gray
-          foreground: "#8E9196", // Neutral Gray
+          DEFAULT: "hsl(var(--muted))",
+          foreground: "hsl(var(--muted-foreground))",
         },
         accent: {
-          DEFAULT: "#D6BCFA", // Light Purple
-          foreground: "#6E59A5", // Tertiary Purple
+          DEFAULT: "#EFF6FF", // blue-50
+          foreground: "#1D4ED8", // blue-700
         },
-      },
-      backgroundImage: {
-        'gradient-primary': 'linear-gradient(102.3deg, rgba(147,39,143,1) 5.9%, rgba(234,172,232,1) 64%, rgba(246,219,245,1) 89%)',
-        'gradient-secondary': 'linear-gradient(90deg, hsla(277, 75%, 84%, 1) 0%, hsla(297, 50%, 51%, 1) 100%)',
-        'gradient-accent': 'linear-gradient(to right, #ee9ca7, #ffdde1)',
       },
       borderRadius: {
         lg: "var(--radius)",
