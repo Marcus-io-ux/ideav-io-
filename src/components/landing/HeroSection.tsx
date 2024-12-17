@@ -41,16 +41,16 @@ export const HeroSection = () => {
             <TypeAnimation
               sequence={[
                 'Store Your Ideas.',
-                2000,
+                4000,
                 'Share Your Vision.',
-                2000,
+                4000,
                 'Collaborate with Innovators.',
-                2000,
+                4000,
                 'Turn Thoughts Into Action.',
-                2000,
+                4000,
               ]}
               wrapper="span"
-              speed={50}
+              speed={75}
               className="bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-indigo-500"
               repeat={Infinity}
             />
