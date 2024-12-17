@@ -65,7 +65,7 @@ export const IdeaCard = ({
     <Card 
       onClick={handleCardClick}
       className={cn(
-        "w-full hover:shadow-lg transition-shadow duration-300 animate-fade-in group",
+        "w-full hover:shadow-lg transition-shadow duration-300 animate-fade-in group relative",
         isSelected && "border-primary",
         onEdit && "cursor-pointer hover:bg-accent/50"
       )}
@@ -75,11 +75,6 @@ export const IdeaCard = ({
           <CardTitle className="text-xl font-semibold">
             {title}
           </CardTitle>
-          <CardHeaderActions
-            isFavorite={isFavorite}
-            onToggleFavorite={handleToggleFavorite}
-            onDelete={onDelete ? handleDelete : undefined}
-          />
         </div>
         <div className="flex items-center gap-4">
           <span className="text-sm text-muted-foreground">
@@ -96,6 +91,14 @@ export const IdeaCard = ({
       </CardHeader>
       <CardContent className="text-muted-foreground">
         <p>{content}</p>
+        <div className="absolute bottom-4 right-4">
+          <CardHeaderActions
+            isFavorite={isFavorite}
+            onToggleFavorite={handleToggleFavorite}
+            onDelete={onDelete ? handleDelete : undefined}
+            size="sm"
+          />
+        </div>
       </CardContent>
     </Card>
   );
