@@ -250,18 +250,15 @@ const Dashboard = () => {
             title={`Welcome back, ${userName}!`}
             description={`"${dailyQuote}"`}
           />
-          <div className="space-y-8">
-            <h3 className="text-lg font-semibold">Your Ideas</h3>
-            <div className="mt-8">
-              <IdeasList
-                ideas={ideas}
-                showFavoritesOnly={showFavoritesOnly}
-                onToggleFavorites={handleToggleFavorites}
-                onEditIdea={handleEditIdea}
-                onDeleteIdeas={handleDeleteIdeas}
-                onRestoreIdeas={handleRestoreIdeas}
-              />
-            </div>
+          <div className="mt-8">
+            <IdeasList
+              ideas={ideas}
+              showFavoritesOnly={showFavoritesOnly}
+              onToggleFavorites={handleToggleFavorites}
+              onEditIdea={handleEditIdea}
+              onDeleteIdeas={handleDeleteIdeas}
+              onRestoreIdeas={handleRestoreIdeas}
+            />
           </div>
         </div>
       </div>
