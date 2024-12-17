@@ -2,7 +2,7 @@ import { IdeaCard } from "@/components/IdeaCard";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { Trash2, RotateCcw, Lightbulb } from "lucide-react";
+import { Trash2, RotateCcw } from "lucide-react";
 import { useState } from "react";
 import { AddIdeaDialog } from "@/components/dashboard/AddIdeaDialog";
 
@@ -60,37 +60,29 @@ export const IdeasList = ({
   return (
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row justify-between items-stretch sm:items-center gap-4">
-        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 w-full sm:w-auto">
-          <div className="flex flex-row items-center gap-2 w-full sm:w-auto">
-            {selectedIds.length > 0 && activeTab !== "trash" && (
-              <Button
-                variant="destructive"
-                size="sm"
-                onClick={handleBulkDelete}
-                className="flex-1 sm:flex-none items-center justify-center gap-2 px-4"
-              >
-                <Trash2 className="h-4 w-4" />
-                Delete Selected ({selectedIds.length})
-              </Button>
-            )}
-            {selectedIds.length > 0 && activeTab === "trash" && (
-              <Button
-                variant="default"
-                size="sm"
-                onClick={handleBulkRestore}
-                className="flex-1 sm:flex-none items-center justify-center gap-2 px-4"
-              >
-                <RotateCcw className="h-4 w-4" />
-                Restore Selected ({selectedIds.length})
-              </Button>
-            )}
-          </div>
-          <div className="flex items-center gap-2 bg-white dark:bg-blue-900/20 rounded-lg px-6 py-3 border border-blue-100 dark:border-blue-800 shadow-sm">
-            <Lightbulb className="h-4 w-4 text-primary" />
-            <span className="text-black dark:text-white font-medium">
-              You have {activeIdeas.length} ideas stored
-            </span>
-          </div>
+        <div className="flex flex-row items-center gap-2 w-full sm:w-auto">
+          {selectedIds.length > 0 && activeTab !== "trash" && (
+            <Button
+              variant="destructive"
+              size="sm"
+              onClick={handleBulkDelete}
+              className="flex-1 sm:flex-none items-center justify-center gap-2 px-4"
+            >
+              <Trash2 className="h-4 w-4" />
+              Delete Selected ({selectedIds.length})
+            </Button>
+          )}
+          {selectedIds.length > 0 && activeTab === "trash" && (
+            <Button
+              variant="default"
+              size="sm"
+              onClick={handleBulkRestore}
+              className="flex-1 sm:flex-none items-center justify-center gap-2 px-4"
+            >
+              <RotateCcw className="h-4 w-4" />
+              Restore Selected ({selectedIds.length})
+            </Button>
+          )}
         </div>
         <AddIdeaDialog onIdeaSubmit={() => {}} />
       </div>
@@ -98,7 +90,7 @@ export const IdeasList = ({
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
         <TabsList className="w-full sm:w-auto grid grid-cols-3 h-auto p-1">
           <TabsTrigger value="recent" className="px-8 py-2">Recent Ideas</TabsTrigger>
-          <TabsTrigger value="all" className="px-8 py-2">All Ideas</TabsTrigger>
+          <TabsTrigger value="all" className="px-8 py-2">All Ideas ({activeIdeas.length})</TabsTrigger>
           <TabsTrigger value="trash" className="px-8 py-2">Trash</TabsTrigger>
         </TabsList>
         
