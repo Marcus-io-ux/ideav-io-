@@ -33,31 +33,33 @@ export const HeroSection = () => {
         </div>
       </div>
 
-      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-32 text-center">
-        <div className="space-y-8">
+      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-24 lg:py-32 text-center">
+        <div className="space-y-4 sm:space-y-6 lg:space-y-8">
           {/* Dynamic headline */}
-          <h1 className="text-5xl md:text-6xl font-bold text-gray-900 mb-6">
+          <h1 className="text-3xl sm:text-4xl lg:text-6xl font-bold text-gray-900">
             <span className="block mb-2">Welcome to IdeaVault</span>
-            <TypeAnimation
-              sequence={[
-                'Store Your Ideas.',
-                4000,
-                'Share Your Vision.',
-                4000,
-                'Collaborate with Innovators.',
-                4000,
-                'Turn Thoughts Into Action.',
-                4000,
-              ]}
-              wrapper="span"
-              speed={75}
-              className="bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-indigo-500"
-              repeat={Infinity}
-            />
+            <div className="min-h-[60px] sm:min-h-[80px]"> {/* Container to prevent layout shift */}
+              <TypeAnimation
+                sequence={[
+                  'Store Your Ideas.',
+                  4000,
+                  'Share Your Vision.',
+                  4000,
+                  'Collaborate with Innovators.',
+                  4000,
+                  'Turn Thoughts Into Action.',
+                  4000,
+                ]}
+                wrapper="span"
+                speed={75}
+                className="bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-indigo-500 text-2xl sm:text-3xl lg:text-5xl"
+                repeat={Infinity}
+              />
+            </div>
           </h1>
 
           {/* Static supportive subheadline */}
-          <p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto animate-fade-in">
+          <p className="text-base sm:text-lg lg:text-xl text-gray-600 max-w-2xl mx-auto animate-fade-in">
             A space to capture, organize, and share your ideas effortlessly. Join our community of innovators and bring your ideas to life.
           </p>
 
@@ -65,12 +67,12 @@ export const HeroSection = () => {
           <div className="flex justify-center items-center gap-4 animate-fade-in">
             <Button
               size="lg"
-              className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-6 rounded-full 
+              className="bg-blue-600 hover:bg-blue-700 text-white px-6 sm:px-8 py-4 sm:py-6 rounded-full 
                        shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-300"
               onClick={scrollToPricing}
             >
               Get Started for Free
-              <ArrowRight className="ml-2 w-5 h-5" />
+              <ArrowRight className="ml-2 w-4 h-4 sm:w-5 sm:h-5" />
             </Button>
           </div>
         </div>
