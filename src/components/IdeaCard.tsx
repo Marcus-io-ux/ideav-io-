@@ -65,9 +65,10 @@ export const IdeaCard = ({
     <Card 
       onClick={handleCardClick}
       className={cn(
-        "w-full hover:shadow-lg transition-shadow duration-300 animate-fade-in group relative",
-        isSelected && "border-primary",
-        onEdit && "cursor-pointer hover:bg-accent/50"
+        "w-full transition-shadow duration-300 animate-fade-in group relative dark:bg-card dark:text-card-foreground dark:border-border",
+        "hover:shadow-lg dark:hover:shadow-primary/5",
+        isSelected && "border-primary dark:border-primary",
+        onEdit && "cursor-pointer hover:bg-accent/50 dark:hover:bg-accent/10"
       )}
     >
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
