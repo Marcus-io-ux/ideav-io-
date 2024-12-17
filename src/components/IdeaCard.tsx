@@ -70,28 +70,31 @@ export const IdeaCard = ({
         onEdit && "cursor-pointer hover:bg-accent/50"
       )}
     >
-      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-        <div className="flex items-center gap-2">
+      <CardHeader className="flex flex-row items-start justify-between space-y-0 pb-2">
+        <div className="flex flex-col gap-2">
           <CardTitle className="text-xl font-semibold">
             {title}
           </CardTitle>
-          <CardHeaderActions
-            isFavorite={isFavorite}
-            onToggleFavorite={handleToggleFavorite}
-            onDelete={onDelete ? handleDelete : undefined}
-          />
-        </div>
-        <div className="flex items-center gap-4">
-          <span className="text-sm text-muted-foreground">
-            {format(createdAt, 'MMM d, yyyy')}
-          </span>
-          {onSelect && (
-            <Checkbox
-              checked={isSelected}
-              onCheckedChange={() => onSelect(id)}
-              onClick={(e) => e.stopPropagation()}
+          <div className="flex items-center gap-4">
+            <span className="text-sm text-muted-foreground">
+              {format(createdAt, 'MMM d, yyyy')}
+            </span>
+            {onSelect && (
+              <Checkbox
+                checked={isSelected}
+                onCheckedChange={() => onSelect(id)}
+                onClick={(e) => e.stopPropagation()}
+              />
+            )}
+          </div>
+          <div className="flex items-center gap-2">
+            <CardHeaderActions
+              isFavorite={isFavorite}
+              onToggleFavorite={handleToggleFavorite}
+              onDelete={onDelete ? handleDelete : undefined}
+              size="sm"
             />
-          )}
+          </div>
         </div>
       </CardHeader>
       <CardContent className="text-muted-foreground">
