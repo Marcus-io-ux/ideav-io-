@@ -1,6 +1,6 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Home, Users, Inbox, Settings, LogOut, Menu, Bell } from "lucide-react";
+import { Home, Users, Inbox, Settings, LogOut, Menu, Bell, User } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useState, useEffect } from "react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
@@ -69,9 +69,10 @@ export const NavigationBar = () => {
   };
 
   const navItems = [
-    { label: "Ideas", icon: Home, path: "/dashboard" },
+    { label: "My Ideas", icon: Home, path: "/dashboard" },
     { label: "Community", icon: Users, path: "/community" },
     { label: "Announcements", icon: Bell, path: "/announcements" },
+    { label: "Profile", icon: User, path: "/profile" },
     { 
       label: "Inbox", 
       icon: Inbox, 
@@ -173,4 +174,4 @@ export const NavigationBar = () => {
       </div>
     </nav>
   );
-}
+};

@@ -12,7 +12,7 @@ export const FeedbackButton = ({ onClick }: FeedbackButtonProps) => {
       className="fixed bottom-6 right-6 gap-2 shadow-lg hover:scale-105 transition-transform"
     >
       <MessageSquarePlus className="h-4 w-4" />
-      Give Feedback
+      User Feedback
     </Button>
   );
 };
