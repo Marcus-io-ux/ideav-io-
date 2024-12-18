@@ -54,24 +54,24 @@ const testimonials = [
 ];
 
 export const TestimonialsCarousel = () => {
+  const autoplayOptions = {
+    delay: 4000,
+    rootNode: (emblaRoot: any) => emblaRoot.parentElement,
+    stopOnInteraction: false,
+  };
+
   const [emblaRef, emblaApi] = useEmblaCarousel(
     { 
       loop: true,
       align: "start",
-      skipSnaps: false,
-      duration: 80, // Increased from 50 to 80 for slower scroll
+      dragFree: true,
+      containScroll: "trimSnaps",
     },
-    [
-      Autoplay({
-        delay: 5000,
-        stopOnInteraction: false,
-      })
-    ]
+    [Autoplay(autoplayOptions)]
   );
 
   useEffect(() => {
     if (emblaApi) {
-      // Initialize the carousel
       emblaApi.reInit();
     }
   }, [emblaApi]);
@@ -87,12 +87,12 @@ export const TestimonialsCarousel = () => {
         </p>
         
         <Carousel
+          ref={emblaRef}
+          className="w-full max-w-6xl mx-auto"
           opts={{
             align: "start",
             loop: true,
           }}
-          className="w-full max-w-6xl mx-auto"
-          ref={emblaRef}
         >
           <CarouselContent>
             {testimonials.map((testimonial, index) => (
