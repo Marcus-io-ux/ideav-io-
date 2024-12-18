@@ -1,9 +1,5 @@
-import { useState } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Edit } from "lucide-react";
-import { useToast } from "@/hooks/use-toast";
 
 interface ProfileHeaderProps {
   profile: {
@@ -15,17 +11,6 @@ interface ProfileHeaderProps {
 }
 
 export const ProfileHeader = ({ profile }: ProfileHeaderProps) => {
-  const { toast } = useToast();
-  const [isEditing, setIsEditing] = useState(false);
-
-  const handleEditProfile = () => {
-    setIsEditing(true);
-    toast({
-      title: "Coming Soon",
-      description: "Profile editing will be available soon!",
-    });
-  };
-
   return (
     <Card className="p-6">
       <div className="flex items-center gap-6">
@@ -35,22 +20,11 @@ export const ProfileHeader = ({ profile }: ProfileHeaderProps) => {
         </Avatar>
 
         <div className="flex-1">
-          <div className="flex justify-between items-start">
-            <div>
-              <h1 className="text-2xl font-bold">{profile.username}</h1>
-              {profile.bio && (
-                <p className="text-muted-foreground mt-1">{profile.bio}</p>
-              )}
-            </div>
-            <Button
-              variant="outline"
-              size="sm"
-              className="gap-2"
-              onClick={handleEditProfile}
-            >
-              <Edit className="h-4 w-4" />
-              Edit Profile
-            </Button>
+          <div>
+            <h1 className="text-2xl font-bold">{profile.username}</h1>
+            {profile.bio && (
+              <p className="text-muted-foreground mt-1">{profile.bio}</p>
+            )}
           </div>
         </div>
       </div>
