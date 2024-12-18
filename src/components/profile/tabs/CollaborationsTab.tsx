@@ -38,7 +38,7 @@ export const CollaborationsTab = () => {
         .eq("status", "accepted");
 
       if (error) throw error;
-      return data;
+      return (data || []) as CollaborationData[];
     },
   });
 
