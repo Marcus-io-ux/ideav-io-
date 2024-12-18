@@ -4,8 +4,19 @@ import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Users } from "lucide-react";
 
+interface CollaborationData {
+  id: string;
+  community_posts: {
+    title: string;
+    content: string;
+  } | null;
+  profiles: {
+    username: string | null;
+  } | null;
+}
+
 export const CollaborationsTab = () => {
-  const { data: collaborations = [] } = useQuery({
+  const { data: collaborations = [] } = useQuery<CollaborationData[]>({
     queryKey: ["collaborations"],
     queryFn: async () => {
       const { data: { user } } = await supabase.auth.getUser();
@@ -24,8 +35,7 @@ export const CollaborationsTab = () => {
           )
         `)
         .or(`requester_id.eq.${user.id},owner_id.eq.${user.id}`)
-        .eq("status", "accepted")
-        .order("created_at", { ascending: false });
+        .eq("status", "accepted");
 
       if (error) throw error;
       return data;

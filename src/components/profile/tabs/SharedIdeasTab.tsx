@@ -2,8 +2,27 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { IdeaCard as CommunityIdeaCard } from "@/components/community/IdeaCard";
 
+interface SharedIdea {
+  id: string;
+  title: string;
+  content: string;
+  user_id: string;
+  created_at: string;
+  tags: string[];
+  likes_count: number;
+  comments_count: number;
+  channel: string;
+  emoji_reactions: Record<string, number>;
+  category?: string;
+  feedback_type?: string;
+  profiles?: {
+    username: string | null;
+    avatar_url: string | null;
+  };
+}
+
 export const SharedIdeasTab = () => {
-  const { data: sharedIdeas = [] } = useQuery({
+  const { data: sharedIdeas = [] } = useQuery<SharedIdea[]>({
     queryKey: ["shared-ideas"],
     queryFn: async () => {
       const { data: { user } } = await supabase.auth.getUser();
@@ -22,15 +41,7 @@ export const SharedIdeasTab = () => {
         .order("created_at", { ascending: false });
 
       if (error) throw error;
-      return data.map(post => ({
-        ...post,
-        author: {
-          id: post.user_id,
-          name: post.profiles?.username || "Anonymous",
-          avatar: post.profiles?.avatar_url,
-        },
-        createdAt: new Date(post.created_at),
-      }));
+      return data;
     },
   });
 
@@ -39,7 +50,21 @@ export const SharedIdeasTab = () => {
       {sharedIdeas.map((idea) => (
         <CommunityIdeaCard
           key={idea.id}
-          {...idea}
+          id={idea.id}
+          title={idea.title}
+          content={idea.content}
+          author={{
+            id: idea.user_id,
+            name: idea.profiles?.username || "Anonymous",
+            avatar: idea.profiles?.avatar_url || undefined,
+          }}
+          likes={idea.likes_count}
+          comments={idea.comments_count}
+          tags={idea.tags || []}
+          category={idea.category}
+          feedbackType={idea.feedback_type}
+          createdAt={new Date(idea.created_at)}
+          emojiReactions={idea.emoji_reactions}
         />
       ))}
       {sharedIdeas.length === 0 && (

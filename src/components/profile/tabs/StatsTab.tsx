@@ -3,8 +3,16 @@ import { supabase } from "@/integrations/supabase/client";
 import { Card } from "@/components/ui/card";
 import { Brain, Share2, Users, Heart, MessageSquare } from "lucide-react";
 
+interface StatsResponse {
+  totalIdeas: number;
+  sharedIdeas: number;
+  collaborations: number;
+  likes: number;
+  comments: number;
+}
+
 export const StatsTab = () => {
-  const { data: stats } = useQuery({
+  const { data: stats } = useQuery<StatsResponse>({
     queryKey: ["user-stats"],
     queryFn: async () => {
       const { data: { user } } = await supabase.auth.getUser();
@@ -42,11 +50,11 @@ export const StatsTab = () => {
       ]);
 
       return {
-        totalIdeas: totalIdeas.count || 0,
-        sharedIdeas: sharedIdeas.count || 0,
-        collaborations: collaborations.count || 0,
-        likes: likes.count || 0,
-        comments: comments.count || 0,
+        totalIdeas: totalIdeas || 0,
+        sharedIdeas: sharedIdeas || 0,
+        collaborations: collaborations || 0,
+        likes: likes || 0,
+        comments: comments || 0,
       };
     },
   });
