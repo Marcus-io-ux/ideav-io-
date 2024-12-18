@@ -29,7 +29,7 @@ export function CollaborationsTab() {
           message,
           status,
           post:community_posts(title),
-          requester:profiles!collaboration_requests_requester_id_fkey(
+          requester:profiles(
             id,
             user_id,
             username,
