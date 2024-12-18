@@ -39,7 +39,7 @@ export const MyIdeasTab = () => {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <SearchBar onSearch={setSearchQuery} />
-        <AddIdeaDialog onIdeaSubmit={() => {}} />
+        <AddIdeaDialog buttonText="Add New Idea" onIdeaSubmit={() => {}} />
       </div>
 
       <div className="grid gap-6">
