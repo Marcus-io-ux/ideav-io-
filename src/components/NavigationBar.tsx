@@ -1,4 +1,4 @@
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Home, Users, Inbox, Settings, LogOut, Menu, Bell, Star } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -6,11 +6,14 @@ import { useState, useEffect } from "react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Badge } from "@/components/ui/badge";
 import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
 
 export const NavigationBar = () => {
   const location = useLocation();
+  const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
   const [unreadCount, setUnreadCount] = useState(0);
+  const { toast } = useToast();
 
   useEffect(() => {
     const fetchUnreadCount = async () => {
@@ -43,6 +46,27 @@ export const NavigationBar = () => {
       channel.unsubscribe();
     };
   }, []);
+
+  const handleLogout = async () => {
+    try {
+      const { error } = await supabase.auth.signOut();
+      if (error) throw error;
+      
+      toast({
+        title: "Logged out successfully",
+        description: "You have been logged out of your account",
+      });
+      
+      navigate("/");
+    } catch (error) {
+      console.error('Error logging out:', error);
+      toast({
+        title: "Error",
+        description: "Failed to log out. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
 
   const navItems = [
     { label: "Ideas", icon: Home, path: "/dashboard" },
@@ -127,9 +151,7 @@ export const NavigationBar = () => {
                   <Button
                     variant="ghost"
                     className="w-full justify-start px-2 py-1.5"
-                    onClick={() => {
-                      console.log("Logging out...");
-                    }}
+                    onClick={handleLogout}
                   >
                     <LogOut className="h-4 w-4 mr-2" />
                     <span>Logout</span>
@@ -142,9 +164,7 @@ export const NavigationBar = () => {
             <Button
               variant="ghost"
               className="hidden md:flex items-center space-x-2 text-sm font-medium text-muted-foreground hover:text-primary"
-              onClick={() => {
-                console.log("Logging out...");
-              }}
+              onClick={handleLogout}
             >
               <LogOut className="h-4 w-4" />
               <span>Logout</span>
