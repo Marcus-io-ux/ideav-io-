@@ -2,14 +2,11 @@ import { Auth } from "@supabase/auth-ui-react";
 import { ThemeSupa } from "@supabase/auth-ui-shared";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
-import { useEffect, useState } from "react";
-import { Label } from "@/components/ui/label";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Lightbulb } from "lucide-react";
+import { useEffect } from "react";
+import { Vault } from "lucide-react";
 
 const Login = () => {
   const navigate = useNavigate();
-  const [persistSession, setPersistSession] = useState(false);
 
   useEffect(() => {
     // Check current auth status
@@ -35,8 +32,11 @@ const Login = () => {
     <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md mx-auto">
         <div className="text-center mb-8">
-          <Lightbulb className="mx-auto h-12 w-12 text-primary" />
-          <h2 className="mt-6 text-3xl font-bold text-gray-900">Welcome Back!</h2>
+          <div className="flex items-center justify-center gap-2 mb-4">
+            <Vault className="h-8 w-8 text-primary" />
+            <span className="text-2xl font-bold text-gray-900">Idea Vault</span>
+          </div>
+          <h2 className="text-3xl font-bold text-gray-900">Welcome Back!</h2>
           <p className="mt-2 text-sm text-gray-600">
             Sign in to continue your journey with Idea Vault
           </p>
@@ -75,21 +75,6 @@ const Login = () => {
               }
             }}
           />
-          <div className="mt-3 mb-4 flex items-center space-x-2">
-            <Checkbox
-              id="persistSession"
-              checked={persistSession}
-              onCheckedChange={(checked) => {
-                setPersistSession(checked as boolean);
-                if (checked) {
-                  supabase.auth.setSession({ persist: true });
-                }
-              }}
-            />
-            <Label htmlFor="persistSession" className="text-sm text-gray-600">
-              Keep me logged in
-            </Label>
-          </div>
 
           <p className="mt-4 text-center text-sm text-gray-600">
             Don't have an account?{" "}
