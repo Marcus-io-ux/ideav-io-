@@ -10,7 +10,7 @@ interface CollaborationData {
     title: string;
     content: string;
   } | null;
-  owner: {
+  owner_profile: {
     username: string | null;
   } | null;
 }
@@ -30,7 +30,7 @@ export const CollaborationsTab = () => {
             title,
             content
           ),
-          owner:owner_id (
+          owner_profile:profiles!collaboration_requests_owner_id_fkey (
             username
           )
         `)
@@ -38,7 +38,7 @@ export const CollaborationsTab = () => {
         .eq("status", "accepted");
 
       if (error) throw error;
-      return data as CollaborationData[];
+      return data;
     },
   });
 
@@ -57,7 +57,7 @@ export const CollaborationsTab = () => {
           <CardContent>
             <div className="flex items-center gap-2 text-sm text-muted-foreground">
               <Users className="h-4 w-4" />
-              <span>Collaborating with {collab.owner?.username || "Anonymous"}</span>
+              <span>Collaborating with {collab.owner_profile?.username || "Anonymous"}</span>
             </div>
           </CardContent>
         </Card>
