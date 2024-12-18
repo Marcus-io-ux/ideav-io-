@@ -4,6 +4,8 @@ import { useToast } from "@/hooks/use-toast";
 import { Checkbox } from "@/components/ui/checkbox";
 import { cn } from "@/lib/utils";
 import { CardHeaderActions } from "@/components/dashboard/CardHeaderActions";
+import { supabase } from "@/integrations/supabase/client";
+import { useState, useEffect } from "react";
 
 interface IdeaCardProps {
   id: string;
@@ -31,13 +33,56 @@ export const IdeaCard = ({
   onToggleFavorite 
 }: IdeaCardProps) => {
   const { toast } = useToast();
+  const [isCurrentlyFavorite, setIsCurrentlyFavorite] = useState(isFavorite);
 
-  const handleToggleFavorite = () => {
-    onToggleFavorite?.(id);
-    toast({
-      title: isFavorite ? "Removed from favorites" : "Added to favorites",
-      description: isFavorite ? "Idea removed from your favorites" : "Idea added to your favorites",
-    });
+  useEffect(() => {
+    setIsCurrentlyFavorite(isFavorite);
+  }, [isFavorite]);
+
+  const handleToggleFavorite = async () => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        toast({
+          title: "Authentication required",
+          description: "Please sign in to favorite ideas",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      if (!isCurrentlyFavorite) {
+        const { error } = await supabase
+          .from('favorites')
+          .insert([
+            { user_id: user.id, idea_id: id, item_type: 'idea' }
+          ]);
+
+        if (error) throw error;
+      } else {
+        const { error } = await supabase
+          .from('favorites')
+          .delete()
+          .match({ user_id: user.id, idea_id: id, item_type: 'idea' });
+
+        if (error) throw error;
+      }
+
+      setIsCurrentlyFavorite(!isCurrentlyFavorite);
+      onToggleFavorite?.(id);
+      
+      toast({
+        title: isCurrentlyFavorite ? "Removed from favorites" : "Added to favorites",
+        description: isCurrentlyFavorite ? "Idea removed from your favorites" : "Idea added to your favorites",
+      });
+    } catch (error) {
+      console.error('Error toggling favorite:', error);
+      toast({
+        title: "Error",
+        description: "Failed to update favorites. Please try again.",
+        variant: "destructive",
+      });
+    }
   };
 
   const handleDelete = () => {
@@ -94,7 +139,7 @@ export const IdeaCard = ({
         <p>{content}</p>
         <div className="absolute bottom-4 right-4">
           <CardHeaderActions
-            isFavorite={isFavorite}
+            isFavorite={isCurrentlyFavorite}
             onToggleFavorite={handleToggleFavorite}
             onDelete={onDelete ? handleDelete : undefined}
             size="sm"
