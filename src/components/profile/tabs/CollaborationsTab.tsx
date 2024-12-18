@@ -18,7 +18,8 @@ export function CollaborationsTab() {
             username,
             avatar_url
           )
-        `);
+        `)
+        .order('created_at', { ascending: false });
 
       if (error) throw error;
       return data;
