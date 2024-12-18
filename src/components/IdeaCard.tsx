@@ -41,8 +41,11 @@ export const IdeaCard = ({
 
   const handleToggleFavorite = async () => {
     try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) {
+      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+      
+      if (sessionError) throw sessionError;
+      
+      if (!session?.user) {
         toast({
           title: "Authentication required",
           description: "Please sign in to favorite ideas",
@@ -55,7 +58,7 @@ export const IdeaCard = ({
         const { error } = await supabase
           .from('favorites')
           .insert([
-            { user_id: user.id, idea_id: id, item_type: 'idea' }
+            { user_id: session.user.id, idea_id: id, item_type: 'idea' }
           ]);
 
         if (error) throw error;
@@ -63,7 +66,7 @@ export const IdeaCard = ({
         const { error } = await supabase
           .from('favorites')
           .delete()
-          .match({ user_id: user.id, idea_id: id, item_type: 'idea' });
+          .match({ user_id: session.user.id, idea_id: id, item_type: 'idea' });
 
         if (error) throw error;
       }
@@ -75,7 +78,7 @@ export const IdeaCard = ({
         title: isCurrentlyFavorite ? "Removed from favorites" : "Added to favorites",
         description: isCurrentlyFavorite ? "Idea removed from your favorites" : "Idea added to your favorites",
       });
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error toggling favorite:', error);
       toast({
         title: "Error",
