@@ -39,14 +39,14 @@ export const CollaborationsTab = () => {
 
       if (error) throw error;
 
-      // Ensure the data matches our interface
+      // Transform the data to match our interface
       const typedData = (data || []).map(item => ({
         id: item.id,
         community_posts: item.community_posts,
         owner_profile: {
           username: item.owner_profile?.username || null
         }
-      })) as CollaborationData[];
+      }));
 
       return typedData;
     },
