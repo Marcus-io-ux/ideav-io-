@@ -1,6 +1,6 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Home, Users, Inbox, Settings, LogOut, Menu, Bell, Star } from "lucide-react";
+import { Home, Users, Inbox, Settings, LogOut, Menu, Bell } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useState, useEffect } from "react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
@@ -78,7 +78,6 @@ export const NavigationBar = () => {
       path: "/inbox",
       badge: unreadCount > 0 ? unreadCount : null
     },
-    { label: "Favorites", icon: Star, path: "/favorites" },
     { label: "Settings", icon: Settings, path: "/settings" },
   ];
 

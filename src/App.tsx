@@ -12,13 +12,11 @@ import Features from "./pages/Features";
 import Pricing from "./pages/Pricing";
 import AboutUs from "./pages/AboutUs";
 import Onboarding from "./pages/Onboarding";
-import Profile from "./pages/Profile";
 import Inbox from "./pages/Inbox";
 import Settings from "./pages/Settings";
 import Announcements from "./pages/Announcements";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
-import Favorites from "./pages/Favorites";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -99,21 +97,9 @@ const App = () => {
               }
             />
             <Route
-              path="/profile"
-              element={
-                isAuthenticated ? <Profile /> : <Navigate to="/login" replace />
-              }
-            />
-            <Route
               path="/inbox"
               element={
                 isAuthenticated ? <Inbox /> : <Navigate to="/login" replace />
-              }
-            />
-            <Route
-              path="/favorites"
-              element={
-                isAuthenticated ? <Favorites /> : <Navigate to="/login" replace />
               }
             />
             <Route
