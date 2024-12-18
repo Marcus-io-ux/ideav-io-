@@ -39,7 +39,7 @@ export const IdeaCard = ({
   emojiReactions = {},
 }: IdeaCardProps) => {
   return (
-    <Card className="w-full transition-shadow duration-300 animate-fade-in hover:shadow-lg">
+    <Card className="w-full max-w-full transition-shadow duration-300 animate-fade-in hover:shadow-lg overflow-hidden">
       <CardHeader className="space-y-2 pb-3">
         <IdeaCardHeader
           title={title}
@@ -62,7 +62,7 @@ export const IdeaCard = ({
           emojiReactions={emojiReactions}
         />
         
-        <div className="pt-2 -mx-2 sm:mx-0">
+        <div className="pt-2">
           <IdeaCardActions
             postId={id}
             ownerId={author.id}

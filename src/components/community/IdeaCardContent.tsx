@@ -17,7 +17,7 @@ export const IdeaCardContent = ({
 }: IdeaCardContentProps) => {
   return (
     <>
-      <p className="text-gray-600 mb-4">{content}</p>
+      <p className="text-gray-600 mb-4 break-words whitespace-pre-wrap">{content}</p>
       
       <div className="flex flex-wrap gap-2 mb-4">
         {category && (
@@ -29,7 +29,7 @@ export const IdeaCardContent = ({
         {tags.map((tag) => (
           <span
             key={tag}
-            className="px-2 py-1 bg-accent text-accent-foreground rounded-full text-sm"
+            className="px-2 py-1 bg-accent text-accent-foreground rounded-full text-sm break-words"
           >
             {tag}
           </span>

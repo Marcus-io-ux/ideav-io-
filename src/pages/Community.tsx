@@ -28,22 +28,22 @@ const Community = () => {
         <ChannelList activeChannel={activeChannel} onChannelSelect={setActiveChannel} />
       </div>
 
-      <div className="flex-1 flex flex-col">
+      <div className="flex-1 flex flex-col min-w-0">
         <div className="border-b p-4 flex items-center justify-between bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 min-w-0">
             <Button
               variant="ghost"
               size="icon"
-              className="md:hidden"
+              className="md:hidden flex-shrink-0"
               onClick={() => setIsSidebarOpen(true)}
             >
               <Menu className="h-5 w-5" />
             </Button>
-            <h1 className="text-2xl font-bold">#{activeChannel}</h1>
+            <h1 className="text-2xl font-bold truncate">#{activeChannel}</h1>
           </div>
           <Button
             onClick={() => setIsShareModalOpen(true)}
-            className="gap-2"
+            className="gap-2 flex-shrink-0"
           >
             <Plus className="h-4 w-4" />
             <span className="hidden sm:inline">Share Idea</span>
@@ -51,27 +51,29 @@ const Community = () => {
         </div>
 
         <div className="flex-1 overflow-y-auto p-2 sm:p-6 space-y-4">
-          {posts.map((post) => (
-            <IdeaCard
-              key={post.id}
-              id={post.id}
-              title={post.title}
-              content={post.content}
-              author={{
-                id: post.user_id,
-                name: post.author?.username || "Anonymous",
-                avatar: post.author?.avatar_url || undefined,
-              }}
-              likes={post.likes_count}
-              comments={post.comments_count}
-              tags={[]}
-              category={post.category}
-              feedbackType={post.feedback_type}
-              createdAt={new Date(post.created_at)}
-              isPinned={post.is_pinned}
-              emojiReactions={post.emoji_reactions}
-            />
-          ))}
+          <div className="max-w-3xl mx-auto w-full">
+            {posts.map((post) => (
+              <IdeaCard
+                key={post.id}
+                id={post.id}
+                title={post.title}
+                content={post.content}
+                author={{
+                  id: post.user_id,
+                  name: post.author?.username || "Anonymous",
+                  avatar: post.author?.avatar_url || undefined,
+                }}
+                likes={post.likes_count}
+                comments={post.comments_count}
+                tags={[]}
+                category={post.category}
+                feedbackType={post.feedback_type}
+                createdAt={new Date(post.created_at)}
+                isPinned={post.is_pinned}
+                emojiReactions={post.emoji_reactions}
+              />
+            ))}
+          </div>
         </div>
       </div>
 
