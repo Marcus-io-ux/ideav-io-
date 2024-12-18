@@ -1,6 +1,7 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { IdeaForm } from "./IdeaForm";
+import { useState } from "react";
 
 export interface AddIdeaDialogProps {
   buttonText?: string;
@@ -8,8 +9,34 @@ export interface AddIdeaDialogProps {
 }
 
 export function AddIdeaDialog({ buttonText = "Add Idea", onIdeaSubmit }: AddIdeaDialogProps) {
+  const [open, setOpen] = useState(false);
+  const [idea, setIdea] = useState({
+    title: "",
+    content: "",
+    channel: "",
+    category: "",
+    feedbackType: "",
+    shareToCommunity: false,
+  });
+
+  const handleIdeaChange = (field: string, value: any) => {
+    setIdea(prev => ({ ...prev, [field]: value }));
+  };
+
+  const handleCancel = () => {
+    setOpen(false);
+    setIdea({
+      title: "",
+      content: "",
+      channel: "",
+      category: "",
+      feedbackType: "",
+      shareToCommunity: false,
+    });
+  };
+
   return (
-    <Dialog>
+    <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button>{buttonText}</Button>
       </DialogTrigger>
@@ -17,7 +44,19 @@ export function AddIdeaDialog({ buttonText = "Add Idea", onIdeaSubmit }: AddIdea
         <DialogHeader>
           <DialogTitle>Add New Idea</DialogTitle>
         </DialogHeader>
-        <IdeaForm onSubmit={onIdeaSubmit} />
+        <IdeaForm 
+          idea={idea}
+          onIdeaChange={handleIdeaChange}
+          onCancel={handleCancel}
+          onSaveDraft={() => {
+            // Implement draft saving logic here
+            handleCancel();
+          }}
+          onSubmit={() => {
+            onIdeaSubmit();
+            handleCancel();
+          }}
+        />
       </DialogContent>
     </Dialog>
   );
