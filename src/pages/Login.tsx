@@ -3,6 +3,8 @@ import { ThemeSupa } from "@supabase/auth-ui-shared";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 import { useEffect } from "react";
+import { Button } from "@/components/ui/button";
+import { HelpCircle } from "lucide-react";
 
 const Login = () => {
   const navigate = useNavigate();
@@ -27,9 +29,27 @@ const Login = () => {
     return () => subscription.unsubscribe();
   }, [navigate]);
 
+  const scrollToFAQ = () => {
+    document.getElementById('faq-section')?.scrollIntoView({ behavior: 'smooth' });
+  };
+
   return (
-    <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md mx-auto">
+    <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white">
+      <nav className="container mx-auto px-4 py-6 flex justify-between items-center">
+        <h1 className="text-2xl font-bold text-primary">IdeaVault</h1>
+        <div className="flex gap-4 items-center">
+          <Button
+            variant="ghost"
+            onClick={scrollToFAQ}
+            className="flex items-center gap-2"
+          >
+            <HelpCircle className="w-4 h-4" />
+            FAQ
+          </Button>
+        </div>
+      </nav>
+
+      <div className="max-w-md mx-auto px-4 py-12">
         <div className="text-center mb-8">
           <h2 className="text-3xl font-bold text-gray-900">Welcome Back!</h2>
           <p className="mt-2 text-sm text-gray-600">
