@@ -381,10 +381,8 @@ export type Database = {
           created_at: string | null
           id: string
           location: string | null
-          tutorial_completed: boolean | null
           user_id: string | null
           username: string | null
-          username_set: boolean | null
         }
         Insert: {
           avatar_url?: string | null
@@ -392,10 +390,8 @@ export type Database = {
           created_at?: string | null
           id?: string
           location?: string | null
-          tutorial_completed?: boolean | null
           user_id?: string | null
           username?: string | null
-          username_set?: boolean | null
         }
         Update: {
           avatar_url?: string | null
@@ -403,10 +399,8 @@ export type Database = {
           created_at?: string | null
           id?: string
           location?: string | null
-          tutorial_completed?: boolean | null
           user_id?: string | null
           username?: string | null
-          username_set?: boolean | null
         }
         Relationships: []
       }
