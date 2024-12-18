@@ -1,26 +1,15 @@
 import { useState } from "react";
-import { Card } from "@/components/ui/card";
-import { Switch } from "@/components/ui/switch";
-import { Label } from "@/components/ui/label";
-import { Separator } from "@/components/ui/separator";
-import { useToast } from "@/hooks/use-toast";
-import {
-  BarChart,
-  Activity,
-  Users,
-  Star,
-  Clock,
-  Share2,
-  Lock,
-  Unlock,
-} from "lucide-react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ProfileHeader } from "@/components/profile/ProfileHeader";
+import { MyIdeasTab } from "@/components/profile/tabs/MyIdeasTab";
+import { SharedIdeasTab } from "@/components/profile/tabs/SharedIdeasTab";
+import { CollaborationsTab } from "@/components/profile/tabs/CollaborationsTab";
+import { StatsTab } from "@/components/profile/tabs/StatsTab";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 
 const Profile = () => {
-  const [isPublic, setIsPublic] = useState(false);
-  const { toast } = useToast();
+  const [activeTab, setActiveTab] = useState("my-ideas");
 
   const { data: profileData } = useQuery({
     queryKey: ["profile-data"],
@@ -48,28 +37,8 @@ const Profile = () => {
     },
   });
 
-  const handlePrivacyChange = (checked: boolean) => {
-    setIsPublic(checked);
-    toast({
-      title: `Profile is now ${checked ? "public" : "private"}`,
-      description: `Other users ${
-        checked ? "can" : "cannot"
-      } view your profile and statistics.`,
-    });
-  };
-
-  const stats = [
-    { label: "Total Ideas", value: 42, icon: BarChart },
-    { label: "Ideas This Month", value: 12, icon: Activity },
-    { label: "Followers", value: 156, icon: Users },
-    { label: "Following", value: 89, icon: Users },
-    { label: "Favorite Ideas", value: 15, icon: Star },
-    { label: "Days Active", value: 60, icon: Clock },
-    { label: "Shared Ideas", value: 8, icon: Share2 },
-  ];
-
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
+    <div className="min-h-screen bg-background py-8">
       <div className="max-w-6xl mx-auto px-4">
         <div className="space-y-8">
           <ProfileHeader
@@ -80,53 +49,30 @@ const Profile = () => {
             avatarUrl={profileData?.avatar_url}
           />
 
-          <div className="flex items-center space-x-2 mb-6">
-            {isPublic ? (
-              <Unlock className="h-4 w-4 text-green-500" />
-            ) : (
-              <Lock className="h-4 w-4 text-gray-500" />
-            )}
-            <Switch
-              checked={isPublic}
-              onCheckedChange={handlePrivacyChange}
-              id="profile-privacy"
-            />
-            <Label htmlFor="profile-privacy">
-              {isPublic ? "Public Profile" : "Private Profile"}
-            </Label>
-          </div>
+          <Tabs value={activeTab} onValueChange={setActiveTab}>
+            <TabsList className="w-full sm:w-auto grid grid-cols-2 sm:grid-cols-4 h-auto p-1">
+              <TabsTrigger value="my-ideas" className="px-8 py-2">My Ideas</TabsTrigger>
+              <TabsTrigger value="shared" className="px-8 py-2">Shared Ideas</TabsTrigger>
+              <TabsTrigger value="collaborations" className="px-8 py-2">Collaborations</TabsTrigger>
+              <TabsTrigger value="stats" className="px-8 py-2">Stats</TabsTrigger>
+            </TabsList>
 
-          <Separator />
+            <TabsContent value="my-ideas">
+              <MyIdeasTab />
+            </TabsContent>
 
-          {/* Stats Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {stats.map((stat) => (
-              <Card
-                key={stat.label}
-                className="p-6 hover:shadow-lg transition-shadow"
-              >
-                <div className="flex items-center space-x-4">
-                  <div className="p-3 bg-primary/10 rounded-full">
-                    <stat.icon className="h-6 w-6 text-primary" />
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium text-gray-500">
-                      {stat.label}
-                    </p>
-                    <p className="text-2xl font-bold">{stat.value}</p>
-                  </div>
-                </div>
-              </Card>
-            ))}
-          </div>
+            <TabsContent value="shared">
+              <SharedIdeasTab />
+            </TabsContent>
 
-          {/* Activity Chart */}
-          <Card className="p-6">
-            <h2 className="text-xl font-semibold mb-4">Activity Overview</h2>
-            <div className="h-64 flex items-center justify-center text-gray-500">
-              Activity chart will be implemented here
-            </div>
-          </Card>
+            <TabsContent value="collaborations">
+              <CollaborationsTab />
+            </TabsContent>
+
+            <TabsContent value="stats">
+              <StatsTab />
+            </TabsContent>
+          </Tabs>
         </div>
       </div>
     </div>

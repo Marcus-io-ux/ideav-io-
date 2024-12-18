@@ -2,8 +2,9 @@ import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-import { Edit, Upload } from "lucide-react";
+import { Edit, Upload, MapPin, Calendar } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { format } from "date-fns";
 import { supabase } from "@/integrations/supabase/client";
 
 interface ProfileHeaderProps {
@@ -12,6 +13,7 @@ interface ProfileHeaderProps {
   location?: string;
   bio?: string;
   avatarUrl?: string;
+  createdAt?: Date;
 }
 
 export const ProfileHeader = ({
@@ -20,6 +22,7 @@ export const ProfileHeader = ({
   location,
   bio,
   avatarUrl,
+  createdAt = new Date(),
 }: ProfileHeaderProps) => {
   const [isEditing, setIsEditing] = useState(false);
   const { toast } = useToast();
@@ -40,8 +43,8 @@ export const ProfileHeader = ({
   };
 
   return (
-    <Card className="p-6 mb-8">
-      <div className="flex items-start gap-6">
+    <Card className="p-6">
+      <div className="flex flex-col sm:flex-row items-start gap-6">
         <div className="relative group">
           <Avatar className="h-24 w-24">
             {avatarUrl ? (
@@ -61,14 +64,25 @@ export const ProfileHeader = ({
         </div>
 
         <div className="flex-1">
-          <div className="flex justify-between items-start">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
             <div>
               <h1 className="text-2xl font-bold">{fullName || username}</h1>
               <p className="text-muted-foreground">@{username}</p>
-              {location && (
-                <p className="text-sm text-muted-foreground mt-1">{location}</p>
-              )}
+              
+              <div className="flex items-center gap-4 mt-2">
+                {location && (
+                  <div className="flex items-center gap-1 text-sm text-muted-foreground">
+                    <MapPin className="h-4 w-4" />
+                    <span>{location}</span>
+                  </div>
+                )}
+                <div className="flex items-center gap-1 text-sm text-muted-foreground">
+                  <Calendar className="h-4 w-4" />
+                  <span>Joined {format(createdAt, 'MMMM yyyy')}</span>
+                </div>
+              </div>
             </div>
+            
             <Button
               onClick={handleEditProfile}
               variant="outline"
@@ -78,6 +92,7 @@ export const ProfileHeader = ({
               Edit Profile
             </Button>
           </div>
+          
           {bio && <p className="mt-4 text-sm">{bio}</p>}
         </div>
       </div>
