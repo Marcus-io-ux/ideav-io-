@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { ProfileHeader } from "@/components/profile/ProfileHeader";
 import { StatsSection } from "@/components/profile/StatsSection";
-import { ActivityGraph } from "@/components/profile/ActivityGraph";
+import { RecentIdeas } from "@/components/profile/RecentIdeas";
 import { Button } from "@/components/ui/button";
 import { PlusCircle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
@@ -54,7 +54,7 @@ const Profile = () => {
     <div className="container max-w-4xl mx-auto px-4 py-8 space-y-8">
       <ProfileHeader profile={profileData} />
       <StatsSection userId={profileData?.user_id} />
-      <ActivityGraph userId={profileData?.user_id} />
+      <RecentIdeas userId={profileData?.user_id} />
       
       <div className="flex justify-center mt-8">
         <Button

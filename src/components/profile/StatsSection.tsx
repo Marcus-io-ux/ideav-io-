@@ -32,7 +32,8 @@ export const StatsSection = ({ userId }: { userId: string }) => {
         { count: sharedCount },
         { count: collaborationsCount },
         { count: likesCount },
-        { count: commentsCount }
+        { count: commentsCount },
+        { count: favoritesCount }
       ] = await Promise.all([
         supabase
           .from("ideas")
@@ -56,6 +57,10 @@ export const StatsSection = ({ userId }: { userId: string }) => {
           .from("community_comments")
           .select("*", { count: "exact", head: true })
           .eq("user_id", userId),
+        supabase
+          .from("favorites")
+          .select("*", { count: "exact", head: true })
+          .eq("user_id", userId),
       ]);
 
       return {
@@ -64,6 +69,7 @@ export const StatsSection = ({ userId }: { userId: string }) => {
         collaborations: collaborationsCount || 0,
         likes: likesCount || 0,
         comments: commentsCount || 0,
+        favorites: favoritesCount || 0,
       };
     },
   });
@@ -99,6 +105,12 @@ export const StatsSection = ({ userId }: { userId: string }) => {
         label="Comments Made"
         value={stats?.comments || 0}
         description="Comments Contributed"
+      />
+      <StatCard
+        icon={<Heart className="h-6 w-6 text-primary" />}
+        label="Favorites"
+        value={stats?.favorites || 0}
+        description="Ideas You've Favorited"
       />
     </div>
   );
