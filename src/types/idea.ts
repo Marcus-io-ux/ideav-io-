@@ -1,10 +1,10 @@
-export interface IdeaFormData {
+export interface Idea {
+  id: string;
   title: string;
   content: string;
   tags: string[];
-  category?: string;
-  feedbackType?: string;
-  channel?: string;
-  isCollaborative?: boolean;
-  shareToCommunity?: boolean;
+  createdAt: Date;
+  isFavorite?: boolean;
+  sharedToCommunity?: boolean;
+  deleted?: boolean;
 }

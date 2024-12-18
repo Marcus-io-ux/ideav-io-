@@ -14,9 +14,12 @@ export const TrashTab = ({
   onSelect,
   onDelete,
 }: TrashTabProps) => {
+  // Only show deleted ideas
+  const trashedIdeas = ideas.filter(idea => idea.deleted);
+  
   return (
     <div className="grid gap-6 mt-6">
-      {ideas.map((idea) => (
+      {trashedIdeas.map((idea) => (
         <IdeaCard
           key={idea.id}
           {...idea}

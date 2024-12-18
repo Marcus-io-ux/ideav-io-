@@ -16,9 +16,12 @@ export const AllIdeasTab = ({
   onEdit,
   onDelete,
 }: AllIdeasTabProps) => {
+  // Filter out deleted ideas
+  const activeIdeas = ideas.filter(idea => !idea.deleted);
+  
   return (
     <div className="grid gap-6 mt-6">
-      {ideas.map((idea) => (
+      {activeIdeas.map((idea) => (
         <IdeaCard
           key={idea.id}
           {...idea}

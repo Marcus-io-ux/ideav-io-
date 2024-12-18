@@ -16,9 +16,12 @@ export const FavoritesTab = ({
   onEdit,
   onDelete,
 }: FavoritesTabProps) => {
+  // Filter out deleted ideas and show only favorites
+  const favoriteIdeas = ideas.filter(idea => !idea.deleted && idea.isFavorite);
+  
   return (
     <div className="grid gap-6 mt-6">
-      {ideas.map((idea) => (
+      {favoriteIdeas.map((idea) => (
         <IdeaCard
           key={idea.id}
           {...idea}
