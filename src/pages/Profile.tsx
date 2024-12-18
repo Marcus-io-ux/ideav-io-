@@ -32,7 +32,8 @@ const Profile = () => {
       
       return {
         ...profile,
-        full_name: onboardingData?.full_name
+        full_name: onboardingData?.full_name,
+        is_public: profile?.is_public ?? true
       };
     },
   });
@@ -47,6 +48,7 @@ const Profile = () => {
             location={profileData?.location}
             bio={profileData?.bio}
             avatarUrl={profileData?.avatar_url}
+            isPublic={profileData?.is_public}
           />
 
           <Tabs value={activeTab} onValueChange={setActiveTab}>
