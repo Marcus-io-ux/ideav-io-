@@ -15,13 +15,13 @@ interface CollaborationData {
     user: {
       profiles: {
         username: string;
-      };
-    };
+      }
+    }
   };
 }
 
 export const CollaborationsTab = () => {
-  const { data: collaborations } = useQuery<CollaborationData[]>({
+  const { data: collaborations } = useQuery({
     queryKey: ["collaborations"],
     queryFn: async () => {
       const { data: { user } } = await supabase.auth.getUser();

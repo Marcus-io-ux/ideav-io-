@@ -3,6 +3,7 @@ import { IdeaCard } from "@/components/IdeaCard";
 import { SearchBar } from "@/components/SearchBar";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { AddIdeaButton } from "@/components/AddIdeaButton";
 import { AddIdeaDialog } from "@/components/dashboard/AddIdeaDialog";
 
 export const MyIdeasTab = () => {
@@ -40,6 +41,7 @@ export const MyIdeasTab = () => {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <SearchBar onSearch={setSearchQuery} />
+        <AddIdeaButton onClick={() => setShowAddIdea(true)} />
       </div>
 
       <div className="grid gap-6">
