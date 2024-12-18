@@ -1,7 +1,5 @@
-import { IdeaCard } from "@/components/IdeaCard";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
 import { Trash2, RotateCcw } from "lucide-react";
 import { useState } from "react";
 import { AddIdeaDialog } from "@/components/dashboard/AddIdeaDialog";
@@ -16,6 +14,10 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { RecentIdeasTab } from "./tabs/RecentIdeasTab";
+import { AllIdeasTab } from "./tabs/AllIdeasTab";
+import { FavoritesTab } from "./tabs/FavoritesTab";
+import { TrashTab } from "./tabs/TrashTab";
 
 interface Idea {
   id: string;
@@ -23,7 +25,6 @@ interface Idea {
   content: string;
   tags: string[];
   createdAt: Date;
-  priority?: "high" | "medium" | "low";
   isFavorite?: boolean;
   sharedToCommunity?: boolean;
   deleted?: boolean;
@@ -48,8 +49,9 @@ export const IdeasList = ({
   const [activeTab, setActiveTab] = useState("recent");
   const [isEmptyTrashDialogOpen, setIsEmptyTrashDialogOpen] = useState(false);
 
-  // Filter ideas based on their deleted status
+  // Filter ideas based on their status
   const activeIdeas = ideas.filter(idea => !idea.deleted);
+  const favoriteIdeas = activeIdeas.filter(idea => idea.isFavorite);
   const trashedIdeas = ideas.filter(idea => idea.deleted);
 
   const handleSelect = (id: string) => {
@@ -74,7 +76,6 @@ export const IdeasList = ({
     try {
       const trashedIds = trashedIdeas.map(idea => idea.id);
       
-      // Delete from Supabase
       const { error } = await supabase
         .from('ideas')
         .delete()
@@ -82,7 +83,6 @@ export const IdeasList = ({
 
       if (error) throw error;
 
-      // Delete from UI
       onDeleteIdeas(trashedIds);
       setIsEmptyTrashDialogOpen(false);
     } catch (error) {
@@ -151,54 +151,50 @@ export const IdeasList = ({
       </AlertDialog>
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="w-full sm:w-auto grid grid-cols-3 h-auto p-1">
+        <TabsList className="w-full sm:w-auto grid grid-cols-4 h-auto p-1">
           <TabsTrigger value="recent" className="px-8 py-2">Recent Ideas</TabsTrigger>
           <TabsTrigger value="all" className="px-8 py-2">All Ideas ({activeIdeas.length})</TabsTrigger>
+          <TabsTrigger value="favorites" className="px-8 py-2">Favorites ({favoriteIdeas.length})</TabsTrigger>
           <TabsTrigger value="trash" className="px-8 py-2">Trash ({trashedIdeas.length})</TabsTrigger>
         </TabsList>
         
         <TabsContent value="recent">
-          <div className="grid gap-6 mt-6">
-            {activeIdeas.slice(0, 5).map((idea) => (
-              <IdeaCard
-                key={idea.id}
-                {...idea}
-                isSelected={selectedIds.includes(idea.id)}
-                onSelect={handleSelect}
-                onEdit={onEditIdea}
-                onDelete={(id) => onDeleteIdeas([id])}
-              />
-            ))}
-          </div>
+          <RecentIdeasTab
+            ideas={activeIdeas}
+            selectedIds={selectedIds}
+            onSelect={handleSelect}
+            onEdit={onEditIdea}
+            onDelete={(id) => onDeleteIdeas([id])}
+          />
         </TabsContent>
         
         <TabsContent value="all">
-          <div className="grid gap-6 mt-6">
-            {activeIdeas.map((idea) => (
-              <IdeaCard
-                key={idea.id}
-                {...idea}
-                isSelected={selectedIds.includes(idea.id)}
-                onSelect={handleSelect}
-                onEdit={onEditIdea}
-                onDelete={(id) => onDeleteIdeas([id])}
-              />
-            ))}
-          </div>
+          <AllIdeasTab
+            ideas={activeIdeas}
+            selectedIds={selectedIds}
+            onSelect={handleSelect}
+            onEdit={onEditIdea}
+            onDelete={(id) => onDeleteIdeas([id])}
+          />
+        </TabsContent>
+
+        <TabsContent value="favorites">
+          <FavoritesTab
+            ideas={favoriteIdeas}
+            selectedIds={selectedIds}
+            onSelect={handleSelect}
+            onEdit={onEditIdea}
+            onDelete={(id) => onDeleteIdeas([id])}
+          />
         </TabsContent>
 
         <TabsContent value="trash">
-          <div className="grid gap-6 mt-6">
-            {trashedIdeas.map((idea) => (
-              <IdeaCard
-                key={idea.id}
-                {...idea}
-                isSelected={selectedIds.includes(idea.id)}
-                onSelect={handleSelect}
-                onDelete={(id) => onDeleteIdeas([id])}
-              />
-            ))}
-          </div>
+          <TrashTab
+            ideas={trashedIdeas}
+            selectedIds={selectedIds}
+            onSelect={handleSelect}
+            onDelete={(id) => onDeleteIdeas([id])}
+          />
         </TabsContent>
       </Tabs>
     </div>
