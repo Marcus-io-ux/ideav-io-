@@ -17,6 +17,7 @@ import Inbox from "./pages/Inbox";
 import Settings from "./pages/Settings";
 import Announcements from "./pages/Announcements";
 import Login from "./pages/Login";
+import Signup from "./pages/Signup";
 import Favorites from "./pages/Favorites";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
@@ -64,6 +65,12 @@ const App = () => {
               path="/login"
               element={
                 isAuthenticated ? <Navigate to="/dashboard" replace /> : <Login />
+              }
+            />
+            <Route
+              path="/signup"
+              element={
+                isAuthenticated ? <Navigate to="/dashboard" replace /> : <Signup />
               }
             />
             <Route

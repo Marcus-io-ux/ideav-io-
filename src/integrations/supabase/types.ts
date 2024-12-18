@@ -404,6 +404,33 @@ export type Database = {
         }
         Relationships: []
       }
+      signup_data: {
+        Row: {
+          created_at: string | null
+          full_name: string
+          id: string
+          signup_provider: string | null
+          terms_accepted: boolean | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          full_name: string
+          id?: string
+          signup_provider?: string | null
+          terms_accepted?: boolean | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          full_name?: string
+          id?: string
+          signup_provider?: string | null
+          terms_accepted?: boolean | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       user_follows: {
         Row: {
           created_at: string | null

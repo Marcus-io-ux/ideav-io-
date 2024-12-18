@@ -1,18 +1,9 @@
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { TypeAnimation } from 'react-type-animation';
 
 export const HeroSection = () => {
-  const navigate = useNavigate();
-
-  const scrollToPricing = () => {
-    const pricingSection = document.querySelector('.pricing-section');
-    if (pricingSection) {
-      pricingSection.scrollIntoView({ behavior: 'smooth' });
-    }
-  };
-
   return (
     <section className="relative min-h-[90vh] flex items-center justify-center overflow-hidden bg-gradient-to-br from-blue-50 to-indigo-50">
       {/* Animated background elements */}
