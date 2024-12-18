@@ -48,6 +48,7 @@ export const IdeasList = ({
   const [activeTab, setActiveTab] = useState("recent");
   const [isEmptyTrashDialogOpen, setIsEmptyTrashDialogOpen] = useState(false);
 
+  // Filter ideas based on their deleted status
   const activeIdeas = ideas.filter(idea => !idea.deleted);
   const trashedIdeas = ideas.filter(idea => idea.deleted);
 
@@ -153,7 +154,7 @@ export const IdeasList = ({
         <TabsList className="w-full sm:w-auto grid grid-cols-3 h-auto p-1">
           <TabsTrigger value="recent" className="px-8 py-2">Recent Ideas</TabsTrigger>
           <TabsTrigger value="all" className="px-8 py-2">All Ideas ({activeIdeas.length})</TabsTrigger>
-          <TabsTrigger value="trash" className="px-8 py-2">Trash</TabsTrigger>
+          <TabsTrigger value="trash" className="px-8 py-2">Trash ({trashedIdeas.length})</TabsTrigger>
         </TabsList>
         
         <TabsContent value="recent">
