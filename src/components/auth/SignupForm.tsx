@@ -1,11 +1,12 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { Loader2, Mail, Lock, User, Vault } from "lucide-react";
+import { Loader2 } from "lucide-react";
+import { AuthLogo } from "./AuthLogo";
+import { SignupFormInputs } from "./SignupFormInputs";
 
 interface SignupFormData {
   firstName: string;
@@ -80,102 +81,10 @@ export const SignupForm = () => {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-center gap-2 text-2xl font-bold text-primary mb-8">
-        <Vault className="h-8 w-8" />
-        <span>IdeaVault</span>
-      </div>
+      <AuthLogo />
       
       <form onSubmit={handleSignup} className="space-y-6">
-        <div className="space-y-4">
-          <div className="space-y-2">
-            <label htmlFor="firstName" className="block text-sm font-medium text-gray-700">
-              First Name
-            </label>
-            <div className="mt-1 relative">
-              <Input
-                id="firstName"
-                type="text"
-                required
-                placeholder="Enter your first name"
-                value={formData.firstName}
-                onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
-                className="pl-10"
-              />
-              <User className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
-            </div>
-          </div>
-          <div className="space-y-2">
-            <label htmlFor="lastName" className="block text-sm font-medium text-gray-700">
-              Last Name
-            </label>
-            <div className="mt-1 relative">
-              <Input
-                id="lastName"
-                type="text"
-                required
-                placeholder="Enter your last name"
-                value={formData.lastName}
-                onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
-                className="pl-10"
-              />
-              <User className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
-            </div>
-          </div>
-        </div>
-
-        <div className="space-y-2">
-          <label htmlFor="email" className="block text-sm font-medium text-gray-700">
-            Email Address
-          </label>
-          <div className="mt-1 relative">
-            <Input
-              id="email"
-              type="email"
-              required
-              placeholder="Enter your email address"
-              value={formData.email}
-              onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-              className="pl-10"
-            />
-            <Mail className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
-          </div>
-        </div>
-
-        <div className="space-y-2">
-          <label htmlFor="password" className="block text-sm font-medium text-gray-700">
-            Password
-          </label>
-          <div className="mt-1 relative">
-            <Input
-              id="password"
-              type="password"
-              required
-              placeholder="Create a secure password"
-              value={formData.password}
-              onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-              className="pl-10"
-            />
-            <Lock className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
-          </div>
-        </div>
-
-        <div className="space-y-2">
-          <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700">
-            Confirm Password
-          </label>
-          <div className="mt-1 relative">
-            <Input
-              id="confirmPassword"
-              type="password"
-              required
-              placeholder="Re-enter your password"
-              value={formData.confirmPassword}
-              onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
-              className="pl-10"
-            />
-            <Lock className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
-          </div>
-        </div>
+        <SignupFormInputs formData={formData} setFormData={setFormData} />
 
         <div className="flex items-center space-x-2">
           <Checkbox
