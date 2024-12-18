@@ -4,8 +4,6 @@ import { supabase } from "@/integrations/supabase/client";
 import { ProfileHeader } from "@/components/profile/ProfileHeader";
 import { StatsSection } from "@/components/profile/StatsSection";
 import { RecentIdeas } from "@/components/profile/RecentIdeas";
-import { Button } from "@/components/ui/button";
-import { PlusCircle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 const Profile = () => {
@@ -55,17 +53,6 @@ const Profile = () => {
       <ProfileHeader profile={profileData} />
       <StatsSection userId={profileData?.user_id} />
       <RecentIdeas userId={profileData?.user_id} />
-      
-      <div className="flex justify-center mt-8">
-        <Button
-          onClick={() => navigate("/dashboard")}
-          className="gap-2"
-          size="lg"
-        >
-          <PlusCircle className="h-5 w-5" />
-          Add New Idea
-        </Button>
-      </div>
     </div>
   );
 };
