@@ -1,11 +1,17 @@
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { Menu } from "lucide-react";
+import { useState } from "react";
 
 export const NavigationBar = () => {
+  const [isOpen, setIsOpen] = useState(false);
+
   const scrollToSection = (sectionId: string) => {
     const element = document.querySelector(`.${sectionId}`);
     if (element) {
       element.scrollIntoView({ behavior: 'smooth' });
+      setIsOpen(false); // Close mobile menu after clicking
     }
   };
 
@@ -19,6 +25,8 @@ export const NavigationBar = () => {
           >
             IdeaVault
           </Link>
+
+          {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-8">
             <button 
               onClick={() => scrollToSection('how-it-works')}
@@ -52,12 +60,50 @@ export const NavigationBar = () => {
               <Link to="/login">Login</Link>
             </Button>
           </div>
+
           {/* Mobile Menu Button */}
-          <button className="md:hidden p-2 text-gray-600 hover:text-primary transition-colors">
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-            </svg>
-          </button>
+          <Sheet open={isOpen} onOpenChange={setIsOpen}>
+            <SheetTrigger asChild>
+              <Button variant="ghost" size="icon" className="md:hidden">
+                <Menu className="h-6 w-6" />
+                <span className="sr-only">Open menu</span>
+              </Button>
+            </SheetTrigger>
+            <SheetContent side="right" className="w-[300px] sm:w-[400px]">
+              <nav className="flex flex-col gap-4">
+                <button
+                  onClick={() => scrollToSection('how-it-works')}
+                  className="flex items-center px-2 py-3 text-lg font-medium transition-colors hover:text-primary"
+                >
+                  How it Works
+                </button>
+                <button
+                  onClick={() => scrollToSection('about-us')}
+                  className="flex items-center px-2 py-3 text-lg font-medium transition-colors hover:text-primary"
+                >
+                  About Us
+                </button>
+                <button
+                  onClick={() => scrollToSection('pricing-section')}
+                  className="flex items-center px-2 py-3 text-lg font-medium transition-colors hover:text-primary"
+                >
+                  Pricing
+                </button>
+                <button
+                  onClick={() => scrollToSection('faq-section')}
+                  className="flex items-center px-2 py-3 text-lg font-medium transition-colors hover:text-primary"
+                >
+                  FAQ
+                </button>
+                <Button 
+                  asChild
+                  className="w-full mt-4 bg-primary hover:bg-primary-hover text-white rounded-full shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-300"
+                >
+                  <Link to="/login">Login</Link>
+                </Button>
+              </nav>
+            </SheetContent>
+          </Sheet>
         </div>
       </div>
     </nav>
