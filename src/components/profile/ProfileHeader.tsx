@@ -1,8 +1,8 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { PlusCircle } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { AddIdeaButton } from "@/components/AddIdeaButton";
+import { AddIdeaDialog } from "@/components/dashboard/AddIdeaDialog";
+import { useState } from "react";
 
 interface ProfileHeaderProps {
   profile: {
@@ -14,7 +14,7 @@ interface ProfileHeaderProps {
 }
 
 export const ProfileHeader = ({ profile }: ProfileHeaderProps) => {
-  const navigate = useNavigate();
+  const [showAddIdea, setShowAddIdea] = useState(false);
 
   return (
     <Card className="p-6">
@@ -32,17 +32,14 @@ export const ProfileHeader = ({ profile }: ProfileHeaderProps) => {
                 <p className="text-muted-foreground mt-1">{profile.bio}</p>
               )}
             </div>
-            <Button
-              onClick={() => navigate("/dashboard")}
-              className="gap-2"
-              size="sm"
-            >
-              <PlusCircle className="h-4 w-4" />
-              Add New Idea
-            </Button>
+            <AddIdeaButton onClick={() => setShowAddIdea(true)} />
           </div>
         </div>
       </div>
+
+      {showAddIdea && (
+        <AddIdeaDialog onIdeaSubmit={() => setShowAddIdea(false)} />
+      )}
     </Card>
   );
 };

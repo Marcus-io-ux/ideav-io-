@@ -1,22 +1,27 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Users } from "lucide-react";
 
 interface CollaborationData {
   id: string;
+  post_id: string;
+  requester_id: string;
+  owner_id: string;
+  status: string;
+  message: string;
+  created_at: string;
   community_posts: {
     title: string;
     content: string;
-  } | null;
-  owner_profile: {
-    username: string | null;
-  } | null;
+    user: {
+      profiles: {
+        username: string;
+      }
+    }
+  };
 }
 
 export const CollaborationsTab = () => {
-  const { data: collaborations = [] } = useQuery<CollaborationData[]>({
+  const { data: collaborations } = useQuery({
     queryKey: ["collaborations"],
     queryFn: async () => {
       const { data: { user } } = await supabase.auth.getUser();
@@ -25,58 +30,52 @@ export const CollaborationsTab = () => {
       const { data, error } = await supabase
         .from("collaboration_requests")
         .select(`
-          id,
+          *,
           community_posts (
             title,
-            content
-          ),
-          owner_profile:profiles!collaboration_requests_owner_id_fkey (
-            username
+            content,
+            user:user_id (
+              profiles (
+                username
+              )
+            )
           )
         `)
-        .or(`requester_id.eq.${user.id},owner_id.eq.${user.id}`)
-        .eq("status", "accepted");
+        .eq("requester_id", user.id);
 
       if (error) throw error;
-
-      // Transform the data to match our interface
-      const typedData = (data || []).map(item => ({
-        id: item.id,
-        community_posts: item.community_posts,
-        owner_profile: {
-          username: item.owner_profile?.username || null
-        }
-      }));
-
-      return typedData;
+      return data as CollaborationData[];
     },
   });
+
+  if (!collaborations?.length) {
+    return (
+      <div className="text-center py-12">
+        <p className="text-muted-foreground">No collaborations yet</p>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
       {collaborations.map((collab) => (
-        <Card key={collab.id}>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-xl font-semibold">
-              {collab.community_posts?.title}
-            </CardTitle>
-            <Badge variant="outline" className="ml-2">
-              Active
-            </Badge>
-          </CardHeader>
-          <CardContent>
-            <div className="flex items-center gap-2 text-sm text-muted-foreground">
-              <Users className="h-4 w-4" />
-              <span>Collaborating with {collab.owner_profile?.username || "Anonymous"}</span>
-            </div>
-          </CardContent>
-        </Card>
-      ))}
-      {collaborations.length === 0 && (
-        <div className="text-center py-12">
-          <p className="text-muted-foreground">No active collaborations</p>
+        <div key={collab.id} className="border p-4 rounded-lg">
+          <h3 className="font-semibold">{collab.community_posts.title}</h3>
+          <p className="text-sm text-muted-foreground mt-1">
+            By {collab.community_posts.user.profiles.username}
+          </p>
+          <p className="mt-2">{collab.message}</p>
+          <div className="mt-2 text-sm">
+            <span className={`px-2 py-1 rounded ${
+              collab.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
+              collab.status === 'accepted' ? 'bg-green-100 text-green-800' :
+              'bg-red-100 text-red-800'
+            }`}>
+              {collab.status.charAt(0).toUpperCase() + collab.status.slice(1)}
+            </span>
+          </div>
         </div>
-      )}
+      ))}
     </div>
   );
 };
