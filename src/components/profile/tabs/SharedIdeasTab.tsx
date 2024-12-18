@@ -18,7 +18,7 @@ interface SharedIdea {
   profiles?: {
     username: string | null;
     avatar_url: string | null;
-  };
+  } | null;
 }
 
 export const SharedIdeasTab = () => {
@@ -41,7 +41,10 @@ export const SharedIdeasTab = () => {
         .order("created_at", { ascending: false });
 
       if (error) throw error;
-      return data;
+      return data.map(idea => ({
+        ...idea,
+        emoji_reactions: idea.emoji_reactions as Record<string, number> || {},
+      }));
     },
   });
 

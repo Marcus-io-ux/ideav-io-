@@ -38,7 +38,7 @@ export const CollaborationsTab = () => {
         .eq("status", "accepted");
 
       if (error) throw error;
-      return data;
+      return data as CollaborationData[];
     },
   });
 
@@ -57,7 +57,7 @@ export const CollaborationsTab = () => {
           <CardContent>
             <div className="flex items-center gap-2 text-sm text-muted-foreground">
               <Users className="h-4 w-4" />
-              <span>Collaborating with {collab.profiles?.username}</span>
+              <span>Collaborating with {collab.profiles?.username || "Anonymous"}</span>
             </div>
           </CardContent>
         </Card>
