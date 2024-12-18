@@ -1,9 +1,11 @@
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { TypeAnimation } from 'react-type-animation';
 
 export const HeroSection = () => {
+  const navigate = useNavigate();
+
   const scrollToPricing = () => {
     const pricingSection = document.querySelector('.pricing-section');
     if (pricingSection) {
@@ -38,7 +40,7 @@ export const HeroSection = () => {
           {/* Dynamic headline */}
           <h1 className="text-3xl sm:text-4xl lg:text-6xl font-bold text-gray-900">
             <span className="block mb-2">Welcome to IdeaVault</span>
-            <div className="min-h-[60px] sm:min-h-[80px]"> {/* Container to prevent layout shift */}
+            <div className="min-h-[60px] sm:min-h-[80px]">
               <TypeAnimation
                 sequence={[
                   'Store Your Ideas.',
@@ -65,15 +67,16 @@ export const HeroSection = () => {
 
           {/* CTAs */}
           <div className="flex justify-center items-center gap-4 animate-fade-in">
-            <Button
-              size="lg"
-              className="bg-blue-600 hover:bg-blue-700 text-white px-6 sm:px-8 py-4 sm:py-6 rounded-full 
-                       shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-300"
-              onClick={scrollToPricing}
-            >
-              Get Started for Free
-              <ArrowRight className="ml-2 w-4 h-4 sm:w-5 sm:h-5" />
-            </Button>
+            <Link to="/signup">
+              <Button
+                size="lg"
+                className="bg-blue-600 hover:bg-blue-700 text-white px-6 sm:px-8 py-4 sm:py-6 rounded-full 
+                         shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-300"
+              >
+                Get Started for Free
+                <ArrowRight className="ml-2 w-4 h-4 sm:w-5 sm:h-5" />
+              </Button>
+            </Link>
           </div>
         </div>
       </div>
