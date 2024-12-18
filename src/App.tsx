@@ -17,6 +17,7 @@ import Settings from "./pages/Settings";
 import Announcements from "./pages/Announcements";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
+import Profile from "./pages/Profile";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -122,6 +123,12 @@ const App = () => {
                 ) : (
                   <Navigate to="/login" replace />
                 )
+              }
+            />
+            <Route
+              path="/profile"
+              element={
+                isAuthenticated ? <Profile /> : <Navigate to="/login" replace />
               }
             />
           </Routes>
