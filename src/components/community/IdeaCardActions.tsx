@@ -81,20 +81,19 @@ export const IdeaCardActions = ({
         <Button
           variant="ghost"
           size="sm"
+          className={`gap-2 ${isFavorite ? "text-yellow-500" : ""}`}
+          onClick={handleToggleFavorite}
+        >
+          <Star className={`h-4 w-4 ${isFavorite ? "fill-current" : ""}`} />
+        </Button>
+        <Button
+          variant="ghost"
+          size="sm"
           className="gap-2"
           onClick={() => setIsCollaborateOpen(true)}
         >
           <UserPlus className="h-4 w-4" />
           <span>Collaborate</span>
-        </Button>
-        <Button
-          variant="ghost"
-          size="sm"
-          className={`gap-2 ${isFavorite ? "text-yellow-500" : ""}`}
-          onClick={handleToggleFavorite}
-        >
-          <Star className={`h-4 w-4 ${isFavorite ? "fill-current" : ""}`} />
-          <span>Favorite</span>
         </Button>
         <MessageButton
           currentUserId={currentUserId}
