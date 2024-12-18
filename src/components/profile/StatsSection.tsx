@@ -39,7 +39,7 @@ export const StatsSection = ({ userId }: { userId: string }) => {
           .from("ideas")
           .select("*", { count: "exact", head: true })
           .eq("user_id", userId)
-          .eq("deleted", false),
+          .eq("deleted", false), // Only count non-deleted ideas
         supabase
           .from("community_posts")
           .select("*", { count: "exact", head: true })
