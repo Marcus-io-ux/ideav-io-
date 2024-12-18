@@ -12,8 +12,14 @@ export function CollaborationsTab() {
         .select(`
           *,
           post:community_posts(*),
-          requester:profiles!collaboration_requests_requester_id_fkey(*)
+          requester:profiles(
+            id,
+            user_id,
+            username,
+            avatar_url
+          )
         `)
+        .eq('requester.user_id', 'collaboration_requests.requester_id')
         .order('created_at', { ascending: false });
 
       if (error) throw error;
