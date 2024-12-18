@@ -10,7 +10,7 @@ interface CollaborationData {
     title: string;
     content: string;
   } | null;
-  profiles: {
+  owner: {
     username: string | null;
   } | null;
 }
@@ -30,7 +30,7 @@ export const CollaborationsTab = () => {
             title,
             content
           ),
-          profiles:owner_id (
+          owner:owner_id (
             username
           )
         `)
@@ -57,7 +57,7 @@ export const CollaborationsTab = () => {
           <CardContent>
             <div className="flex items-center gap-2 text-sm text-muted-foreground">
               <Users className="h-4 w-4" />
-              <span>Collaborating with {collab.profiles?.username || "Anonymous"}</span>
+              <span>Collaborating with {collab.owner?.username || "Anonymous"}</span>
             </div>
           </CardContent>
         </Card>
