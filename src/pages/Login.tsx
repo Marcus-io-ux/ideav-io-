@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Lightbulb } from "lucide-react";
 
 const Login = () => {
   const navigate = useNavigate();
@@ -31,17 +32,17 @@ const Login = () => {
   }, [navigate]);
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-8">
-        <div>
-          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
-            Welcome to IdeaVault
-          </h2>
-          <p className="mt-2 text-center text-sm text-gray-600">
-            Sign in to your account or create a new one
+    <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white py-12 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-md mx-auto">
+        <div className="text-center mb-8">
+          <Lightbulb className="mx-auto h-12 w-12 text-primary" />
+          <h2 className="mt-6 text-3xl font-bold text-gray-900">Welcome Back!</h2>
+          <p className="mt-2 text-sm text-gray-600">
+            Sign in to continue your journey with Idea Vault
           </p>
         </div>
-        <div className="mt-8">
+
+        <div className="bg-white p-8 rounded-lg shadow-md">
           <Auth
             supabaseClient={supabase}
             appearance={{
@@ -54,6 +55,12 @@ const Login = () => {
                   },
                 },
               },
+              className: {
+                container: 'space-y-4',
+                label: 'block text-sm font-medium text-gray-700',
+                input: 'mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm placeholder-gray-400 shadow-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary',
+                button: 'w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary',
+              },
             }}
             providers={[]}
             redirectTo={`${window.location.origin}/dashboard`}
@@ -62,18 +69,20 @@ const Login = () => {
                 sign_in: {
                   email_label: 'Email',
                   password_label: 'Password',
+                  button_label: 'Sign In',
+                  loading_button_label: 'Signing in...',
                 }
               }
             }}
           />
-          <div className="mt-4 flex items-center space-x-2">
+          <div className="mt-3 mb-4 flex items-center space-x-2">
             <Checkbox
               id="persistSession"
               checked={persistSession}
               onCheckedChange={(checked) => {
                 setPersistSession(checked as boolean);
                 if (checked) {
-                  supabase.auth.setSession({ persistSession: true });
+                  supabase.auth.setSession({ persist: true });
                 }
               }}
             />
@@ -81,6 +90,13 @@ const Login = () => {
               Keep me logged in
             </Label>
           </div>
+
+          <p className="mt-4 text-center text-sm text-gray-600">
+            Don't have an account?{" "}
+            <a href="/signup" className="text-primary hover:underline">
+              Sign up
+            </a>
+          </p>
         </div>
       </div>
     </div>
