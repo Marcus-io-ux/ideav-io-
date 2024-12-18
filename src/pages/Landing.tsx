@@ -18,12 +18,12 @@ const Landing = () => {
         <div id="how-it-works" className="how-it-works">
           <HowItWorksSection />
         </div>
+        <div id="about-us" className="about-us">
+          <AboutUsSection />
+        </div>
         <div id="community" className="community">
           <JoinCommunitySection />
           <TestimonialsCarousel />
-        </div>
-        <div id="about-us" className="about-us">
-          <AboutUsSection />
         </div>
         <div id="pricing" className="pricing-section">
           <PricingSection />
