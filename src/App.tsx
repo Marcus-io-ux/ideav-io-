@@ -11,7 +11,7 @@ import Landing from "./pages/Landing";
 import Features from "./pages/Features";
 import Pricing from "./pages/Pricing";
 import AboutUs from "./pages/AboutUs";
-import Onboarding from "./pages/Onboarding";
+import { OnboardingFlow } from "./components/onboarding/OnboardingFlow";
 import Profile from "./pages/Profile";
 import Inbox from "./pages/Inbox";
 import Settings from "./pages/Settings";
@@ -26,22 +26,46 @@ const queryClient = new QueryClient();
 
 const App = () => {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
+  const [needsOnboarding, setNeedsOnboarding] = useState<boolean | null>(null);
 
   useEffect(() => {
-    // Check initial auth state
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    const checkAuth = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
       setIsAuthenticated(!!session);
-    });
 
-    // Listen for auth changes
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (session?.user) {
+        const { data: profile } = await supabase
+          .from("profiles")
+          .select("username_set, tutorial_completed")
+          .eq("user_id", session.user.id)
+          .single();
+
+        setNeedsOnboarding(profile && (!profile.username_set || !profile.tutorial_completed));
+      }
+    };
+
+    checkAuth();
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
       setIsAuthenticated(!!session);
+      
+      if (session?.user) {
+        const { data: profile } = await supabase
+          .from("profiles")
+          .select("username_set, tutorial_completed")
+          .eq("user_id", session.user.id)
+          .single();
+
+        setNeedsOnboarding(profile && (!profile.username_set || !profile.tutorial_completed));
+      }
     });
 
     return () => subscription.unsubscribe();
   }, []);
+
+  if (isAuthenticated === null || needsOnboarding === null) {
+    return null; // or a loading spinner
+  }
 
   return (
     <QueryClientProvider client={queryClient}>
@@ -49,16 +73,16 @@ const App = () => {
         <Toaster />
         <Sonner />
         <BrowserRouter>
-          {isAuthenticated && <NavigationBar />}
+          {isAuthenticated && !needsOnboarding && <NavigationBar />}
           <Routes>
             <Route
               path="/"
               element={
-                isAuthenticated ? (
-                  <Navigate to="/dashboard" replace />
-                ) : (
-                  <Landing />
-                )
+                isAuthenticated 
+                  ? needsOnboarding 
+                    ? <OnboardingFlow />
+                    : <Navigate to="/dashboard" replace />
+                  : <Landing />
               }
             />
             <Route
@@ -92,7 +116,7 @@ const App = () => {
               path="/onboarding"
               element={
                 isAuthenticated ? (
-                  <Onboarding />
+                  <OnboardingFlow />
                 ) : (
                   <Navigate to="/login" replace />
                 )
