@@ -3,7 +3,6 @@ import { IdeaCardHeader } from "./idea-card/IdeaCardHeader";
 import { IdeaCardContent } from "./IdeaCardContent";
 import { IdeaCardActions } from "./IdeaCardActions";
 import { IdeaCardMetadata } from "./idea-card/IdeaCardMetadata";
-import { IdeaCardStats } from "./idea-card/IdeaCardStats";
 
 interface IdeaCardProps {
   id: string;
@@ -49,7 +48,6 @@ export const IdeaCard = ({
         />
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
           <IdeaCardMetadata author={author} createdAt={createdAt} />
-          <IdeaCardStats likes={likes} comments={comments} />
         </div>
       </CardHeader>
       
