@@ -2,9 +2,13 @@ import { useState } from "react";
 import { Avatar } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { Send, Search, Check, X } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
+import { Search, Check, X } from "lucide-react";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { ConversationList } from "@/components/inbox/ConversationList";
+import { MessageList } from "@/components/inbox/MessageList";
+import { MessageInput } from "@/components/inbox/MessageInput";
+import { useIsMobile } from "@/hooks/use-mobile";
+import type { Conversation } from "@/types/inbox";
 
 // Mock data - replace with actual data from your backend
 const mockConversations = [
@@ -50,9 +54,11 @@ const mockMessages = [
 ];
 
 export default function Inbox() {
-  const [selectedConversation, setSelectedConversation] = useState(mockConversations[0]);
+  const [selectedConversation, setSelectedConversation] = useState<Conversation | undefined>(mockConversations[0]);
   const [newMessage, setNewMessage] = useState("");
   const [filter, setFilter] = useState("all");
+  const isMobile = useIsMobile();
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
   const handleSendMessage = () => {
     if (!newMessage.trim()) return;
@@ -64,18 +70,72 @@ export default function Inbox() {
     console.log(accept ? "Accepting collaboration" : "Declining collaboration");
   };
 
+  const handleSelectConversation = (conversation: Conversation) => {
+    setSelectedConversation(conversation);
+    if (isMobile) {
+      setIsDrawerOpen(false);
+    }
+  };
+
+  const ConversationView = () => (
+    <>
+      <div className="p-4 border-b">
+        <div className="flex items-center gap-3">
+          <Avatar className="h-10 w-10">
+            <img
+              src={selectedConversation.sender.avatar}
+              alt={selectedConversation.sender.name}
+            />
+          </Avatar>
+          <div>
+            <h2 className="font-medium">{selectedConversation.sender.name}</h2>
+            <p className="text-sm text-muted-foreground">
+              {selectedConversation.ideaTitle}
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {selectedConversation.type === "request" ? (
+        <div className="bg-accent p-4 rounded-lg m-4">
+          <p className="mb-4">{selectedConversation.lastMessage}</p>
+          <div className="flex gap-2">
+            <Button
+              onClick={() => handleCollaborationResponse(true)}
+              className="gap-2"
+            >
+              <Check className="h-4 w-4" /> Accept
+            </Button>
+            <Button
+              variant="outline"
+              onClick={() => handleCollaborationResponse(false)}
+              className="gap-2"
+            >
+              <X className="h-4 w-4" /> Decline
+            </Button>
+          </div>
+        </div>
+      ) : (
+        <MessageList messages={mockMessages} />
+      )}
+
+      <MessageInput
+        value={newMessage}
+        onChange={setNewMessage}
+        onSend={handleSendMessage}
+      />
+    </>
+  );
+
   return (
     <div className="container mx-auto p-4 h-[calc(100vh-4rem)]">
       <div className="flex h-full gap-4 bg-white rounded-lg shadow-sm">
-        {/* Left Panel */}
-        <div className="w-1/3 border-r">
+        {/* Left Panel - Conversations List */}
+        <div className={`${isMobile ? 'hidden' : 'w-1/3'} border-r`}>
           <div className="p-4">
             <div className="relative">
               <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-              <Input
-                placeholder="Search messages..."
-                className="pl-9"
-              />
+              <Input placeholder="Search messages..." className="pl-9" />
             </div>
             <div className="flex gap-2 mt-4">
               <Button
@@ -101,133 +161,64 @@ export default function Inbox() {
               </Button>
             </div>
           </div>
-          <ScrollArea className="h-[calc(100vh-12rem)]">
-            <div className="space-y-2 p-4">
-              {mockConversations.map((conversation) => (
-                <div
-                  key={conversation.id}
-                  className={`p-4 rounded-lg cursor-pointer hover:bg-accent ${
-                    selectedConversation?.id === conversation.id ? "bg-accent" : ""
-                  }`}
-                  onClick={() => setSelectedConversation(conversation)}
-                >
-                  <div className="flex items-start gap-3">
-                    <Avatar className="h-10 w-10">
-                      <img src={conversation.sender.avatar} alt={conversation.sender.name} />
-                    </Avatar>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center justify-between">
-                        <p className={`font-medium ${conversation.unread ? "text-primary" : ""}`}>
-                          {conversation.sender.name}
-                        </p>
-                        <span className="text-xs text-muted-foreground">
-                          {conversation.timestamp}
-                        </span>
-                      </div>
-                      <p className="text-sm text-muted-foreground truncate">
-                        {conversation.ideaTitle}
-                      </p>
-                      <p className="text-sm truncate">
-                        {conversation.lastMessage}
-                      </p>
-                      {conversation.unread && (
-                        <Badge variant="default" className="mt-1">New</Badge>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </ScrollArea>
+          <ConversationList
+            conversations={mockConversations}
+            selectedConversation={selectedConversation}
+            onSelectConversation={handleSelectConversation}
+          />
         </div>
 
-        {/* Right Panel */}
-        <div className="flex-1 flex flex-col">
-          {selectedConversation ? (
-            <>
-              <div className="p-4 border-b">
-                <div className="flex items-center gap-3">
-                  <Avatar className="h-10 w-10">
-                    <img
-                      src={selectedConversation.sender.avatar}
-                      alt={selectedConversation.sender.name}
-                    />
-                  </Avatar>
-                  <div>
-                    <h2 className="font-medium">{selectedConversation.sender.name}</h2>
-                    <p className="text-sm text-muted-foreground">
-                      {selectedConversation.ideaTitle}
-                    </p>
-                  </div>
+        {/* Mobile View - Conversations List in Sheet */}
+        {isMobile && (
+          <Sheet open={isDrawerOpen} onOpenChange={setIsDrawerOpen}>
+            <SheetTrigger asChild>
+              <Button variant="outline" className="mb-4">
+                View Conversations
+              </Button>
+            </SheetTrigger>
+            <SheetContent side="left" className="w-[100vw] sm:w-[540px]">
+              <div className="p-4">
+                <div className="relative">
+                  <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                  <Input placeholder="Search messages..." className="pl-9" />
                 </div>
-              </div>
-
-              <ScrollArea className="flex-1 p-4">
-                <div className="space-y-4">
-                  {selectedConversation.type === "request" ? (
-                    <div className="bg-accent p-4 rounded-lg">
-                      <p className="mb-4">{selectedConversation.lastMessage}</p>
-                      <div className="flex gap-2">
-                        <Button
-                          onClick={() => handleCollaborationResponse(true)}
-                          className="gap-2"
-                        >
-                          <Check className="h-4 w-4" /> Accept
-                        </Button>
-                        <Button
-                          variant="outline"
-                          onClick={() => handleCollaborationResponse(false)}
-                          className="gap-2"
-                        >
-                          <X className="h-4 w-4" /> Decline
-                        </Button>
-                      </div>
-                    </div>
-                  ) : (
-                    mockMessages.map((message) => (
-                      <div
-                        key={message.id}
-                        className={`flex ${
-                          message.senderId === "me" ? "justify-end" : "justify-start"
-                        }`}
-                      >
-                        <div
-                          className={`max-w-[70%] p-3 rounded-lg ${
-                            message.senderId === "me"
-                              ? "bg-primary text-primary-foreground"
-                              : "bg-accent"
-                          }`}
-                        >
-                          <p>{message.content}</p>
-                          <span className="text-xs opacity-70 mt-1 block">
-                            {message.timestamp}
-                          </span>
-                        </div>
-                      </div>
-                    ))
-                  )}
-                </div>
-              </ScrollArea>
-
-              <div className="p-4 border-t">
-                <div className="flex gap-2">
-                  <Input
-                    placeholder="Write your message..."
-                    value={newMessage}
-                    onChange={(e) => setNewMessage(e.target.value)}
-                    onKeyDown={(e) => {
-                      if (e.key === "Enter" && !e.shiftKey) {
-                        e.preventDefault();
-                        handleSendMessage();
-                      }
-                    }}
-                  />
-                  <Button onClick={handleSendMessage} size="icon">
-                    <Send className="h-4 w-4" />
+                <div className="flex gap-2 mt-4">
+                  <Button
+                    variant={filter === "all" ? "default" : "outline"}
+                    size="sm"
+                    onClick={() => setFilter("all")}
+                  >
+                    All
+                  </Button>
+                  <Button
+                    variant={filter === "unread" ? "default" : "outline"}
+                    size="sm"
+                    onClick={() => setFilter("unread")}
+                  >
+                    Unread
+                  </Button>
+                  <Button
+                    variant={filter === "requests" ? "default" : "outline"}
+                    size="sm"
+                    onClick={() => setFilter("requests")}
+                  >
+                    Requests
                   </Button>
                 </div>
               </div>
-            </>
+              <ConversationList
+                conversations={mockConversations}
+                selectedConversation={selectedConversation}
+                onSelectConversation={handleSelectConversation}
+              />
+            </SheetContent>
+          </Sheet>
+        )}
+
+        {/* Right Panel - Messages */}
+        <div className="flex-1 flex flex-col">
+          {selectedConversation ? (
+            <ConversationView />
           ) : (
             <div className="flex items-center justify-center h-full text-muted-foreground">
               Select a conversation to start messaging
