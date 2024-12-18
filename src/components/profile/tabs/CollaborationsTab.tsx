@@ -3,6 +3,21 @@ import { supabase } from "@/integrations/supabase/client";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 
+interface CollaborationRequest {
+  id: string;
+  post: {
+    title: string;
+  } | null;
+  requester: {
+    id: string;
+    user_id: string;
+    username: string | null;
+    avatar_url: string | null;
+  } | null;
+  message: string;
+  status: string;
+}
+
 export function CollaborationsTab() {
   const { data: collaborations, isLoading } = useQuery({
     queryKey: ['collaborations'],
@@ -18,11 +33,10 @@ export function CollaborationsTab() {
             username,
             avatar_url
           )
-        `)
-        .order('created_at', { ascending: false });
+        `);
 
       if (error) throw error;
-      return data;
+      return data as CollaborationRequest[];
     },
   });
 
