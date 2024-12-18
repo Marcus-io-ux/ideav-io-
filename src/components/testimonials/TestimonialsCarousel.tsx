@@ -58,6 +58,7 @@ export const TestimonialsCarousel = () => {
     delay: 4000,
     rootNode: (emblaRoot: any) => emblaRoot.parentElement,
     stopOnInteraction: false,
+    playOnInit: true
   };
 
   const [emblaRef, emblaApi] = useEmblaCarousel(
