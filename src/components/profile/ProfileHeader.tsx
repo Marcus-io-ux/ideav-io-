@@ -37,20 +37,20 @@ export const ProfileHeader = ({
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error("No user found");
 
-      const [{ count: followersCount }, { count: followingCount }] = await Promise.all([
+      const [{ data: followers }, { data: following }] = await Promise.all([
         supabase
-          .from('profile_followers')
-          .select('*', { count: 'exact', head: true })
-          .eq('following_id', user.id),
+          .from("profile_followers")
+          .select("*", { count: "exact" })
+          .eq("following_id", user.id),
         supabase
-          .from('profile_followers')
-          .select('*', { count: 'exact', head: true })
-          .eq('follower_id', user.id)
+          .from("profile_followers")
+          .select("*", { count: "exact" })
+          .eq("follower_id", user.id)
       ]);
 
       return {
-        followers: followersCount || 0,
-        following: followingCount || 0
+        followers: followers?.length || 0,
+        following: following?.length || 0
       };
     }
   });
@@ -61,9 +61,9 @@ export const ProfileHeader = ({
       if (!user) throw new Error("No user found");
 
       const { error } = await supabase
-        .from('profiles')
+        .from("profiles")
         .update({ is_public: !isPublic })
-        .eq('user_id', user.id);
+        .eq("user_id", user.id);
 
       if (error) throw error;
 

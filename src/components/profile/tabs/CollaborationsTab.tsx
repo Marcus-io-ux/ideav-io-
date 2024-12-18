@@ -25,7 +25,7 @@ export const CollaborationsTab = () => {
       const { data, error } = await supabase
         .from("collaboration_requests")
         .select(`
-          *,
+          id,
           community_posts (
             title,
             content
