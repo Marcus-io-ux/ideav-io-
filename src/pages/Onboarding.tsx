@@ -1,60 +1,67 @@
 import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
+import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
+import { Label } from "@/components/ui/label";
+import { Loader2 } from "lucide-react";
 
 const Onboarding = () => {
-  const [step, setStep] = useState(1);
-  const [answers, setAnswers] = useState({
-    motivation: "",
-    goals: "",
-    experience: ""
-  });
+  const [username, setUsername] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState("");
   const { toast } = useToast();
   const navigate = useNavigate();
 
-  const questions = [
-    {
-      id: "motivation",
-      title: "What brings you to IdeaVault?",
-      description: "Tell us what motivated you to join our platform"
-    },
-    {
-      id: "goals",
-      title: "What are your goals?",
-      description: "What do you hope to achieve with IdeaVault?"
-    },
-    {
-      id: "experience",
-      title: "What's your experience level?",
-      description: "Tell us about your background and experience"
-    }
-  ];
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsLoading(true);
+    setError("");
 
-  const currentQuestion = questions[step - 1];
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error("No user found");
 
-  const handleNext = () => {
-    if (!answers[currentQuestion.id as keyof typeof answers]) {
+      // Check if username is available
+      const { data: existingUser } = await supabase
+        .from("profiles")
+        .select("username")
+        .eq("username", username)
+        .single();
+
+      if (existingUser) {
+        setError("Username is already taken");
+        return;
+      }
+
+      // Update profile with username
+      const { error: updateError } = await supabase
+        .from("profiles")
+        .update({ 
+          username: username,
+          username_set: true 
+        })
+        .eq("user_id", user.id);
+
+      if (updateError) throw updateError;
+
       toast({
-        title: "Please answer the question",
-        description: "Your input helps us personalize your experience",
-        variant: "destructive"
+        title: "Welcome to Idea Vault!",
+        description: "Let's show you around the dashboard.",
       });
-      return;
-    }
 
-    if (step < questions.length) {
-      setStep(step + 1);
-    } else {
-      // Here you would typically save the answers
-      console.log("Answers:", answers);
-      toast({
-        title: "Welcome to IdeaVault!",
-        description: "Your account is being set up..."
-      });
       navigate("/dashboard");
+    } catch (error) {
+      console.error("Error:", error);
+      toast({
+        title: "Error",
+        description: "Failed to set username. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -63,39 +70,46 @@ const Onboarding = () => {
       <Card className="w-full max-w-lg">
         <CardHeader>
           <CardTitle className="text-2xl text-center">
-            {currentQuestion.title}
+            Welcome to Idea Vault!
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          <p className="text-gray-600 text-center mb-4">
-            {currentQuestion.description}
-          </p>
-          <Textarea
-            value={answers[currentQuestion.id as keyof typeof answers]}
-            onChange={(e) => 
-              setAnswers({
-                ...answers,
-                [currentQuestion.id]: e.target.value
-              })
-            }
-            className="min-h-[150px]"
-            placeholder="Type your answer here..."
-          />
-          <div className="flex justify-between items-center pt-4">
-            <Button
-              variant="outline"
-              onClick={() => step > 1 && setStep(step - 1)}
-              disabled={step === 1}
-            >
-              Back
-            </Button>
-            <div className="text-sm text-gray-500">
-              Step {step} of {questions.length}
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="username">Choose Your Username</Label>
+              <Input
+                id="username"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                placeholder="Enter a unique username"
+                required
+                minLength={3}
+                maxLength={30}
+                pattern="^[a-zA-Z0-9_-]+$"
+                className={error ? "border-red-500" : ""}
+              />
+              {error && (
+                <p className="text-sm text-red-500">{error}</p>
+              )}
+              <p className="text-sm text-gray-500">
+                Username can contain letters, numbers, underscores, and hyphens
+              </p>
             </div>
-            <Button onClick={handleNext}>
-              {step === questions.length ? "Complete" : "Next"}
+            <Button 
+              type="submit" 
+              className="w-full"
+              disabled={isLoading}
+            >
+              {isLoading ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Setting up...
+                </>
+              ) : (
+                "Get Started"
+              )}
             </Button>
-          </div>
+          </form>
         </CardContent>
       </Card>
     </div>

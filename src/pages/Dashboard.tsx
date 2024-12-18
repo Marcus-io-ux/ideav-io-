@@ -6,6 +6,7 @@ import { PageHeader } from "@/components/ui/page-header";
 import { Tables } from "@/integrations/supabase/types";
 import { FeedbackButton } from "@/components/feedback/FeedbackButton";
 import { FeedbackModal } from "@/components/feedback/FeedbackModal";
+import { DashboardTutorial } from "@/components/dashboard/DashboardTutorial";
 
 type IdeaDB = Tables<"ideas">;
 
@@ -245,6 +246,29 @@ const Dashboard = () => {
     setShowFavoritesOnly(!showFavoritesOnly);
   };
 
+  const [showTutorial, setShowTutorial] = useState(false);
+
+  useEffect(() => {
+    const checkTutorialStatus = async () => {
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) return;
+
+        const { data: profile } = await supabase
+          .from("profiles")
+          .select("tutorial_completed")
+          .eq("user_id", user.id)
+          .single();
+
+        setShowTutorial(!profile?.tutorial_completed);
+      } catch (error) {
+        console.error("Error checking tutorial status:", error);
+      }
+    };
+
+    checkTutorialStatus();
+  }, []);
+
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="container max-w-6xl mx-auto p-8">
@@ -270,6 +294,7 @@ const Dashboard = () => {
         isOpen={isFeedbackModalOpen}
         onClose={() => setIsFeedbackModalOpen(false)}
       />
+      {showTutorial && <DashboardTutorial />}
     </div>
   );
 };
