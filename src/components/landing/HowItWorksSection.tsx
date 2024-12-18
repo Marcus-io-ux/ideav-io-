@@ -1,4 +1,4 @@
-import { Brain, Share2, Users } from "lucide-react";
+import { Sparkles, Share2, Users } from "lucide-react"; // Changed Brain to Sparkles
 
 export const HowItWorksSection = () => {
   return (
@@ -8,7 +8,7 @@ export const HowItWorksSection = () => {
         <div className="grid md:grid-cols-3 gap-8">
           {[
             {
-              icon: Brain,
+              icon: Sparkles, // Changed from Brain to Sparkles
               title: "Save Your Ideas",
               description: "Store your ideas privately and access them anytime, anywhere.",
             },

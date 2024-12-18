@@ -3,6 +3,7 @@ import { HelpCircle } from "lucide-react";
 import { SignupForm } from "@/components/auth/SignupForm";
 import { SocialSignup } from "@/components/auth/SocialSignup";
 import { Button } from "@/components/ui/button";
+import { FAQDialog } from "@/components/auth/FAQDialog";
 
 const Signup = () => {
   const scrollToFAQ = () => {
@@ -19,14 +20,7 @@ const Signup = () => {
           IdeaVault
         </Link>
         <div className="flex gap-4 items-center">
-          <Button
-            variant="ghost"
-            onClick={scrollToFAQ}
-            className="flex items-center gap-2"
-          >
-            <HelpCircle className="w-4 h-4" />
-            FAQ
-          </Button>
+          <FAQDialog />
         </div>
       </nav>
 

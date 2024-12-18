@@ -112,5 +112,5 @@
 }
 
 .animate-float {
-  animation: float 20s ease-in-out infinite;
+  animation: float 15s ease-in-out infinite; /* Changed from 20s to 15s */
 }

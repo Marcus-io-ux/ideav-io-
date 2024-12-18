@@ -50,12 +50,6 @@ const testimonials = [
     author: "Nina Patel",
     role: "UX Designer",
     avatar: "https://i.pravatar.cc/150?u=nina",
-  },
-  {
-    content: "The collaboration features have connected me with brilliant minds across the globe. Truly revolutionary!",
-    author: "Thomas Chen",
-    role: "Tech Innovator",
-    avatar: "https://i.pravatar.cc/150?u=thomas",
   }
 ];
 
@@ -65,7 +59,7 @@ export const TestimonialsCarousel = () => {
       loop: true,
       align: "start",
       skipSnaps: false,
-      duration: 50,
+      duration: 80, // Increased from 50 to 80 for slower scroll
     },
     [
       Autoplay({

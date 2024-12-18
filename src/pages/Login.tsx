@@ -5,6 +5,7 @@ import { useNavigate, Link } from "react-router-dom";
 import { useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { HelpCircle } from "lucide-react";
+import { FAQDialog } from "@/components/auth/FAQDialog";
 
 const Login = () => {
   const navigate = useNavigate();
@@ -43,14 +44,7 @@ const Login = () => {
           IdeaVault
         </Link>
         <div className="flex gap-4 items-center">
-          <Button
-            variant="ghost"
-            onClick={scrollToFAQ}
-            className="flex items-center gap-2"
-          >
-            <HelpCircle className="w-4 h-4" />
-            FAQ
-          </Button>
+          <FAQDialog />
         </div>
       </nav>
 
