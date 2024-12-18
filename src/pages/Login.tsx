@@ -2,10 +2,13 @@ import { Auth } from "@supabase/auth-ui-react";
 import { ThemeSupa } from "@supabase/auth-ui-shared";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
 
 const Login = () => {
   const navigate = useNavigate();
+  const [persistSession, setPersistSession] = useState(false);
 
   useEffect(() => {
     // Check current auth status
@@ -54,7 +57,30 @@ const Login = () => {
             }}
             providers={[]}
             redirectTo={`${window.location.origin}/dashboard`}
+            localization={{
+              variables: {
+                sign_in: {
+                  email_label: 'Email',
+                  password_label: 'Password',
+                }
+              }
+            }}
           />
+          <div className="mt-4 flex items-center space-x-2">
+            <Checkbox
+              id="persistSession"
+              checked={persistSession}
+              onCheckedChange={(checked) => {
+                setPersistSession(checked as boolean);
+                if (checked) {
+                  supabase.auth.setSession({ persistSession: true });
+                }
+              }}
+            />
+            <Label htmlFor="persistSession" className="text-sm text-gray-600">
+              Keep me logged in
+            </Label>
+          </div>
         </div>
       </div>
     </div>
