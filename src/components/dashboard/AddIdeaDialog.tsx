@@ -17,6 +17,7 @@ export function AddIdeaDialog({ buttonText = "Add Idea", onIdeaSubmit }: AddIdea
     category: "",
     feedbackType: "",
     shareToCommunity: false,
+    tags: [], // Added missing tags property
   });
 
   const handleIdeaChange = (field: string, value: any) => {
@@ -32,6 +33,7 @@ export function AddIdeaDialog({ buttonText = "Add Idea", onIdeaSubmit }: AddIdea
       category: "",
       feedbackType: "",
       shareToCommunity: false,
+      tags: [], // Reset tags as well
     });
   };
 

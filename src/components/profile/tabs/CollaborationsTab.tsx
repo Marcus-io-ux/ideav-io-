@@ -12,10 +12,7 @@ export function CollaborationsTab() {
         .select(`
           *,
           post:community_posts(*),
-          requester:profiles!collaboration_requests_requester_id_fkey(
-            user_id,
-            username
-          )
+          requester:profiles!collaboration_requests_requester_id_fkey(*)
         `)
         .order('created_at', { ascending: false });
 
