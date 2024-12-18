@@ -38,7 +38,17 @@ export const CollaborationsTab = () => {
         .eq("status", "accepted");
 
       if (error) throw error;
-      return (data || []) as CollaborationData[];
+
+      // Ensure the data matches our interface
+      const typedData = (data || []).map(item => ({
+        id: item.id,
+        community_posts: item.community_posts,
+        owner_profile: {
+          username: item.owner_profile?.username || null
+        }
+      })) as CollaborationData[];
+
+      return typedData;
     },
   });
 
