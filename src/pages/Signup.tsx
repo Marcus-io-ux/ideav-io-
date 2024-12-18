@@ -1,15 +1,38 @@
 import { Link } from "react-router-dom";
-import { Lightbulb } from "lucide-react";
+import { HelpCircle } from "lucide-react";
 import { SignupForm } from "@/components/auth/SignupForm";
 import { SocialSignup } from "@/components/auth/SocialSignup";
+import { Button } from "@/components/ui/button";
 
 const Signup = () => {
+  const scrollToFAQ = () => {
+    document.getElementById('faq-section')?.scrollIntoView({ behavior: 'smooth' });
+  };
+
   return (
-    <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md mx-auto">
+    <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white">
+      <nav className="container mx-auto px-4 py-6 flex justify-between items-center">
+        <Link 
+          to="/" 
+          className="text-2xl font-bold text-primary hover:opacity-80 transition-opacity"
+        >
+          IdeaVault
+        </Link>
+        <div className="flex gap-4 items-center">
+          <Button
+            variant="ghost"
+            onClick={scrollToFAQ}
+            className="flex items-center gap-2"
+          >
+            <HelpCircle className="w-4 h-4" />
+            FAQ
+          </Button>
+        </div>
+      </nav>
+
+      <div className="max-w-md mx-auto px-4 py-12">
         <div className="text-center mb-8">
-          <Lightbulb className="mx-auto h-12 w-12 text-primary" />
-          <h2 className="mt-6 text-3xl font-bold text-gray-900">Join Idea Vault Today!</h2>
+          <h2 className="text-3xl font-bold text-gray-900">Join Idea Vault Today!</h2>
           <p className="mt-2 text-sm text-gray-600">
             Turn your ideas into action. Save, share, and collaborate with a community of innovators.
           </p>

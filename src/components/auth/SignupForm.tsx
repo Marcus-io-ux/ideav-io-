@@ -5,7 +5,6 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { Loader2 } from "lucide-react";
-import { AuthLogo } from "./AuthLogo";
 import { SignupFormInputs } from "./SignupFormInputs";
 
 interface SignupFormData {
@@ -81,8 +80,6 @@ export const SignupForm = () => {
 
   return (
     <div className="space-y-6">
-      <AuthLogo />
-      
       <form onSubmit={handleSignup} className="space-y-6">
         <SignupFormInputs formData={formData} setFormData={setFormData} />
 
