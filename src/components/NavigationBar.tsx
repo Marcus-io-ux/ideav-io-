@@ -70,8 +70,8 @@ export const NavigationBar = () => {
 
   const navItems = [
     { label: "My Ideas", icon: Home, path: "/dashboard" },
-    { label: "Community", icon: Users, path: "/community" },
     { label: "Announcements", icon: Bell, path: "/announcements" },
+    { label: "Community", icon: Users, path: "/community" },
     { label: "Profile", icon: User, path: "/profile" },
     { 
       label: "Inbox", 
