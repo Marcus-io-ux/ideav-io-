@@ -11,7 +11,7 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import type { Conversation } from "@/types/inbox";
 
 // Mock data - replace with actual data from your backend
-const mockConversations = [
+const mockConversations: Conversation[] = [
   {
     id: 1,
     sender: {
