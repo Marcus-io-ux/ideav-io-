@@ -14,8 +14,8 @@ interface CollaborationRequest {
     username: string | null;
     avatar_url: string | null;
   } | null;
-  message: string;
-  status: string;
+  message: string | null;
+  status: string | null;
 }
 
 export function CollaborationsTab() {
@@ -25,8 +25,10 @@ export function CollaborationsTab() {
       const { data, error } = await supabase
         .from('collaboration_requests')
         .select(`
-          *,
-          post:community_posts(*),
+          id,
+          message,
+          status,
+          post:community_posts(title),
           requester:profiles!collaboration_requests_requester_id_fkey(
             id,
             user_id,
