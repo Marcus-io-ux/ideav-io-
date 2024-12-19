@@ -64,9 +64,9 @@ export const CommunityChannels = ({ onChannelSelect }: ChannelListProps) => {
   };
 
   return (
-    <ScrollArea className="h-full py-6 px-4">
-      <div className="mb-4">
-        <h2 className="px-2 mb-2 text-lg font-semibold tracking-tight">
+    <ScrollArea className="h-full py-2 px-2 md:py-6 md:px-4">
+      <div className="mb-2 md:mb-4">
+        <h2 className="px-2 mb-2 text-base md:text-lg font-semibold tracking-tight">
           Channels
         </h2>
       </div>
@@ -77,7 +77,7 @@ export const CommunityChannels = ({ onChannelSelect }: ChannelListProps) => {
             variant="ghost"
             size="sm"
             className={cn(
-              "w-full justify-start gap-2",
+              "w-full justify-start gap-2 text-sm md:text-base py-1.5",
               location.pathname === channel.path && 
               "bg-accent text-accent-foreground"
             )}
