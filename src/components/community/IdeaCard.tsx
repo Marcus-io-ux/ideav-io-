@@ -6,7 +6,7 @@ import { Author } from "@/types/author";
 import { useState } from "react";
 import { IdeaComments } from "./IdeaComments";
 import { Button } from "@/components/ui/button";
-import { Trash2 } from "lucide-react";
+import { ArrowBigDown, ArrowBigUp, Trash2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
@@ -42,7 +42,7 @@ export const IdeaCard = ({
   userId,
   isPinned,
   feedbackType,
-  emojiReactions,
+  tags = [],
 }: IdeaCardProps) => {
   const [showComments, setShowComments] = useState(false);
   const [currentLikes, setCurrentLikes] = useState(likes);
@@ -125,74 +125,114 @@ export const IdeaCard = ({
   };
 
   return (
-    <Card className="w-full mb-4">
-      <CardHeader className="flex flex-row items-center justify-between gap-4">
-        <div className="flex items-center gap-4">
-          <Avatar>
-            <AvatarImage src={author.avatar} />
-            <AvatarFallback>{getInitials(author.name)}</AvatarFallback>
-          </Avatar>
-          <div className="flex flex-col">
-            <p className="font-semibold">{author.name}</p>
-            <p className="text-sm text-gray-500">
-              {formatDistanceToNow(new Date(createdAt), { addSuffix: true })}
-            </p>
-          </div>
+    <Card className="overflow-hidden hover:border-primary/20 transition-colors">
+      <div className="flex">
+        {/* Vote buttons */}
+        <div className="flex flex-col items-center gap-1 p-2 bg-accent/5">
+          <Button
+            variant="ghost"
+            size="sm"
+            className={`px-2 ${isCurrentlyLiked ? "text-primary" : ""}`}
+            onClick={handleLike}
+          >
+            <ArrowBigUp className={`h-5 w-5 ${isCurrentlyLiked ? "fill-primary" : ""}`} />
+          </Button>
+          <span className="text-sm font-medium">{currentLikes}</span>
+          <Button
+            variant="ghost"
+            size="sm"
+            className="px-2"
+            onClick={handleLike}
+          >
+            <ArrowBigDown className="h-5 w-5" />
+          </Button>
         </div>
-        {userId === author.id && (
-          <AlertDialog>
-            <AlertDialogTrigger asChild>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="text-destructive hover:text-destructive/90"
-              >
-                <Trash2 className="h-4 w-4" />
-              </Button>
-            </AlertDialogTrigger>
-            <AlertDialogContent>
-              <AlertDialogHeader>
-                <AlertDialogTitle>Delete Post</AlertDialogTitle>
-                <AlertDialogDescription>
-                  Are you sure you want to delete this post? This action cannot be undone.
-                </AlertDialogDescription>
-              </AlertDialogHeader>
-              <AlertDialogFooter>
-                <AlertDialogCancel>Cancel</AlertDialogCancel>
-                <AlertDialogAction
-                  onClick={handleDelete}
-                  className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-                >
-                  Delete
-                </AlertDialogAction>
-              </AlertDialogFooter>
-            </AlertDialogContent>
-          </AlertDialog>
-        )}
-      </CardHeader>
-      <CardContent>
-        <h3 className="text-xl font-semibold mb-2">{title}</h3>
-        <p className="text-gray-600 mb-4">{content}</p>
-        <div className="border-t pt-4">
-          <IdeaCardActions
-            postId={id}
-            ownerId={userId || ''}
-            isLiked={isCurrentlyLiked}
-            likeCount={currentLikes}
-            comments={currentComments}
-            onLike={handleLike}
-            onComment={() => setShowComments(!showComments)}
-            currentUserId={userId || null}
-            authorName={author.name}
-          />
+
+        {/* Content */}
+        <div className="flex-1">
+          <CardHeader className="flex flex-row items-center justify-between gap-4">
+            <div className="flex items-center gap-4">
+              <Avatar className="h-8 w-8">
+                <AvatarImage src={author.avatar} />
+                <AvatarFallback>{getInitials(author.name)}</AvatarFallback>
+              </Avatar>
+              <div className="flex flex-col">
+                <div className="flex items-center gap-2">
+                  <p className="text-sm font-medium">{author.name}</p>
+                  <span className="text-xs text-muted-foreground">
+                    {formatDistanceToNow(new Date(createdAt), { addSuffix: true })}
+                  </span>
+                </div>
+                {tags.length > 0 && (
+                  <div className="flex gap-2 mt-1">
+                    {tags.map((tag) => (
+                      <span
+                        key={tag}
+                        className="px-2 py-0.5 bg-accent text-accent-foreground rounded-full text-xs"
+                      >
+                        {tag}
+                      </span>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+            {userId === author.id && (
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="text-destructive hover:text-destructive/90"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>Delete Post</AlertDialogTitle>
+                    <AlertDialogDescription>
+                      Are you sure you want to delete this post? This action cannot be undone.
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                    <AlertDialogAction
+                      onClick={handleDelete}
+                      className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                    >
+                      Delete
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
+            )}
+          </CardHeader>
+          <CardContent>
+            <h3 className="text-xl font-semibold mb-2">{title}</h3>
+            <p className="text-muted-foreground mb-4">{content}</p>
+            <div className="border-t pt-4">
+              <IdeaCardActions
+                postId={id}
+                ownerId={userId || ''}
+                isLiked={isCurrentlyLiked}
+                likeCount={currentLikes}
+                comments={currentComments}
+                onLike={handleLike}
+                onComment={() => setShowComments(!showComments)}
+                currentUserId={userId || null}
+                authorName={author.name}
+              />
+            </div>
+            {showComments && (
+              <IdeaComments
+                postId={id}
+                onCommentAdded={handleCommentAdded}
+              />
+            )}
+          </CardContent>
         </div>
-        {showComments && (
-          <IdeaComments
-            postId={id}
-            onCommentAdded={handleCommentAdded}
-          />
-        )}
-      </CardContent>
+      </div>
     </Card>
   );
 };
