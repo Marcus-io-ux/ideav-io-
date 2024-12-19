@@ -16,7 +16,15 @@ export function useRealTimeMessages(userId: string | null) {
         .order('created_at', { ascending: false });
 
       if (!error && data) {
-        setMessages(data as Message[]);
+        const formattedMessages: Message[] = data.map(msg => ({
+          id: msg.id,
+          senderId: msg.sender_id,
+          recipientId: msg.recipient_id,
+          content: msg.content,
+          timestamp: new Date(msg.created_at).toLocaleString(),
+          isRead: msg.is_read
+        }));
+        setMessages(formattedMessages);
       }
     };
 

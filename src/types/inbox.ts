@@ -14,8 +14,10 @@ export interface Conversation {
 }
 
 export interface Message {
-  id: number;
-  senderId: string | number;
+  id: string;
+  senderId: string;
+  recipientId: string;
   content: string;
   timestamp: string;
+  isRead: boolean;
 }
