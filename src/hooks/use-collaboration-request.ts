@@ -14,7 +14,14 @@ export const useCollaborationRequest = () => {
     setIsLoading(true);
     try {
       const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error("Not authenticated");
+      if (!user) {
+        toast({
+          title: "Authentication required",
+          description: "Please sign in to send collaboration requests",
+          variant: "destructive",
+        });
+        return;
+      }
 
       // Create collaboration request
       const { error: requestError } = await supabase
@@ -36,7 +43,8 @@ export const useCollaborationRequest = () => {
           sender_id: user.id,
           recipient_id: ownerId,
           content: `New collaboration request: ${message}`,
-          is_read: false
+          is_read: false,
+          type: 'collaboration_request'
         });
 
       if (messageError) throw messageError;
