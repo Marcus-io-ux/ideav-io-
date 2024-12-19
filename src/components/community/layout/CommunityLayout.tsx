@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { CommunityChannels } from "./CommunityChannels";
 import { CommunityContentHeader } from "./CommunityContent";
-import { CommunityUserPanel } from "./CommunityUserPanel";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { Menu } from "lucide-react";
@@ -31,11 +30,6 @@ export const CommunityLayout = ({ children }: { children: React.ReactNode }) => 
       {/* Main Content */}
       <div className="flex-1 flex flex-col min-w-0">
         {children}
-      </div>
-
-      {/* User Panel - Hidden on mobile */}
-      <div className="hidden lg:block w-64 border-l border-border">
-        <CommunityUserPanel />
       </div>
     </div>
   );

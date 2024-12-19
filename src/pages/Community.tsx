@@ -78,7 +78,7 @@ const Community = () => {
             </div>
           </div>
 
-          {/* Sidebar */}
+          {/* Guidelines Sidebar */}
           <div className="hidden md:block w-80">
             <Card className="p-6">
               <h2 className="text-lg font-semibold mb-4">Community Guidelines</h2>

@@ -1,7 +1,7 @@
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { Megaphone, Lightbulb, MessageSquare, Handshake, MessagesSquare } from "lucide-react";
+import { MessageSquare, Lightbulb, Building, Heart, Palette, Smartphone, MessageCircleQuestion, Handshake } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
 
 interface Channel {
@@ -13,34 +13,52 @@ interface Channel {
 
 const channels: Channel[] = [
   { 
-    id: "announcements", 
-    name: "Announcements", 
-    icon: <Megaphone className="h-4 w-4" />,
-    path: "/community/announcements"
-  },
-  { 
-    id: "showcase", 
-    name: "Idea Showcase", 
-    icon: <Lightbulb className="h-4 w-4" />,
-    path: "/community/showcase"
-  },
-  { 
-    id: "feedback", 
-    name: "Feedback Requests", 
+    id: "general-ideas", 
+    name: "General Ideas", 
     icon: <MessageSquare className="h-4 w-4" />,
-    path: "/community/feedback"
+    path: "/community/general-ideas"
+  },
+  { 
+    id: "startups-business", 
+    name: "Startups & Business", 
+    icon: <Building className="h-4 w-4" />,
+    path: "/community/startups-business"
+  },
+  { 
+    id: "tech-innovation", 
+    name: "Tech & Innovation", 
+    icon: <Lightbulb className="h-4 w-4" />,
+    path: "/community/tech-innovation"
+  },
+  { 
+    id: "lifestyle-wellness", 
+    name: "Lifestyle & Wellness", 
+    icon: <Heart className="h-4 w-4" />,
+    path: "/community/lifestyle-wellness"
+  },
+  { 
+    id: "design-creativity", 
+    name: "Design & Creativity", 
+    icon: <Palette className="h-4 w-4" />,
+    path: "/community/design-creativity"
+  },
+  { 
+    id: "apps-tech-tools", 
+    name: "Apps & Tech Tools", 
+    icon: <Smartphone className="h-4 w-4" />,
+    path: "/community/apps-tech-tools"
+  },
+  { 
+    id: "user-feedback", 
+    name: "User Feedback", 
+    icon: <MessageCircleQuestion className="h-4 w-4" />,
+    path: "/community/user-feedback"
   },
   { 
     id: "collaboration", 
-    name: "Collaboration Requests", 
+    name: "Collaboration Corner", 
     icon: <Handshake className="h-4 w-4" />,
     path: "/community/collaboration"
-  },
-  { 
-    id: "general", 
-    name: "General Discussion", 
-    icon: <MessagesSquare className="h-4 w-4" />,
-    path: "/community/general"
   },
 ];
 
