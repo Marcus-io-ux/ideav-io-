@@ -15,13 +15,13 @@ export const MyIdeasTab = () => {
   const { data: ideas = [] } = useQuery({
     queryKey: ["my-ideas"],
     queryFn: async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error("No user found");
+      const { data: sessionData } = await supabase.auth.getUser();
+      if (!sessionData.user) throw new Error("No user found");
 
       const { data, error } = await supabase
         .from("ideas")
         .select("*")
-        .eq("user_id", user.id)
+        .eq("user_id", sessionData.user.id)
         .eq("deleted", false)
         .order("created_at", { ascending: false });
 
