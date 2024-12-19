@@ -2,6 +2,7 @@ import { IdeaCard } from "@/components/IdeaCard";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { useQuery } from "@tanstack/react-query";
 
 interface FavoritesTabProps {
   ideas: any[];
@@ -18,41 +19,61 @@ export const FavoritesTab = ({
   onEdit,
   onDelete,
 }: FavoritesTabProps) => {
-  const [favoriteIds, setFavoriteIds] = useState<string[]>([]);
   const { toast } = useToast();
 
-  useEffect(() => {
-    const fetchFavorites = async () => {
-      try {
-        const { data: { user } } = await supabase.auth.getUser();
-        if (!user) return;
+  const { data: favoriteIds = [] } = useQuery({
+    queryKey: ['favorites'],
+    queryFn: async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return [];
 
-        const { data: favorites, error } = await supabase
-          .from('favorites')
-          .select('idea_id')
-          .eq('user_id', user.id)
-          .eq('item_type', 'idea');
+      const { data: favorites, error } = await supabase
+        .from('favorites')
+        .select('idea_id')
+        .eq('user_id', user.id)
+        .eq('item_type', 'idea');
 
-        if (error) throw error;
-
-        setFavoriteIds(favorites.map(f => f.idea_id));
-      } catch (error) {
+      if (error) {
         console.error('Error fetching favorites:', error);
         toast({
           title: "Error",
           description: "Failed to load favorites. Please try again.",
           variant: "destructive",
         });
+        return [];
       }
-    };
 
-    fetchFavorites();
-  }, [toast]);
+      return favorites.map(f => f.idea_id);
+    },
+  });
 
   // Filter ideas to show only favorites that aren't deleted
   const favoriteIdeas = ideas.filter(idea => 
     !idea.deleted && favoriteIds.includes(idea.id)
   );
+
+  // Subscribe to changes in favorites
+  useEffect(() => {
+    const channel = supabase
+      .channel('favorites_changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'favorites',
+        },
+        () => {
+          // Invalidate the favorites query to refresh the data
+          // This will be handled by the queryClient
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, []);
   
   return (
     <div className="grid gap-6 mt-6">
