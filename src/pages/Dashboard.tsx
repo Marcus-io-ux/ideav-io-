@@ -28,7 +28,7 @@ const Dashboard = () => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  const { data: ideas = [], isLoading } = useQuery({
+  const { data: ideasData = [], isLoading } = useQuery({
     queryKey: ["my-ideas", showFavorites],
     queryFn: async () => {
       const { data: { user } } = await supabase.auth.getUser();
@@ -41,23 +41,51 @@ const Dashboard = () => {
         throw new Error("No user found");
       }
 
-      let query = supabase
+      // First, get all ideas for the user
+      const { data: ideas, error: ideasError } = await supabase
         .from("ideas")
-        .select("*, favorites!inner(*)")
+        .select("*")
         .eq("user_id", user.id)
-        .eq("deleted", false);
+        .eq("deleted", false)
+        .order("created_at", { ascending: false });
 
+      if (ideasError) throw ideasError;
+
+      // If showing favorites, get the user's favorites
       if (showFavorites) {
-        query = query.not("favorites", "is", null);
+        const { data: favorites, error: favoritesError } = await supabase
+          .from("favorites")
+          .select("idea_id")
+          .eq("user_id", user.id)
+          .eq("item_type", "idea");
+
+        if (favoritesError) throw favoritesError;
+
+        const favoriteIdeaIds = new Set(favorites.map(f => f.idea_id));
+        return ideas
+          .filter(idea => favoriteIdeaIds.has(idea.id))
+          .map(idea => ({
+            ...idea,
+            createdAt: new Date(idea.created_at),
+            isFavorite: true
+          }));
       }
 
-      const { data, error } = await query.order("created_at", { ascending: false });
+      // Get all favorites to mark favorite ideas
+      const { data: favorites, error: favoritesError } = await supabase
+        .from("favorites")
+        .select("idea_id")
+        .eq("user_id", user.id)
+        .eq("item_type", "idea");
 
-      if (error) throw error;
-      return data.map(idea => ({
+      if (favoritesError) throw favoritesError;
+
+      const favoriteIdeaIds = new Set(favorites?.map(f => f.idea_id) || []);
+
+      return ideas.map(idea => ({
         ...idea,
         createdAt: new Date(idea.created_at),
-        isFavorite: true, // Since we're using an inner join, all returned ideas are favorites
+        isFavorite: favoriteIdeaIds.has(idea.id)
       }));
     },
   });
@@ -95,7 +123,7 @@ const Dashboard = () => {
     });
   };
 
-  const filteredIdeas = ideas.filter(idea =>
+  const filteredIdeas = ideasData.filter(idea =>
     idea.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
     idea.content.toLowerCase().includes(searchQuery.toLowerCase())
   );
