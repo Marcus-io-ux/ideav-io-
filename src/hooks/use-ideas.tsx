@@ -15,6 +15,7 @@ export const useIdeas = () => {
       const { data, error } = await supabase
         .from('ideas')
         .select('*')
+        .eq('deleted', false)
         .order('created_at', { ascending: false });
 
       if (error) {
@@ -48,12 +49,16 @@ export const useIdeas = () => {
     try {
       const { error } = await supabase
         .from('ideas')
-        .delete()
+        .update({ 
+          deleted: true,
+          deleted_at: new Date().toISOString()
+        })
         .in('id', ids);
 
       if (error) throw error;
 
-      setIdeas(ideas.filter(idea => !ids.includes(idea.id)));
+      // Remove the deleted ideas from the local state
+      setIdeas(prevIdeas => prevIdeas.filter(idea => !ids.includes(idea.id)));
 
       toast({
         title: "Success",
