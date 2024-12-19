@@ -7,6 +7,9 @@ import { useQueryClient } from "@tanstack/react-query";
 import { IdeaCardHeader } from "@/components/dashboard/idea-card/IdeaCardHeader";
 import { IdeaCardContent } from "@/components/dashboard/idea-card/IdeaCardContent";
 import { IdeaCardActions } from "@/components/dashboard/idea-card/IdeaCardActions";
+import { IdeaCardMetadata } from "@/components/dashboard/idea-card/IdeaCardMetadata";
+import { IdeaCardTitle } from "@/components/dashboard/idea-card/IdeaCardTitle";
+import { IdeaCardSelection } from "@/components/dashboard/idea-card/IdeaCardSelection";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { Trash2 } from "lucide-react";
@@ -168,18 +171,26 @@ export const IdeaCard = ({
       onClick={() => setIsEditing(true)}
     >
       <CardHeader>
-        <IdeaCardHeader
-          title={title}
-          createdAt={createdAt}
-          isSelected={isSelected}
-          isEditing={isEditing}
-          editedTitle={editedTitle}
-          onSelect={onSelect}
-          onTitleChange={setEditedTitle}
-          onKeyDown={handleKeyDown}
-          id={id}
-          isDraft={isDraft}
-        />
+        <div className="flex items-center justify-between space-y-0 pb-2">
+          <div className="flex items-center gap-2 flex-1">
+            <IdeaCardTitle
+              title={title}
+              isEditing={isEditing}
+              editedTitle={editedTitle}
+              onTitleChange={setEditedTitle}
+              onKeyDown={handleKeyDown}
+              isDraft={isDraft}
+            />
+          </div>
+          <div className="flex items-center gap-4">
+            <IdeaCardMetadata createdAt={createdAt} />
+            <IdeaCardSelection
+              isSelected={isSelected}
+              onSelect={onSelect}
+              id={id}
+            />
+          </div>
+        </div>
       </CardHeader>
       <CardContent>
         <IdeaCardContent
