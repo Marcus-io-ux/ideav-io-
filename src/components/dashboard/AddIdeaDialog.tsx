@@ -2,6 +2,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Button } from "@/components/ui/button";
 import { IdeaForm } from "./IdeaForm";
 import { useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 
 export interface AddIdeaDialogProps {
   buttonText?: string;
@@ -10,6 +11,7 @@ export interface AddIdeaDialogProps {
 
 export function AddIdeaDialog({ buttonText = "Add Idea", onIdeaSubmit }: AddIdeaDialogProps) {
   const [open, setOpen] = useState(false);
+  const queryClient = useQueryClient();
   const [idea, setIdea] = useState({
     title: "",
     content: "",
@@ -17,7 +19,7 @@ export function AddIdeaDialog({ buttonText = "Add Idea", onIdeaSubmit }: AddIdea
     category: "",
     feedbackType: "",
     shareToCommunity: false,
-    tags: [], // Added missing tags property
+    tags: [],
   });
 
   const handleIdeaChange = (field: string, value: any) => {
@@ -33,8 +35,15 @@ export function AddIdeaDialog({ buttonText = "Add Idea", onIdeaSubmit }: AddIdea
       category: "",
       feedbackType: "",
       shareToCommunity: false,
-      tags: [], // Reset tags as well
+      tags: [],
     });
+  };
+
+  const handleSubmitSuccess = async () => {
+    // Invalidate and refetch ideas query to show new idea immediately
+    await queryClient.invalidateQueries({ queryKey: ["my-ideas"] });
+    onIdeaSubmit();
+    handleCancel();
   };
 
   return (
@@ -51,13 +60,9 @@ export function AddIdeaDialog({ buttonText = "Add Idea", onIdeaSubmit }: AddIdea
           onIdeaChange={handleIdeaChange}
           onCancel={handleCancel}
           onSaveDraft={() => {
-            // Implement draft saving logic here
             handleCancel();
           }}
-          onSubmit={() => {
-            onIdeaSubmit();
-            handleCancel();
-          }}
+          onSubmit={handleSubmitSuccess}
         />
       </DialogContent>
     </Dialog>

@@ -7,6 +7,7 @@ import { RecentIdeasTab } from "./tabs/RecentIdeasTab";
 import { AllIdeasTab } from "./tabs/AllIdeasTab";
 import { FavoritesTab } from "./tabs/FavoritesTab";
 import { Idea } from "@/types/idea";
+import { useQueryClient } from "@tanstack/react-query";
 
 interface IdeasListProps {
   ideas: Idea[];
@@ -23,6 +24,7 @@ export const IdeasList = ({
 }: IdeasListProps) => {
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [activeTab, setActiveTab] = useState("recent");
+  const queryClient = useQueryClient();
 
   const handleSelect = (id: string) => {
     setSelectedIds(prev => 
@@ -35,6 +37,11 @@ export const IdeasList = ({
   const handleBulkDelete = () => {
     onDeleteIdeas(selectedIds);
     setSelectedIds([]);
+  };
+
+  const handleIdeaSubmit = async () => {
+    // Refresh the ideas list
+    await queryClient.invalidateQueries({ queryKey: ["my-ideas"] });
   };
 
   // Calculate counts
@@ -58,7 +65,7 @@ export const IdeasList = ({
             </Button>
           )}
         </div>
-        <AddIdeaDialog onIdeaSubmit={() => {}} />
+        <AddIdeaDialog onIdeaSubmit={handleIdeaSubmit} />
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
