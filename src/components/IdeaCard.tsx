@@ -201,7 +201,6 @@ export const IdeaCard = ({
           onKeyDown={handleKeyDown}
           isCurrentlyFavorite={isCurrentlyFavorite}
           onToggleFavorite={handleToggleFavorite}
-          onDelete={onDelete ? handleDelete : undefined}
         />
       </CardContent>
       
