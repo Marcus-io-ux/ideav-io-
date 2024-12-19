@@ -1,55 +1,50 @@
-import { Label } from "@/components/ui/label";
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Button } from "@/components/ui/button";
-import { DialogFooter } from "@/components/ui/dialog";
-import { Save, X, Tag, ImagePlus } from "lucide-react";
-import { IdeaFormData } from "@/types/idea";
-import { useToast } from "@/hooks/use-toast";
+import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
-import { useQueryClient } from "@tanstack/react-query";
-import { useState } from "react";
+import { useToast } from "@/hooks/use-toast";
+import { Image, X } from "lucide-react";
 
 interface IdeaFormProps {
-  idea: IdeaFormData;
-  onIdeaChange: (field: keyof IdeaFormData, value: any) => void;
-  onCancel: () => void;
-  onSaveDraft: () => void;
-  onSubmit: () => void;
+  onSubmit: (data: { title: string; content: string; images: string[] }) => void;
+  initialData?: {
+    title: string;
+    content: string;
+    images?: string[];
+  };
 }
 
-export const IdeaForm = ({
-  idea,
-  onIdeaChange,
-  onCancel,
-  onSaveDraft,
-  onSubmit,
-}: IdeaFormProps) => {
-  const { toast } = useToast();
-  const queryClient = useQueryClient();
+export const IdeaForm = ({ onSubmit, initialData }: IdeaFormProps) => {
+  const [title, setTitle] = useState(initialData?.title || "");
+  const [content, setContent] = useState(initialData?.content || "");
+  const [images, setImages] = useState<string[]>(initialData?.images || []);
   const [uploading, setUploading] = useState(false);
+  const { toast } = useToast();
 
-  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (!e.target.files || e.target.files.length === 0) return;
-    
+  const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     try {
+      const file = event.target.files?.[0];
+      if (!file) return;
+
       setUploading(true);
-      const file = e.target.files[0];
       const fileExt = file.name.split('.').pop();
       const filePath = `${crypto.randomUUID()}.${fileExt}`;
 
-      const { error: uploadError } = await supabase.storage
+      const { error: uploadError, data } = await supabase.storage
         .from('idea-images')
         .upload(filePath, file);
 
-      if (uploadError) throw uploadError;
+      if (uploadError) {
+        throw uploadError;
+      }
 
       const { data: { publicUrl } } = supabase.storage
         .from('idea-images')
         .getPublicUrl(filePath);
 
-      onIdeaChange('images', [...(idea.images || []), publicUrl]);
-      
+      setImages(prev => [...prev, publicUrl]);
       toast({
         title: "Success",
         description: "Image uploaded successfully",
@@ -66,135 +61,81 @@ export const IdeaForm = ({
     }
   };
 
-  const handleSubmit = async () => {
-    try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) {
-        toast({
-          title: "Authentication required",
-          description: "Please sign in to save ideas",
-          variant: "destructive",
-        });
-        return;
-      }
-
-      const { error } = await supabase
-        .from('ideas')
-        .insert([
-          {
-            title: idea.title,
-            content: idea.content,
-            tags: idea.tags,
-            images: idea.images,
-            user_id: user.id,
-          }
-        ]);
-
-      if (error) throw error;
-
-      await queryClient.invalidateQueries({ queryKey: ["my-ideas"] });
-
-      toast({
-        title: "Success",
-        description: "Your idea has been saved",
-      });
-
-      onSubmit();
-    } catch (error) {
-      console.error('Error saving idea:', error);
-      toast({
-        title: "Error",
-        description: "Failed to save idea. Please try again.",
-        variant: "destructive",
-      });
-    }
+  const removeImage = (imageUrl: string) => {
+    setImages(prev => prev.filter(url => url !== imageUrl));
   };
 
-  const handleTagsChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const tags = e.target.value.split(',').map(tag => tag.trim()).filter(Boolean);
-    onIdeaChange('tags', tags);
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    onSubmit({ title, content, images });
   };
 
   return (
-    <div className="space-y-6 py-4">
+    <form onSubmit={handleSubmit} className="space-y-4">
       <div className="space-y-2">
         <Label htmlFor="title">Title</Label>
         <Input
           id="title"
-          placeholder="What's your big idea?"
-          value={idea.title}
-          onChange={(e) => onIdeaChange("title", e.target.value)}
-          className="w-full"
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+          placeholder="Enter idea title..."
+          required
         />
       </div>
+      
       <div className="space-y-2">
-        <Label htmlFor="content">Description</Label>
+        <Label htmlFor="content">Content</Label>
         <Textarea
           id="content"
-          placeholder="Add details or context to your idea..."
-          value={idea.content}
-          onChange={(e) => onIdeaChange("content", e.target.value)}
+          value={content}
+          onChange={(e) => setContent(e.target.value)}
+          placeholder="Describe your idea..."
+          required
           className="min-h-[100px]"
         />
       </div>
+
       <div className="space-y-2">
-        <Label htmlFor="tags">Tags (comma-separated)</Label>
-        <Input
-          id="tags"
-          placeholder="Enter tags separated by commas"
-          value={idea.tags.join(', ')}
-          onChange={handleTagsChange}
-        />
-      </div>
-      <div className="space-y-2">
-        <Label htmlFor="image">Add Image</Label>
-        <Input
-          id="image"
-          type="file"
-          accept="image/*"
-          onChange={handleImageUpload}
-          disabled={uploading}
-          className="cursor-pointer"
-        />
-        {idea.images && idea.images.length > 0 && (
-          <div className="grid grid-cols-2 gap-2 mt-2">
-            {idea.images.map((url, index) => (
+        <Label>Images</Label>
+        <div className="flex flex-wrap gap-2">
+          {images.map((url, index) => (
+            <div key={index} className="relative group">
               <img
-                key={index}
                 src={url}
                 alt={`Idea image ${index + 1}`}
-                className="w-full h-32 object-cover rounded-md"
+                className="w-20 h-20 object-cover rounded-md"
               />
-            ))}
-          </div>
-        )}
-      </div>
-      <DialogFooter className="flex justify-between sm:justify-between">
-        <div className="flex items-center gap-4">
-          <Button
-            type="button"
-            variant="outline"
-            onClick={onCancel}
-            className="gap-2"
+              <button
+                type="button"
+                onClick={() => removeImage(url)}
+                className="absolute -top-2 -right-2 bg-destructive text-destructive-foreground rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+          ))}
+          <Label
+            htmlFor="image-upload"
+            className="w-20 h-20 border-2 border-dashed border-muted-foreground rounded-md flex items-center justify-center cursor-pointer hover:border-primary transition-colors"
           >
-            <X className="h-4 w-4" />
-            Cancel
-          </Button>
-          <Button
-            type="button"
-            variant="outline"
-            onClick={onSaveDraft}
-            className="gap-2"
-          >
-            <Save className="h-4 w-4" />
-            Save Draft
-          </Button>
+            <Image className="h-8 w-8 text-muted-foreground" />
+            <input
+              id="image-upload"
+              type="file"
+              accept="image/*"
+              onChange={handleImageUpload}
+              className="hidden"
+              disabled={uploading}
+            />
+          </Label>
         </div>
-        <Button onClick={handleSubmit} className="gap-2" disabled={uploading}>
-          <Tag className="h-4 w-4" />
-          Save Idea
+      </div>
+
+      <div className="flex justify-end">
+        <Button type="submit" disabled={uploading}>
+          {uploading ? "Uploading..." : "Save Idea"}
         </Button>
-      </DialogFooter>
-    </div>
+      </div>
+    </form>
   );
 };

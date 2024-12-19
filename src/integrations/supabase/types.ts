@@ -267,6 +267,7 @@ export type Database = {
           deleted: boolean | null
           deleted_at: string | null
           id: string
+          images: string[] | null
           is_draft: boolean | null
           tags: string[] | null
           title: string
@@ -278,6 +279,7 @@ export type Database = {
           deleted?: boolean | null
           deleted_at?: string | null
           id?: string
+          images?: string[] | null
           is_draft?: boolean | null
           tags?: string[] | null
           title: string
@@ -289,6 +291,7 @@ export type Database = {
           deleted?: boolean | null
           deleted_at?: string | null
           id?: string
+          images?: string[] | null
           is_draft?: boolean | null
           tags?: string[] | null
           title?: string
