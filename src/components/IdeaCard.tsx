@@ -1,14 +1,11 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { format } from "date-fns";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
-import { Checkbox } from "@/components/ui/checkbox";
 import { cn } from "@/lib/utils";
-import { CardHeaderActions } from "@/components/dashboard/CardHeaderActions";
 import { supabase } from "@/integrations/supabase/client";
-import { useState, useEffect, useRef } from "react";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
+import { useState, useEffect } from "react";
 import { useQueryClient } from "@tanstack/react-query";
+import { IdeaCardHeader } from "@/components/dashboard/idea-card/IdeaCardHeader";
+import { IdeaCardContent } from "@/components/dashboard/idea-card/IdeaCardContent";
 
 interface IdeaCardProps {
   id: string;
@@ -31,7 +28,6 @@ export const IdeaCard = ({
   isFavorite = false,
   isSelected = false,
   onSelect,
-  onEdit,
   onDelete,
   onToggleFavorite 
 }: IdeaCardProps) => {
@@ -41,17 +37,10 @@ export const IdeaCard = ({
   const [isEditing, setIsEditing] = useState(false);
   const [editedTitle, setEditedTitle] = useState(title);
   const [editedContent, setEditedContent] = useState(content);
-  const titleInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     setIsCurrentlyFavorite(isFavorite);
   }, [isFavorite]);
-
-  useEffect(() => {
-    if (isEditing && titleInputRef.current) {
-      titleInputRef.current.focus();
-    }
-  }, [isEditing]);
 
   const handleToggleFavorite = async () => {
     try {
@@ -124,11 +113,6 @@ export const IdeaCard = ({
     });
   };
 
-  const handleStartEdit = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    setIsEditing(true);
-  };
-
   const handleSaveEdit = async () => {
     try {
       const { error } = await supabase
@@ -173,70 +157,36 @@ export const IdeaCard = ({
   return (
     <Card 
       className={cn(
-        "w-full transition-shadow duration-300 animate-fade-in group relative dark:bg-card dark:text-card-foreground dark:border-border",
+        "w-full transition-shadow duration-300 animate-fade-in group relative dark:bg-card dark:text-card-foreground dark:border-border cursor-pointer",
         "hover:shadow-lg dark:hover:shadow-primary/5",
         isSelected && "border-primary dark:border-primary"
       )}
+      onClick={() => setIsEditing(true)}
     >
-      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-        <div className="flex items-center gap-2 flex-1">
-          {isEditing ? (
-            <Input
-              ref={titleInputRef}
-              value={editedTitle}
-              onChange={(e) => setEditedTitle(e.target.value)}
-              onKeyDown={handleKeyDown}
-              className="text-xl font-semibold"
-              onClick={(e) => e.stopPropagation()}
-            />
-          ) : (
-            <CardTitle 
-              className="text-xl font-semibold cursor-pointer"
-              onClick={handleStartEdit}
-            >
-              {title}
-            </CardTitle>
-          )}
-        </div>
-        <div className="flex items-center gap-4">
-          <span className="text-sm text-muted-foreground">
-            {format(createdAt, 'MMM d, yyyy')}
-          </span>
-          {onSelect && (
-            <Checkbox
-              checked={isSelected}
-              onCheckedChange={() => onSelect(id)}
-              onClick={(e) => e.stopPropagation()}
-            />
-          )}
-        </div>
+      <CardHeader>
+        <IdeaCardHeader
+          title={title}
+          createdAt={createdAt}
+          isSelected={isSelected}
+          isEditing={isEditing}
+          editedTitle={editedTitle}
+          onSelect={onSelect}
+          onTitleChange={setEditedTitle}
+          onKeyDown={handleKeyDown}
+          id={id}
+        />
       </CardHeader>
-      <CardContent className="text-muted-foreground">
-        {isEditing ? (
-          <Textarea
-            value={editedContent}
-            onChange={(e) => setEditedContent(e.target.value)}
-            onKeyDown={handleKeyDown}
-            className="min-h-[100px]"
-            onClick={(e) => e.stopPropagation()}
-            onBlur={handleSaveEdit}
-          />
-        ) : (
-          <p 
-            className="cursor-pointer"
-            onClick={handleStartEdit}
-          >
-            {content}
-          </p>
-        )}
-        <div className="absolute bottom-4 right-4">
-          <CardHeaderActions
-            isFavorite={isCurrentlyFavorite}
-            onToggleFavorite={handleToggleFavorite}
-            onDelete={onDelete ? handleDelete : undefined}
-            size="sm"
-          />
-        </div>
+      <CardContent>
+        <IdeaCardContent
+          content={content}
+          isEditing={isEditing}
+          editedContent={editedContent}
+          onContentChange={setEditedContent}
+          onKeyDown={handleKeyDown}
+          isCurrentlyFavorite={isCurrentlyFavorite}
+          onToggleFavorite={handleToggleFavorite}
+          onDelete={onDelete ? handleDelete : undefined}
+        />
       </CardContent>
     </Card>
   );
