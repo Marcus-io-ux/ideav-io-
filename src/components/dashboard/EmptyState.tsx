@@ -6,6 +6,12 @@ interface EmptyStateProps {
 }
 
 export const EmptyState = ({ onIdeaSubmit }: EmptyStateProps) => {
+  const handleIdeaSubmit = async () => {
+    if (onIdeaSubmit) {
+      await onIdeaSubmit();
+    }
+  };
+
   return (
     <div className="flex flex-col items-center justify-center py-12 text-center space-y-4">
       <div className="rounded-full bg-primary/10 p-4">
@@ -15,7 +21,7 @@ export const EmptyState = ({ onIdeaSubmit }: EmptyStateProps) => {
       <p className="text-muted-foreground max-w-sm">
         You haven't saved any ideas yet. Click '+ Add New Idea' to get started!
       </p>
-      <AddIdeaDialog onIdeaSubmit={onIdeaSubmit} />
+      <AddIdeaDialog onIdeaSubmit={handleIdeaSubmit} />
     </div>
   );
 };

@@ -8,17 +8,15 @@ import { AddIdeaDialog } from "@/components/dashboard/AddIdeaDialog";
 import { IdeasGrid } from "@/components/dashboard/IdeasGrid";
 import { SearchBar } from "@/components/SearchBar";
 import { Button } from "@/components/ui/button";
-import { Filter, Grid, List, Trash2 } from "lucide-react";
+import { Filter, Grid, List } from "lucide-react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 
 const Dashboard = () => {
   const [isFeedbackModalOpen, setIsFeedbackModalOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
-  const [sortBy, setSortBy] = useState<"recent" | "oldest" | "alphabetical">("recent");
   const { userName } = useUserProfile();
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -27,14 +25,21 @@ const Dashboard = () => {
     queryKey: ["my-ideas"],
     queryFn: async () => {
       const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error("No user found");
+      if (!user) {
+        toast({
+          title: "Authentication required",
+          description: "Please sign in to view your ideas",
+          variant: "destructive",
+        });
+        throw new Error("No user found");
+      }
 
       const { data, error } = await supabase
         .from("ideas")
         .select("*")
         .eq("user_id", user.id)
         .eq("deleted", false)
-        .order("created_at", { ascending: sortBy === "oldest" });
+        .order("created_at", { ascending: false });
 
       if (error) throw error;
       return data.map(idea => ({
@@ -69,11 +74,6 @@ const Dashboard = () => {
     }
   };
 
-  const filteredIdeas = ideas.filter(idea =>
-    idea.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    idea.content.toLowerCase().includes(searchQuery.toLowerCase())
-  );
-
   const handleIdeaSubmit = async () => {
     await queryClient.invalidateQueries({ queryKey: ["my-ideas"] });
     toast({
@@ -81,6 +81,11 @@ const Dashboard = () => {
       description: "Your idea has been created successfully!",
     });
   };
+
+  const filteredIdeas = ideas.filter(idea =>
+    idea.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    idea.content.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
   return (
     <div className="min-h-screen bg-background">
@@ -120,6 +125,7 @@ const Dashboard = () => {
           isLoading={isLoading}
           viewMode={viewMode}
           onDelete={handleDeleteIdea}
+          onIdeaSubmit={handleIdeaSubmit}
         />
       </div>
 

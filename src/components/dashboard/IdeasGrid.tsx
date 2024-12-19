@@ -12,9 +12,10 @@ interface IdeasGridProps {
   isLoading: boolean;
   viewMode: "grid" | "list";
   onDelete?: (id: string) => void;
+  onIdeaSubmit?: () => Promise<void>;
 }
 
-export const IdeasGrid = ({ ideas, isLoading, viewMode, onDelete }: IdeasGridProps) => {
+export const IdeasGrid = ({ ideas, isLoading, viewMode, onDelete, onIdeaSubmit }: IdeasGridProps) => {
   if (isLoading) {
     return (
       <div className={`grid gap-6 ${viewMode === "grid" ? "grid-cols-1 md:grid-cols-2 lg:grid-cols-3" : ""}`}>
@@ -26,7 +27,7 @@ export const IdeasGrid = ({ ideas, isLoading, viewMode, onDelete }: IdeasGridPro
   }
 
   if (ideas.length === 0) {
-    return <EmptyState />;
+    return <EmptyState onIdeaSubmit={onIdeaSubmit} />;
   }
 
   return (
