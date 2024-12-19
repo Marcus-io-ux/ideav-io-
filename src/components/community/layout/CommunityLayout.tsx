@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { CommunityChannels } from "./CommunityChannels";
-import { CommunityContent } from "./CommunityContent";
+import { CommunityContentHeader } from "./CommunityContent";
 import { CommunityUserPanel } from "./CommunityUserPanel";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
