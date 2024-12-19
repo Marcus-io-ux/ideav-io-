@@ -41,7 +41,8 @@ export const IdeaComments = ({
         id,
         content,
         created_at,
-        profiles:user_id (
+        user_id,
+        profiles (
           username,
           avatar_url
         )
@@ -54,15 +55,17 @@ export const IdeaComments = ({
       return;
     }
 
-    setComments(data.map(comment => ({
-      id: comment.id,
-      content: comment.content,
-      created_at: comment.created_at,
-      author: {
-        name: comment.profiles?.username || 'Anonymous',
-        avatar: comment.profiles?.avatar_url
-      }
-    })));
+    if (data) {
+      setComments(data.map(comment => ({
+        id: comment.id,
+        content: comment.content,
+        created_at: comment.created_at,
+        author: {
+          name: comment.profiles?.username || 'Anonymous',
+          avatar: comment.profiles?.avatar_url
+        }
+      })));
+    }
   };
 
   const subscribeToComments = () => {
