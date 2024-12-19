@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Dialog,
   DialogContent,
@@ -6,7 +6,6 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 
 interface FollowersDialogProps {
@@ -22,43 +21,73 @@ export function FollowersDialog({
   userId,
   type,
 }: FollowersDialogProps) {
-  const { data: users } = useQuery({
-    queryKey: ["followers", type, userId],
-    queryFn: async () => {
-      const { data } = await supabase
-        .from("user_follows")
-        .select(`
-          ${type === "followers" ? "follower:follower_id(*)" : "following:following_id(*)"},
-          profiles!user_follows_${type === "followers" ? "follower" : "following"}_id_fkey(*)
-        `)
-        .eq(type === "followers" ? "following_id" : "follower_id", userId);
+  const [users, setUsers] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
 
-      return data || [];
-    },
-  });
+  useEffect(() => {
+    const fetchUsers = async () => {
+      setLoading(true);
+      try {
+        const { data, error } = await supabase
+          .from("user_follows")
+          .select(
+            `${
+              type === "followers" ? "follower:profiles!follower_id(*)" : "following:profiles!following_id(*)"
+            }`
+          )
+          .eq(type === "followers" ? "following_id" : "follower_id", userId);
+
+        if (error) throw error;
+
+        setUsers(
+          data?.map((item) => (type === "followers" ? item.follower : item.following)) || []
+        );
+      } catch (error) {
+        console.error(`Error fetching ${type}:`, error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (isOpen && userId) {
+      fetchUsers();
+    }
+  }, [isOpen, userId, type]);
 
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent>
+    <Dialog open={isOpen} onOpenChange={() => onClose()}>
+      <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle>
             {type === "followers" ? "Followers" : "Following"}
           </DialogTitle>
         </DialogHeader>
-        <div className="space-y-4">
-          {users?.map((user: any) => (
-            <div key={user.id} className="flex items-center gap-3">
-              <Avatar>
-                <AvatarImage src={user.profiles?.avatar_url} />
-                <AvatarFallback>
-                  {user.profiles?.username?.[0]?.toUpperCase()}
-                </AvatarFallback>
-              </Avatar>
-              <div>
-                <p className="font-medium">{user.profiles?.username}</p>
-              </div>
+        <div className="mt-4 space-y-4">
+          {loading ? (
+            <div className="text-center text-muted-foreground">Loading...</div>
+          ) : users.length === 0 ? (
+            <div className="text-center text-muted-foreground">
+              No {type} yet
             </div>
-          ))}
+          ) : (
+            users.map((user) => (
+              <div
+                key={user.id}
+                className="flex items-center gap-3 p-2 rounded-lg hover:bg-accent"
+              >
+                <Avatar>
+                  <AvatarImage src={user.avatar_url} />
+                  <AvatarFallback>
+                    {user.username?.[0]?.toUpperCase()}
+                  </AvatarFallback>
+                </Avatar>
+                <div>
+                  <p className="font-medium">{user.username}</p>
+                  <p className="text-sm text-muted-foreground">{user.bio}</p>
+                </div>
+              </div>
+            ))
+          )}
         </div>
       </DialogContent>
     </Dialog>

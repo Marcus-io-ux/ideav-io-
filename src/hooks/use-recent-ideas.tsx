@@ -16,8 +16,9 @@ export function useRecentIdeas(userId: string | null) {
         .limit(5);
 
       if (error) throw error;
+
       return data;
     },
-    enabled: !!userId,
+    enabled: !!userId
   });
 }

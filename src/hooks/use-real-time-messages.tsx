@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Message } from "@/types/inbox";
 
@@ -8,40 +8,38 @@ export function useRealTimeMessages(userId: string | null) {
   useEffect(() => {
     if (!userId) return;
 
+    // Fetch initial messages
     const fetchMessages = async () => {
       const { data, error } = await supabase
-        .from('messages')
-        .select('*')
-        .or(`recipient_id.eq.${userId},sender_id.eq.${userId}`)
-        .order('created_at', { ascending: false });
+        .from("messages")
+        .select("*, sender:profiles!sender_id(*), recipient:profiles!recipient_id(*)")
+        .or(`sender_id.eq.${userId},recipient_id.eq.${userId}`)
+        .order("created_at", { ascending: false });
 
-      if (!error && data) {
-        const formattedMessages: Message[] = data.map(msg => ({
-          id: msg.id,
-          senderId: msg.sender_id,
-          recipientId: msg.recipient_id,
-          content: msg.content,
-          timestamp: new Date(msg.created_at).toLocaleString(),
-          isRead: msg.is_read
-        }));
-        setMessages(formattedMessages);
+      if (error) {
+        console.error("Error fetching messages:", error);
+        return;
       }
+
+      setMessages(data || []);
     };
 
     fetchMessages();
 
+    // Subscribe to new messages
     const channel = supabase
-      .channel('messages_changes')
+      .channel("messages")
       .on(
-        'postgres_changes',
+        "postgres_changes",
         {
-          event: '*',
-          schema: 'public',
-          table: 'messages',
-          filter: `recipient_id=eq.${userId}`,
+          event: "*",
+          schema: "public",
+          table: "messages",
+          filter: `sender_id=eq.${userId},recipient_id=eq.${userId}`,
         },
-        () => {
-          fetchMessages();
+        (payload) => {
+          console.log("Real-time message update:", payload);
+          fetchMessages(); // Refetch messages when there's an update
         }
       )
       .subscribe();
