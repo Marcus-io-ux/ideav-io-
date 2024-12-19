@@ -1,26 +1,19 @@
 import { useState } from "react";
-import { IdeasList } from "@/components/dashboard/IdeasList";
 import { PageHeader } from "@/components/ui/page-header";
 import { FeedbackButton } from "@/components/feedback/FeedbackButton";
 import { FeedbackModal } from "@/components/feedback/FeedbackModal";
 import { DashboardTutorial } from "@/components/dashboard/DashboardTutorial";
 import { useUserProfile } from "@/hooks/use-user-profile";
-import { useIdeas } from "@/hooks/use-ideas";
+import { AddIdeaDialog } from "@/components/dashboard/AddIdeaDialog";
 
 const Dashboard = () => {
-  const [showFavoritesOnly, setShowFavoritesOnly] = useState(false);
   const [isFeedbackModalOpen, setIsFeedbackModalOpen] = useState(false);
   const [dailyQuote] = useState("The best way to predict the future is to create it.");
   const { userName } = useUserProfile();
-  const { ideas, handleDeleteIdeas } = useIdeas();
 
-  const handleEditIdea = async (id: string) => {
+  const handleIdeaSubmit = () => {
     // This will be implemented in a future update
-    console.log("Edit idea:", id);
-  };
-
-  const handleToggleFavorites = () => {
-    setShowFavoritesOnly(!showFavoritesOnly);
+    console.log("Idea submitted");
   };
 
   return (
@@ -32,13 +25,7 @@ const Dashboard = () => {
             description={`"${dailyQuote}"`}
           />
           <div className="mt-8">
-            <IdeasList
-              ideas={ideas}
-              showFavoritesOnly={showFavoritesOnly}
-              onToggleFavorites={handleToggleFavorites}
-              onEditIdea={handleEditIdea}
-              onDeleteIdeas={handleDeleteIdeas}
-            />
+            <AddIdeaDialog onIdeaSubmit={handleIdeaSubmit} />
           </div>
         </div>
       </div>
