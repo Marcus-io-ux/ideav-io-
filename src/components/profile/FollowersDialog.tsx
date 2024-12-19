@@ -38,21 +38,20 @@ export function FollowersDialog({
         const { data, error } = await supabase
           .from("user_follows")
           .select(`
-            ${type === "followers" 
-              ? "profiles!user_follows_follower_id_fkey(id, username, avatar_url, bio)" 
-              : "profiles!user_follows_following_id_fkey(id, username, avatar_url, bio)"
-            }
+            profiles!user_follows_${type === "followers" ? "follower" : "following"}_id_fkey (
+              id,
+              username,
+              avatar_url,
+              bio
+            )
           `)
           .eq(type === "followers" ? "following_id" : "follower_id", userId);
 
         if (error) throw error;
 
-        const profiles = data?.map(item => {
-          const profile = type === "followers" 
-            ? item.profiles 
-            : item.profiles;
-          return profile as Profile;
-        }).filter(Boolean) || [];
+        const profiles = data
+          ?.map((item) => item.profiles as Profile)
+          .filter(Boolean) || [];
 
         setUsers(profiles);
       } catch (error) {

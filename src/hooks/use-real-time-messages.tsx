@@ -13,8 +13,14 @@ export function useRealTimeMessages(userId: string | null) {
         .from("messages")
         .select(`
           *,
-          profiles!messages_sender_id_fkey(username, avatar_url),
-          profiles!messages_recipient_id_fkey(username, avatar_url)
+          sender:profiles!messages_sender_id_fkey (
+            username,
+            avatar_url
+          ),
+          recipient:profiles!messages_recipient_id_fkey (
+            username,
+            avatar_url
+          )
         `)
         .or(`sender_id.eq.${userId},recipient_id.eq.${userId}`)
         .order("created_at", { ascending: false });
@@ -32,12 +38,12 @@ export function useRealTimeMessages(userId: string | null) {
         created_at: msg.created_at,
         is_read: msg.is_read,
         sender: {
-          username: msg.profiles?.username || "Unknown",
-          avatar_url: msg.profiles?.avatar_url
+          username: msg.sender?.username || "Unknown",
+          avatar_url: msg.sender?.avatar_url
         },
         recipient: {
-          username: msg.profiles?.username || "Unknown",
-          avatar_url: msg.profiles?.avatar_url
+          username: msg.recipient?.username || "Unknown",
+          avatar_url: msg.recipient?.avatar_url
         }
       }));
 
