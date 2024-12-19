@@ -1,7 +1,7 @@
 import { useState, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { SharedIdea } from "@/types/shared-idea";
+import { SharedIdea, SharedIdeaResponse } from "@/types/shared-idea";
 
 interface IdeaSubmitData {
   title: string;
@@ -34,7 +34,10 @@ export const useCommunityPosts = (channel: string) => {
       return;
     }
 
-    setPosts(data || []);
+    setPosts((data as SharedIdeaResponse[]).map(post => ({
+      ...post,
+      emoji_reactions: post.emoji_reactions as Record<string, number> || {},
+    })));
   }, [channel]);
 
   const handleIdeaSubmit = async (idea: IdeaSubmitData) => {

@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { IdeaCard } from "@/components/community/IdeaCard";
-import { SharedIdea } from "@/types/shared-idea";
+import { SharedIdea, SharedIdeaResponse } from "@/types/shared-idea";
 
 export const SharedIdeasTab = () => {
   const { data: sharedIdeas = [] } = useQuery<SharedIdea[]>({
@@ -14,7 +14,7 @@ export const SharedIdeasTab = () => {
         .from("community_posts")
         .select(`
           *,
-          profiles:user_id (
+          profiles (
             username,
             avatar_url
           )
@@ -24,8 +24,9 @@ export const SharedIdeasTab = () => {
 
       if (error) throw error;
       
-      return data.map((post: SharedIdea) => ({
+      return (data as SharedIdeaResponse[]).map((post) => ({
         ...post,
+        emoji_reactions: post.emoji_reactions as Record<string, number> || {},
         author: {
           id: post.user_id || '',
           name: post.profiles?.username || "Anonymous",

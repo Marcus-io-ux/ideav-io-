@@ -24,3 +24,7 @@ export interface SharedIdea {
     avatar?: string;
   };
 }
+
+export interface SharedIdeaResponse extends Omit<SharedIdea, 'emoji_reactions'> {
+  emoji_reactions: Json;
+}
