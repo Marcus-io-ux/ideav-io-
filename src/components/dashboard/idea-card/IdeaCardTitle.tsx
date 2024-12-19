@@ -1,6 +1,3 @@
-import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
-
 interface IdeaCardTitleProps {
   title: string;
   isEditing: boolean;
@@ -16,24 +13,31 @@ export const IdeaCardTitle = ({
   editedTitle,
   onTitleChange,
   onKeyDown,
-  isDraft
+  isDraft = false,
 }: IdeaCardTitleProps) => {
-  return isEditing ? (
-    <Input
-      value={editedTitle}
-      onChange={(e) => onTitleChange(e.target.value)}
-      onKeyDown={onKeyDown}
-      className="text-xl font-semibold"
-      onClick={(e) => e.stopPropagation()}
-    />
-  ) : (
-    <div className="flex items-center gap-2">
-      <h3 className="text-xl font-semibold">{title}</h3>
-      {isDraft && (
-        <Badge variant="outline" className="text-muted-foreground">
-          Draft
-        </Badge>
-      )}
-    </div>
+  if (isEditing) {
+    return (
+      <div className="space-y-2 w-full">
+        <label htmlFor="title" className="text-sm font-medium text-muted-foreground">
+          Title
+        </label>
+        <input
+          id="title"
+          type="text"
+          value={editedTitle}
+          onChange={(e) => onTitleChange(e.target.value)}
+          onKeyDown={onKeyDown}
+          className="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
+          onClick={(e) => e.stopPropagation()}
+        />
+      </div>
+    );
+  }
+
+  return (
+    <h3 className="text-lg font-semibold">
+      {isDraft && <span className="text-muted-foreground">[Draft] </span>}
+      {title}
+    </h3>
   );
 };

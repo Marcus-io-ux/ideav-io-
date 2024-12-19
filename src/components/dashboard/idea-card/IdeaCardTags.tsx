@@ -1,42 +1,44 @@
-import { Tag } from "lucide-react";
-import { cn } from "@/lib/utils";
-import { Input } from "@/components/ui/input";
-
 interface IdeaCardTagsProps {
   tags: string[];
-  isEditing?: boolean;
-  onTagsChange?: (value: string) => void;
+  isEditing: boolean;
+  onTagsChange: (value: string) => void;
 }
 
-export const IdeaCardTags = ({ tags, isEditing, onTagsChange }: IdeaCardTagsProps) => {
-  if (!tags || tags.length === 0 && !isEditing) return null;
-
+export const IdeaCardTags = ({
+  tags,
+  isEditing,
+  onTagsChange,
+}: IdeaCardTagsProps) => {
   if (isEditing) {
     return (
-      <Input
-        placeholder="Enter tags separated by commas"
-        value={tags.join(', ')}
-        onChange={(e) => onTagsChange?.(e.target.value)}
-        onClick={(e) => e.stopPropagation()}
-        className="mt-2"
-      />
+      <div className="space-y-2">
+        <label htmlFor="tags" className="text-sm font-medium text-muted-foreground">
+          Tags
+        </label>
+        <input
+          id="tags"
+          type="text"
+          value={tags.join(', ')}
+          onChange={(e) => onTagsChange(e.target.value)}
+          placeholder="Enter tags separated by commas"
+          className="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
+          onClick={(e) => e.stopPropagation()}
+        />
+      </div>
     );
   }
 
+  if (tags.length === 0) return null;
+
   return (
-    <div className="flex flex-wrap gap-2 mt-2">
+    <div className="flex flex-wrap gap-2">
       {tags.map((tag, index) => (
-        <div
+        <span
           key={index}
-          className={cn(
-            "flex items-center gap-1 px-2 py-1",
-            "bg-secondary/50 text-secondary-foreground",
-            "rounded-full text-sm"
-          )}
+          className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary/10 text-primary"
         >
-          <Tag className="h-3 w-3" />
-          <span>{tag}</span>
-        </div>
+          {tag}
+        </span>
       ))}
     </div>
   );
