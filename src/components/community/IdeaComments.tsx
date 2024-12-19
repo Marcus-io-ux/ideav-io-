@@ -5,7 +5,6 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { formatDistanceToNow } from "date-fns";
-import { ScrollArea } from "@/components/ui/scroll-area";
 
 interface Comment {
   id: string;
@@ -39,7 +38,7 @@ export const IdeaComments = ({ postId, onCommentAdded }: IdeaCommentsProps) => {
           id,
           content,
           created_at,
-          profiles:profiles!community_comments_user_id_fkey(username, avatar_url)
+          profiles!community_comments_user_id_fkey(username, avatar_url)
         `)
         .eq("post_id", postId)
         .order("created_at", { ascending: true });
@@ -93,27 +92,25 @@ export const IdeaComments = ({ postId, onCommentAdded }: IdeaCommentsProps) => {
 
   return (
     <div className="space-y-4">
-      <ScrollArea className="h-[300px] pr-4">
-        <div className="space-y-4">
-          {comments.map((comment) => (
-            <div key={comment.id} className="flex gap-3">
-              <Avatar className="h-8 w-8">
-                <AvatarImage src={comment.profiles?.avatar_url} />
-                <AvatarFallback>{comment.profiles?.username?.[0]?.toUpperCase()}</AvatarFallback>
-              </Avatar>
-              <div className="flex-1">
-                <div className="flex items-center gap-2">
-                  <span className="font-semibold">{comment.profiles?.username}</span>
-                  <span className="text-sm text-gray-500">
-                    {formatDistanceToNow(new Date(comment.created_at), { addSuffix: true })}
-                  </span>
-                </div>
-                <p className="text-sm text-gray-700">{comment.content}</p>
+      <div className="space-y-4">
+        {comments.map((comment) => (
+          <div key={comment.id} className="flex gap-3">
+            <Avatar className="h-8 w-8">
+              <AvatarImage src={comment.profiles?.avatar_url} />
+              <AvatarFallback>{comment.profiles?.username?.[0]?.toUpperCase()}</AvatarFallback>
+            </Avatar>
+            <div className="flex-1">
+              <div className="flex items-center gap-2">
+                <span className="font-semibold">{comment.profiles?.username}</span>
+                <span className="text-sm text-gray-500">
+                  {formatDistanceToNow(new Date(comment.created_at), { addSuffix: true })}
+                </span>
               </div>
+              <p className="text-sm text-gray-700">{comment.content}</p>
             </div>
-          ))}
-        </div>
-      </ScrollArea>
+          </div>
+        ))}
+      </div>
       <div className="flex gap-2">
         <Textarea
           value={newComment}
