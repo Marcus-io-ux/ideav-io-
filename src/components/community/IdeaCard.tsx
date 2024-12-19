@@ -71,8 +71,6 @@ export const IdeaCard = ({
             onComment={() => {}}
             currentUserId={null}
             authorName={author.name}
-            isFavorite={false}
-            onFavoriteChange={() => {}}
           />
         </div>
       </CardContent>
