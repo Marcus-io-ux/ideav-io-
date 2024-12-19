@@ -569,6 +569,7 @@ export type Database = {
           font_size: string | null
           id: string
           language: string | null
+          last_password_update: string | null
           notification_preferences: Json | null
           profile_visibility: string | null
           push_notifications: boolean | null
@@ -582,6 +583,7 @@ export type Database = {
           font_size?: string | null
           id?: string
           language?: string | null
+          last_password_update?: string | null
           notification_preferences?: Json | null
           profile_visibility?: string | null
           push_notifications?: boolean | null
@@ -595,6 +597,7 @@ export type Database = {
           font_size?: string | null
           id?: string
           language?: string | null
+          last_password_update?: string | null
           notification_preferences?: Json | null
           profile_visibility?: string | null
           push_notifications?: boolean | null
