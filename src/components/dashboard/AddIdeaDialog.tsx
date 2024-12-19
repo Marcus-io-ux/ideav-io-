@@ -40,7 +40,6 @@ export function AddIdeaDialog({ buttonText = "Add Idea", onIdeaSubmit }: AddIdea
   };
 
   const handleSubmitSuccess = async () => {
-    // Invalidate and refetch ideas query to show new idea immediately
     await queryClient.invalidateQueries({ queryKey: ["my-ideas"] });
     onIdeaSubmit();
     handleCancel();

@@ -45,13 +45,13 @@ export const IdeaForm = ({
           {
             title: idea.title,
             content: idea.content,
+            tags: idea.tags,
             user_id: user.id,
           }
         ]);
 
       if (error) throw error;
 
-      // Invalidate and refetch ideas query
       await queryClient.invalidateQueries({ queryKey: ["my-ideas"] });
 
       toast({
@@ -68,6 +68,11 @@ export const IdeaForm = ({
         variant: "destructive",
       });
     }
+  };
+
+  const handleTagsChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const tags = e.target.value.split(',').map(tag => tag.trim()).filter(Boolean);
+    onIdeaChange('tags', tags);
   };
 
   return (
@@ -90,6 +95,15 @@ export const IdeaForm = ({
           value={idea.content}
           onChange={(e) => onIdeaChange("content", e.target.value)}
           className="min-h-[100px]"
+        />
+      </div>
+      <div className="space-y-2">
+        <Label htmlFor="tags">Tags (comma-separated)</Label>
+        <Input
+          id="tags"
+          placeholder="Enter tags separated by commas"
+          value={idea.tags.join(', ')}
+          onChange={handleTagsChange}
         />
       </div>
       <DialogFooter className="flex justify-between sm:justify-between">

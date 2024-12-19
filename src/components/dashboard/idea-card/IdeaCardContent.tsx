@@ -1,5 +1,6 @@
 import { Textarea } from "@/components/ui/textarea";
-import { CardHeaderActions } from "@/components/dashboard/CardHeaderActions";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 
 interface IdeaCardContentProps {
   content: string;
@@ -7,8 +8,8 @@ interface IdeaCardContentProps {
   editedContent: string;
   onContentChange: (value: string) => void;
   onKeyDown: (e: React.KeyboardEvent) => void;
-  isCurrentlyFavorite: boolean;
-  onToggleFavorite: () => void;
+  tags: string[];
+  onTagsChange: (tags: string[]) => void;
 }
 
 export const IdeaCardContent = ({
@@ -17,29 +18,53 @@ export const IdeaCardContent = ({
   editedContent,
   onContentChange,
   onKeyDown,
-  isCurrentlyFavorite,
-  onToggleFavorite,
+  tags,
+  onTagsChange,
 }: IdeaCardContentProps) => {
+  const handleTagsChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newTags = e.target.value.split(',').map(tag => tag.trim()).filter(Boolean);
+    onTagsChange(newTags);
+  };
+
   return (
-    <div className="text-muted-foreground relative">
+    <div className="space-y-4">
       {isEditing ? (
-        <Textarea
-          value={editedContent}
-          onChange={(e) => onContentChange(e.target.value)}
-          onKeyDown={onKeyDown}
-          className="min-h-[100px]"
-          onClick={(e) => e.stopPropagation()}
-        />
+        <>
+          <Textarea
+            value={editedContent}
+            onChange={(e) => onContentChange(e.target.value)}
+            onKeyDown={onKeyDown}
+            className="min-h-[100px]"
+            onClick={(e) => e.stopPropagation()}
+          />
+          <div>
+            <Label htmlFor="tags">Tags (comma-separated)</Label>
+            <Input
+              id="tags"
+              value={tags.join(', ')}
+              onChange={handleTagsChange}
+              placeholder="Enter tags separated by commas"
+              onClick={(e) => e.stopPropagation()}
+            />
+          </div>
+        </>
       ) : (
-        <p>{content}</p>
+        <>
+          <p className="text-muted-foreground whitespace-pre-wrap">{content}</p>
+          {tags.length > 0 && (
+            <div className="flex flex-wrap gap-2 mt-4">
+              {tags.map((tag, index) => (
+                <span
+                  key={index}
+                  className="px-2 py-1 bg-secondary text-secondary-foreground rounded-full text-sm"
+                >
+                  {tag}
+                </span>
+              ))}
+            </div>
+          )}
+        </>
       )}
-      <div className="absolute bottom-4 right-4">
-        <CardHeaderActions
-          isFavorite={isCurrentlyFavorite}
-          onToggleFavorite={onToggleFavorite}
-          size="sm"
-        />
-      </div>
     </div>
   );
 };

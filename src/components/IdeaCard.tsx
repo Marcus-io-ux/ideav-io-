@@ -12,7 +12,7 @@ import { IdeaCardTitle } from "@/components/dashboard/idea-card/IdeaCardTitle";
 import { IdeaCardSelection } from "@/components/dashboard/idea-card/IdeaCardSelection";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
-import { Trash2 } from "lucide-react";
+import { Heart, Trash2 } from "lucide-react";
 
 interface IdeaCardProps {
   id: string;
@@ -22,6 +22,7 @@ interface IdeaCardProps {
   isFavorite?: boolean;
   isSelected?: boolean;
   isDraft?: boolean;
+  tags?: string[];
   onSelect?: (id: string) => void;
   onEdit?: (id: string) => void;
   onDelete?: (id: string) => void;
@@ -36,6 +37,7 @@ export const IdeaCard = ({
   isFavorite = false,
   isSelected = false,
   isDraft = false,
+  tags = [],
   onSelect,
   onDelete,
   onToggleFavorite 
@@ -46,6 +48,7 @@ export const IdeaCard = ({
   const [isEditing, setIsEditing] = useState(false);
   const [editedTitle, setEditedTitle] = useState(title);
   const [editedContent, setEditedContent] = useState(content);
+  const [editedTags, setEditedTags] = useState(tags);
 
   useEffect(() => {
     setIsCurrentlyFavorite(isFavorite);
@@ -125,6 +128,7 @@ export const IdeaCard = ({
         .update({
           title: editedTitle,
           content: editedContent,
+          tags: editedTags,
           is_draft: isDraft
         })
         .eq('id', id);
@@ -157,6 +161,7 @@ export const IdeaCard = ({
       setIsEditing(false);
       setEditedTitle(title);
       setEditedContent(content);
+      setEditedTags(tags);
     }
   };
 
@@ -192,64 +197,81 @@ export const IdeaCard = ({
           </div>
         </div>
       </CardHeader>
-      <CardContent>
+      <CardContent className="relative pb-16">
         <IdeaCardContent
           content={content}
           isEditing={isEditing}
           editedContent={editedContent}
           onContentChange={setEditedContent}
           onKeyDown={handleKeyDown}
-          isCurrentlyFavorite={isCurrentlyFavorite}
-          onToggleFavorite={handleToggleFavorite}
+          tags={editedTags}
+          onTagsChange={setEditedTags}
         />
-      </CardContent>
-      
-      <IdeaCardActions
-        isEditing={isEditing}
-        onSave={handleSaveEdit}
-        onCancel={() => {
-          setIsEditing(false);
-          setEditedTitle(title);
-          setEditedContent(content);
-        }}
-      />
-      
-      {onDelete && (
-        <div className="absolute bottom-4 right-4">
-          <AlertDialog>
-            <AlertDialogTrigger asChild>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="h-8 w-8 text-muted-foreground hover:text-destructive"
-                onClick={(e) => e.stopPropagation()}
-              >
-                <Trash2 className="h-4 w-4" />
-              </Button>
-            </AlertDialogTrigger>
-            <AlertDialogContent>
-              <AlertDialogHeader>
-                <AlertDialogTitle>Delete Idea</AlertDialogTitle>
-                <AlertDialogDescription>
-                  Are you sure you want to delete this idea? This action can be undone from the trash.
-                </AlertDialogDescription>
-              </AlertDialogHeader>
-              <AlertDialogFooter>
-                <AlertDialogCancel onClick={(e) => e.stopPropagation()}>Cancel</AlertDialogCancel>
-                <AlertDialogAction
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleDelete();
-                  }}
-                  className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-                >
-                  Delete
-                </AlertDialogAction>
-              </AlertDialogFooter>
-            </AlertDialogContent>
-          </AlertDialog>
+        
+        <div className="absolute bottom-0 right-0 left-0 p-4 flex justify-between items-center">
+          <div className="flex items-center gap-2">
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-8 w-8 text-muted-foreground hover:text-primary"
+              onClick={(e) => {
+                e.stopPropagation();
+                handleToggleFavorite();
+              }}
+            >
+              <Heart className={cn("h-4 w-4", isCurrentlyFavorite && "fill-current text-primary")} />
+            </Button>
+            
+            {onDelete && (
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-8 w-8 text-muted-foreground hover:text-destructive"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>Delete Idea</AlertDialogTitle>
+                    <AlertDialogDescription>
+                      Are you sure you want to delete this idea? This action can be undone from the trash.
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel onClick={(e) => e.stopPropagation()}>Cancel</AlertDialogCancel>
+                    <AlertDialogAction
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleDelete();
+                      }}
+                      className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                    >
+                      Delete
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
+            )}
+          </div>
+          
+          {isEditing && (
+            <IdeaCardActions
+              isEditing={isEditing}
+              onSave={handleSaveEdit}
+              onCancel={() => {
+                setIsEditing(false);
+                setEditedTitle(title);
+                setEditedContent(content);
+                setEditedTags(tags);
+              }}
+            />
+          )}
         </div>
-      )}
+      </CardContent>
     </Card>
   );
 };
