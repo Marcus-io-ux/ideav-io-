@@ -12,7 +12,7 @@ const Dashboard = () => {
   const [isFeedbackModalOpen, setIsFeedbackModalOpen] = useState(false);
   const [dailyQuote] = useState("The best way to predict the future is to create it.");
   const { userName } = useUserProfile();
-  const { ideas, handleDeleteIdeas, handleRestoreIdeas } = useIdeas();
+  const { ideas, handleDeleteIdeas } = useIdeas();
 
   const handleEditIdea = async (id: string) => {
     // This will be implemented in a future update
@@ -38,7 +38,6 @@ const Dashboard = () => {
               onToggleFavorites={handleToggleFavorites}
               onEditIdea={handleEditIdea}
               onDeleteIdeas={handleDeleteIdeas}
-              onRestoreIdeas={handleRestoreIdeas}
             />
           </div>
         </div>

@@ -17,7 +17,6 @@ interface IdeasSectionProps {
   onToggleFavorites: () => void;
   onEditIdea: (id: string) => void;
   onDeleteIdeas: (ids: string[]) => void;
-  onRestoreIdeas: (ids: string[]) => void;
 }
 
 export const IdeasSection = ({
@@ -26,7 +25,6 @@ export const IdeasSection = ({
   onToggleFavorites,
   onEditIdea,
   onDeleteIdeas,
-  onRestoreIdeas,
 }: IdeasSectionProps) => {
   return (
     <IdeasList
@@ -35,7 +33,6 @@ export const IdeasSection = ({
       onToggleFavorites={onToggleFavorites}
       onEditIdea={onEditIdea}
       onDeleteIdeas={onDeleteIdeas}
-      onRestoreIdeas={onRestoreIdeas}
     />
   );
 };
