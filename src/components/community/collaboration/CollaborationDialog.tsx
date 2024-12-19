@@ -9,7 +9,6 @@ import {
 } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
 import { useCollaborationRequest } from "@/hooks/use-collaboration-request";
-import { useToast } from "@/hooks/use-toast";
 
 interface CollaborationDialogProps {
   isOpen: boolean;
@@ -28,7 +27,6 @@ export const CollaborationDialog = ({
 }: CollaborationDialogProps) => {
   const [message, setMessage] = useState("");
   const { sendCollaborationRequest, isLoading } = useCollaborationRequest();
-  const { toast } = useToast();
 
   const handleCollaborate = async () => {
     if (!message.trim()) return;
