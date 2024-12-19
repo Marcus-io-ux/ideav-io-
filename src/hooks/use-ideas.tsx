@@ -3,12 +3,14 @@ import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { DashboardIdea } from "@/types/dashboard";
 import { Tables } from "@/integrations/supabase/types";
+import { useQueryClient } from "@tanstack/react-query";
 
 type IdeaDB = Tables<"ideas">;
 
 export const useIdeas = () => {
   const [ideas, setIdeas] = useState<DashboardIdea[]>([]);
   const { toast } = useToast();
+  const queryClient = useQueryClient();
 
   const fetchIdeas = async () => {
     try {
@@ -71,6 +73,7 @@ export const useIdeas = () => {
 
       // Remove the deleted ideas from the local state
       setIdeas(prevIdeas => prevIdeas.filter(idea => !ids.includes(idea.id)));
+      await queryClient.invalidateQueries({ queryKey: ["my-ideas"] });
 
       toast({
         title: "Success",
@@ -91,7 +94,7 @@ export const useIdeas = () => {
 
     // Subscribe to real-time changes
     const channel = supabase
-      .channel('public:ideas')
+      .channel('ideas_changes')
       .on(
         'postgres_changes',
         {
@@ -99,9 +102,10 @@ export const useIdeas = () => {
           schema: 'public',
           table: 'ideas'
         },
-        async () => {
-          console.log('Real-time update received for ideas');
+        async (payload) => {
+          console.log('Real-time update received for ideas:', payload);
           await fetchIdeas(); // Refresh the ideas list
+          await queryClient.invalidateQueries({ queryKey: ["my-ideas"] });
         }
       )
       .subscribe();

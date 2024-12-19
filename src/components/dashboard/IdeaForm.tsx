@@ -7,6 +7,7 @@ import { Save, X, Tag } from "lucide-react";
 import { IdeaFormData } from "@/types/idea";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { useQueryClient } from "@tanstack/react-query";
 
 interface IdeaFormProps {
   idea: IdeaFormData;
@@ -24,6 +25,7 @@ export const IdeaForm = ({
   onSubmit,
 }: IdeaFormProps) => {
   const { toast } = useToast();
+  const queryClient = useQueryClient();
 
   const handleSubmit = async () => {
     try {
@@ -48,6 +50,9 @@ export const IdeaForm = ({
         ]);
 
       if (error) throw error;
+
+      // Invalidate and refetch ideas query
+      await queryClient.invalidateQueries({ queryKey: ["my-ideas"] });
 
       toast({
         title: "Success",
