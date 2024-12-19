@@ -44,7 +44,7 @@ const Dashboard = () => {
 
       let query = supabase
         .from("ideas")
-        .select("*, favorites!inner(*)")
+        .select("*, favorites(id)")
         .eq("user_id", user.id)
         .eq("deleted", false);
 
@@ -70,6 +70,7 @@ const Dashboard = () => {
       return data.map(idea => ({
         ...idea,
         createdAt: new Date(idea.created_at),
+        isFavorite: idea.favorites !== null && idea.favorites.length > 0
       }));
     },
   });
@@ -161,10 +162,8 @@ const Dashboard = () => {
               </PopoverTrigger>
               <PopoverContent className="w-auto p-0" align="start">
                 <DatePicker
-                  mode="single"
                   selected={selectedDate}
                   onSelect={setSelectedDate}
-                  initialFocus
                 />
               </PopoverContent>
             </Popover>
