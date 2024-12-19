@@ -77,7 +77,7 @@ export const useIdeas = () => {
 
       toast({
         title: "Success",
-        description: `${ids.length} idea(s) deleted`,
+        description: `${ids.length} idea(s) moved to trash`,
       });
     } catch (error) {
       console.error('Error deleting ideas:', error);
@@ -92,7 +92,7 @@ export const useIdeas = () => {
   useEffect(() => {
     fetchIdeas();
 
-    // Subscribe to real-time changes
+    // Subscribe to real-time changes for ideas
     const channel = supabase
       .channel('ideas_changes')
       .on(
@@ -104,15 +104,51 @@ export const useIdeas = () => {
         },
         async (payload) => {
           console.log('Real-time update received for ideas:', payload);
-          await fetchIdeas(); // Refresh the ideas list
+          
+          // Refresh ideas list when changes occur
+          await fetchIdeas();
+          
+          // Invalidate React Query cache
+          await queryClient.invalidateQueries({ queryKey: ["my-ideas"] });
+          
+          // Show toast notification for relevant events
+          if (payload.eventType === 'INSERT') {
+            toast({
+              title: "New idea created",
+              description: "Your ideas list has been updated",
+            });
+          } else if (payload.eventType === 'UPDATE') {
+            toast({
+              title: "Idea updated",
+              description: "Changes have been saved",
+            });
+          }
+        }
+      )
+      .subscribe();
+
+    // Also subscribe to favorites changes
+    const favoritesChannel = supabase
+      .channel('favorites_changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'favorites'
+        },
+        async () => {
+          // Refresh ideas to update favorite status
+          await fetchIdeas();
           await queryClient.invalidateQueries({ queryKey: ["my-ideas"] });
         }
       )
       .subscribe();
 
-    // Cleanup subscription
+    // Cleanup subscriptions
     return () => {
       supabase.removeChannel(channel);
+      supabase.removeChannel(favoritesChannel);
     };
   }, []);
 
