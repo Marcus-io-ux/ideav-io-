@@ -20,7 +20,13 @@ const Community = () => {
     feedbackType: string;
     isCollaborative: boolean;
   }) => {
-    await handleIdeaSubmit(idea);
+    await handleIdeaSubmit({
+      title: idea.title,
+      content: idea.content,
+      channel: idea.channel,
+      feedbackType: idea.feedbackType,
+      category: idea.feedbackType // Using feedbackType as category for backward compatibility
+    });
     setIsShareModalOpen(false);
   };
 

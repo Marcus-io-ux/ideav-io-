@@ -42,7 +42,7 @@ export const IdeaComments = ({
         content,
         created_at,
         user_id,
-        profiles (
+        user:profiles!community_comments_user_id_fkey (
           username,
           avatar_url
         )
@@ -61,8 +61,8 @@ export const IdeaComments = ({
         content: comment.content,
         created_at: comment.created_at,
         author: {
-          name: comment.profiles?.username || 'Anonymous',
-          avatar: comment.profiles?.avatar_url
+          name: comment.user?.username || 'Anonymous',
+          avatar: comment.user?.avatar_url
         }
       })));
     }
