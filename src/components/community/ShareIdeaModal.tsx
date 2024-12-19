@@ -103,7 +103,7 @@ export const ShareIdeaModal = ({ isOpen, onClose, onSubmit }: ShareIdeaModalProp
                 <SelectTrigger className="w-full bg-background border-2">
                   <SelectValue placeholder="Select channel" />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent className="bg-background border shadow-lg">
                   <SelectItem value="general-ideas">General Ideas</SelectItem>
                   <SelectItem value="startups-business">Startups & Business</SelectItem>
                   <SelectItem value="tech-innovation">Tech & Innovation</SelectItem>
@@ -121,7 +121,7 @@ export const ShareIdeaModal = ({ isOpen, onClose, onSubmit }: ShareIdeaModalProp
                 <SelectTrigger className="w-full bg-background border-2">
                   <SelectValue placeholder="What feedback?" />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent className="bg-background border shadow-lg">
                   <SelectItem value="improvement">Ideas for improvement</SelectItem>
                   <SelectItem value="collaboration">Looking for collaborators</SelectItem>
                   <SelectItem value="feedback">General feedback</SelectItem>
