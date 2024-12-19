@@ -3,7 +3,6 @@ import { Auth } from "@supabase/auth-ui-react";
 import { ThemeSupa } from "@supabase/auth-ui-shared";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { AuthLogo } from "@/components/auth/AuthLogo";
 import { FAQDialog } from "@/components/auth/FAQDialog";
 
 const Login = () => {
@@ -32,8 +31,6 @@ const Login = () => {
         </div>
 
         <div className="bg-white p-8 rounded-lg shadow-md">
-          <AuthLogo />
-          
           <Auth
             supabaseClient={supabase}
             appearance={{
