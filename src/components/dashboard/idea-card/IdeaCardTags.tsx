@@ -1,4 +1,5 @@
 import { Tag } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 interface IdeaCardTagsProps {
   tags: string[];
@@ -12,7 +13,11 @@ export const IdeaCardTags = ({ tags }: IdeaCardTagsProps) => {
       {tags.map((tag, index) => (
         <div
           key={index}
-          className="flex items-center gap-1 px-2 py-1 bg-secondary/50 text-secondary-foreground rounded-full text-sm"
+          className={cn(
+            "flex items-center gap-1 px-2 py-1",
+            "bg-secondary/50 text-secondary-foreground",
+            "rounded-full text-sm"
+          )}
         >
           <Tag className="h-3 w-3" />
           <span>{tag}</span>
