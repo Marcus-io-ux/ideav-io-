@@ -3,7 +3,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { IdeaCardActions } from "./IdeaCardActions";
 import { formatDistanceToNow } from "date-fns";
 import { Author } from "@/types/author";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { IdeaComments } from "./IdeaComments";
 import { Button } from "@/components/ui/button";
 import { Trash2 } from "lucide-react";
@@ -123,38 +123,8 @@ export const IdeaCard = ({
     setCurrentComments(prev => prev + 1);
   };
 
-  // Set up real-time subscription for post deletions
-  useEffect(() => {
-    const channel = supabase
-      .channel('public:community_posts')
-      .on(
-        'postgres_changes',
-        {
-          event: 'DELETE',
-          schema: 'public',
-          table: 'community_posts',
-          filter: `id=eq.${id}`,
-        },
-        () => {
-          // Remove the post from the UI
-          const postElement = document.getElementById(`post-${id}`);
-          if (postElement) {
-            postElement.style.animation = 'fadeOut 0.3s ease-out';
-            setTimeout(() => {
-              postElement.remove();
-            }, 300);
-          }
-        }
-      )
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  }, [id]);
-
   return (
-    <Card className="w-full mb-4" id={`post-${id}`}>
+    <Card className="w-full mb-4">
       <CardHeader className="flex flex-row items-center justify-between gap-4">
         <div className="flex items-center gap-4">
           <Avatar>
