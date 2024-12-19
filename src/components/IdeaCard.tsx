@@ -11,7 +11,6 @@ import { IdeaCardMetadata } from "@/components/dashboard/idea-card/IdeaCardMetad
 import { IdeaCardTitle } from "@/components/dashboard/idea-card/IdeaCardTitle";
 import { IdeaCardSelection } from "@/components/dashboard/idea-card/IdeaCardSelection";
 import { IdeaCardFooter } from "@/components/dashboard/idea-card/IdeaCardFooter";
-import { IdeaCardTags } from "@/components/dashboard/idea-card/IdeaCardTags";
 
 interface IdeaCardProps {
   id: string;
@@ -36,7 +35,6 @@ export const IdeaCard = ({
   isFavorite = false,
   isSelected = false,
   isDraft = false,
-  tags = [],
   onSelect,
   onDelete,
   onToggleFavorite 
@@ -47,7 +45,6 @@ export const IdeaCard = ({
   const [isEditing, setIsEditing] = useState(false);
   const [editedTitle, setEditedTitle] = useState(title);
   const [editedContent, setEditedContent] = useState(content);
-  const [editedTags, setEditedTags] = useState(tags);
 
   useEffect(() => {
     setIsCurrentlyFavorite(isFavorite);
@@ -127,7 +124,6 @@ export const IdeaCard = ({
         .update({
           title: editedTitle,
           content: editedContent,
-          tags: editedTags,
           is_draft: isDraft
         })
         .eq('id', id);
@@ -160,7 +156,6 @@ export const IdeaCard = ({
       setIsEditing(false);
       setEditedTitle(title);
       setEditedContent(content);
-      setEditedTags(tags);
     }
   };
 
@@ -195,7 +190,6 @@ export const IdeaCard = ({
             />
           </div>
         </div>
-        <IdeaCardTags tags={editedTags} />
       </CardHeader>
       <CardContent className="relative pb-16">
         <IdeaCardContent
@@ -204,8 +198,6 @@ export const IdeaCard = ({
           editedContent={editedContent}
           onContentChange={setEditedContent}
           onKeyDown={handleKeyDown}
-          tags={editedTags}
-          onTagsChange={setEditedTags}
         />
         
         <IdeaCardFooter
@@ -222,7 +214,6 @@ export const IdeaCard = ({
               setIsEditing(false);
               setEditedTitle(title);
               setEditedContent(content);
-              setEditedTags(tags);
             }}
           />
         )}
