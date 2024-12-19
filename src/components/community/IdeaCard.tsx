@@ -69,12 +69,23 @@ export const IdeaCard = ({
       }
 
       if (!isCurrentlyLiked) {
-        const { error } = await supabase
+        // Check if like already exists
+        const { data: existingLike } = await supabase
           .from('community_post_likes')
-          .insert([{ post_id: id, user_id: session.user.id }]);
+          .select()
+          .eq('post_id', id)
+          .eq('user_id', session.user.id)
+          .maybeSingle();
 
-        if (error) throw error;
-        setCurrentLikes(prev => prev + 1);
+        if (!existingLike) {
+          const { error } = await supabase
+            .from('community_post_likes')
+            .insert([{ post_id: id, user_id: session.user.id }]);
+
+          if (error) throw error;
+          setCurrentLikes(prev => prev + 1);
+          setIsCurrentlyLiked(true);
+        }
       } else {
         const { error } = await supabase
           .from('community_post_likes')
@@ -83,8 +94,8 @@ export const IdeaCard = ({
 
         if (error) throw error;
         setCurrentLikes(prev => prev - 1);
+        setIsCurrentlyLiked(false);
       }
-      setIsCurrentlyLiked(!isCurrentlyLiked);
     } catch (error) {
       console.error('Error toggling like:', error);
       toast({
