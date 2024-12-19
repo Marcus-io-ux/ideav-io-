@@ -3,11 +3,12 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { DialogFooter } from "@/components/ui/dialog";
-import { Save, X, Tag } from "lucide-react";
+import { Save, X, Tag, ImagePlus } from "lucide-react";
 import { IdeaFormData } from "@/types/idea";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useQueryClient } from "@tanstack/react-query";
+import { useState } from "react";
 
 interface IdeaFormProps {
   idea: IdeaFormData;
@@ -26,6 +27,44 @@ export const IdeaForm = ({
 }: IdeaFormProps) => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const [uploading, setUploading] = useState(false);
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!e.target.files || e.target.files.length === 0) return;
+    
+    try {
+      setUploading(true);
+      const file = e.target.files[0];
+      const fileExt = file.name.split('.').pop();
+      const filePath = `${crypto.randomUUID()}.${fileExt}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from('idea-images')
+        .upload(filePath, file);
+
+      if (uploadError) throw uploadError;
+
+      const { data: { publicUrl } } = supabase.storage
+        .from('idea-images')
+        .getPublicUrl(filePath);
+
+      onIdeaChange('images', [...(idea.images || []), publicUrl]);
+      
+      toast({
+        title: "Success",
+        description: "Image uploaded successfully",
+      });
+    } catch (error) {
+      console.error('Error uploading image:', error);
+      toast({
+        title: "Error",
+        description: "Failed to upload image. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setUploading(false);
+    }
+  };
 
   const handleSubmit = async () => {
     try {
@@ -46,6 +85,7 @@ export const IdeaForm = ({
             title: idea.title,
             content: idea.content,
             tags: idea.tags,
+            images: idea.images,
             user_id: user.id,
           }
         ]);
@@ -106,6 +146,29 @@ export const IdeaForm = ({
           onChange={handleTagsChange}
         />
       </div>
+      <div className="space-y-2">
+        <Label htmlFor="image">Add Image</Label>
+        <Input
+          id="image"
+          type="file"
+          accept="image/*"
+          onChange={handleImageUpload}
+          disabled={uploading}
+          className="cursor-pointer"
+        />
+        {idea.images && idea.images.length > 0 && (
+          <div className="grid grid-cols-2 gap-2 mt-2">
+            {idea.images.map((url, index) => (
+              <img
+                key={index}
+                src={url}
+                alt={`Idea image ${index + 1}`}
+                className="w-full h-32 object-cover rounded-md"
+              />
+            ))}
+          </div>
+        )}
+      </div>
       <DialogFooter className="flex justify-between sm:justify-between">
         <div className="flex items-center gap-4">
           <Button
@@ -127,7 +190,7 @@ export const IdeaForm = ({
             Save Draft
           </Button>
         </div>
-        <Button onClick={handleSubmit} className="gap-2">
+        <Button onClick={handleSubmit} className="gap-2" disabled={uploading}>
           <Tag className="h-4 w-4" />
           Save Idea
         </Button>

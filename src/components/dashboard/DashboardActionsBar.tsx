@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { Filter, Grid, List, Search, Star } from "lucide-react";
+import { Filter, Grid, List, Search, Star, FileText } from "lucide-react";
 import { AddIdeaDialog } from "@/components/dashboard/AddIdeaDialog";
 import {
   Popover,
@@ -17,6 +17,8 @@ interface DashboardActionsBarProps {
   setViewMode: (mode: "grid" | "list") => void;
   showFavorites: boolean;
   setShowFavorites: (show: boolean) => void;
+  showDrafts: boolean;
+  setShowDrafts: (show: boolean) => void;
   handleIdeaSubmit: () => Promise<void>;
 }
 
@@ -28,14 +30,16 @@ export const DashboardActionsBar = ({
   setViewMode,
   showFavorites,
   setShowFavorites,
+  showDrafts,
+  setShowDrafts,
   handleIdeaSubmit,
 }: DashboardActionsBarProps) => {
   return (
-    <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-      <div className="text-muted-foreground">
+    <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
+      <div className="text-muted-foreground text-center sm:text-left w-full sm:w-auto">
         You have {totalIdeas} idea{totalIdeas !== 1 ? 's' : ''} stored
       </div>
-      <div className="flex items-center gap-2 ml-auto">
+      <div className="flex items-center gap-2">
         <Button
           variant="outline"
           size="icon"
@@ -59,6 +63,14 @@ export const DashboardActionsBar = ({
             />
           </PopoverContent>
         </Popover>
+        <Button
+          variant={showDrafts ? "default" : "outline"}
+          size="icon"
+          className="h-10 w-10"
+          onClick={() => setShowDrafts(!showDrafts)}
+        >
+          <FileText className="h-4 w-4" />
+        </Button>
         <Button
           variant={showFavorites ? "default" : "outline"}
           size="icon"

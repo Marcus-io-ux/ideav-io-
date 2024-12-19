@@ -15,12 +15,13 @@ const Dashboard = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [showFavorites, setShowFavorites] = useState(false);
+  const [showDrafts, setShowDrafts] = useState(false);
   const { userName } = useUserProfile();
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
   const { data: ideasData = [], isLoading } = useQuery({
-    queryKey: ["my-ideas", showFavorites],
+    queryKey: ["my-ideas", showFavorites, showDrafts],
     queryFn: async () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) {
@@ -37,6 +38,7 @@ const Dashboard = () => {
         .select("*")
         .eq("user_id", user.id)
         .eq("deleted", false)
+        .eq("is_draft", showDrafts)
         .order("created_at", { ascending: false });
 
       if (ideasError) throw ideasError;
@@ -137,6 +139,8 @@ const Dashboard = () => {
           setViewMode={setViewMode}
           showFavorites={showFavorites}
           setShowFavorites={setShowFavorites}
+          showDrafts={showDrafts}
+          setShowDrafts={setShowDrafts}
           handleIdeaSubmit={handleIdeaSubmit}
         />
 
