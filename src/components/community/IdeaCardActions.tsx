@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { Heart, MessageCircle, UserPlus2 } from "lucide-react";
+import { Heart, MessageCircle, UserPlus2, Users } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { MessageButton } from "./messaging/MessageButton";
@@ -101,16 +101,19 @@ export const IdeaCardActions = ({
         <Heart className={`h-4 w-4 ${isLiked ? "fill-current" : ""}`} />
         <span>{likeCount}</span>
       </Button>
+      
       <Button variant="ghost" size="sm" className="gap-2" onClick={onComment}>
         <MessageCircle className="h-4 w-4" />
         <span>{comments}</span>
       </Button>
       
-      <CollaborateButton
-        currentUserId={currentUserId}
-        ownerId={ownerId}
-        postId={postId}
-      />
+      {currentUserId && currentUserId !== ownerId && (
+        <CollaborateButton
+          currentUserId={currentUserId}
+          ownerId={ownerId}
+          postId={postId}
+        />
+      )}
 
       {currentUserId && currentUserId !== ownerId && (
         <Button

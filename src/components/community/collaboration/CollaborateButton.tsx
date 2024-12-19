@@ -30,15 +30,13 @@ export const CollaborateButton = ({
         <span>Collaborate</span>
       </Button>
 
-      {isCollaborateOpen && (
-        <CollaborationDialog
-          isOpen={isCollaborateOpen}
-          onClose={() => setIsCollaborateOpen(false)}
-          postId={postId}
-          ownerId={ownerId}
-          currentUserId={currentUserId}
-        />
-      )}
+      <CollaborationDialog
+        isOpen={isCollaborateOpen}
+        onClose={() => setIsCollaborateOpen(false)}
+        postId={postId}
+        ownerId={ownerId}
+        currentUserId={currentUserId}
+      />
     </>
   );
 };
