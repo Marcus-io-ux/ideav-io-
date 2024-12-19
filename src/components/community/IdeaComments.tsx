@@ -5,12 +5,13 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { formatDistanceToNow } from "date-fns";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 interface Comment {
   id: string;
   content: string;
   created_at: string;
-  profiles: {
+  user: {
     username: string;
     avatar_url: string;
   };
@@ -26,10 +27,6 @@ export const IdeaComments = ({ postId, onCommentAdded }: IdeaCommentsProps) => {
   const [newComment, setNewComment] = useState("");
   const { toast } = useToast();
 
-  useEffect(() => {
-    fetchComments();
-  }, [postId]);
-
   const fetchComments = async () => {
     try {
       const { data, error } = await supabase
@@ -38,7 +35,9 @@ export const IdeaComments = ({ postId, onCommentAdded }: IdeaCommentsProps) => {
           id,
           content,
           created_at,
-          profiles!community_comments_user_id_fkey(username, avatar_url)
+          user:user_id (
+            username:profiles!inner(username, avatar_url)
+          )
         `)
         .eq("post_id", postId)
         .order("created_at", { ascending: true });
@@ -48,11 +47,46 @@ export const IdeaComments = ({ postId, onCommentAdded }: IdeaCommentsProps) => {
         return;
       }
 
-      setComments(data || []);
+      // Transform the data to match our Comment interface
+      const formattedComments = data.map(comment => ({
+        id: comment.id,
+        content: comment.content,
+        created_at: comment.created_at,
+        user: {
+          username: comment.user?.username?.[0]?.username || "Anonymous",
+          avatar_url: comment.user?.username?.[0]?.avatar_url || ""
+        }
+      }));
+
+      setComments(formattedComments);
     } catch (error) {
       console.error("Error in fetchComments:", error);
     }
   };
+
+  useEffect(() => {
+    fetchComments();
+
+    // Set up real-time subscription for new comments
+    const subscription = supabase
+      .channel('public:community_comments')
+      .on('postgres_changes', 
+        { 
+          event: '*', 
+          schema: 'public', 
+          table: 'community_comments',
+          filter: `post_id=eq.${postId}` 
+        }, 
+        () => {
+          fetchComments();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, [postId]);
 
   const handleSubmitComment = async () => {
     if (!newComment.trim()) return;
@@ -84,7 +118,6 @@ export const IdeaComments = ({ postId, onCommentAdded }: IdeaCommentsProps) => {
     }
 
     setNewComment("");
-    fetchComments();
     if (onCommentAdded) {
       onCommentAdded();
     }
@@ -92,25 +125,27 @@ export const IdeaComments = ({ postId, onCommentAdded }: IdeaCommentsProps) => {
 
   return (
     <div className="space-y-4">
-      <div className="space-y-4">
-        {comments.map((comment) => (
-          <div key={comment.id} className="flex gap-3">
-            <Avatar className="h-8 w-8">
-              <AvatarImage src={comment.profiles?.avatar_url} />
-              <AvatarFallback>{comment.profiles?.username?.[0]?.toUpperCase()}</AvatarFallback>
-            </Avatar>
-            <div className="flex-1">
-              <div className="flex items-center gap-2">
-                <span className="font-semibold">{comment.profiles?.username}</span>
-                <span className="text-sm text-gray-500">
-                  {formatDistanceToNow(new Date(comment.created_at), { addSuffix: true })}
-                </span>
+      <ScrollArea className="h-[300px] pr-4">
+        <div className="space-y-4">
+          {comments.map((comment) => (
+            <div key={comment.id} className="flex gap-3">
+              <Avatar className="h-8 w-8">
+                <AvatarImage src={comment.user.avatar_url} />
+                <AvatarFallback>{comment.user.username[0]?.toUpperCase()}</AvatarFallback>
+              </Avatar>
+              <div className="flex-1">
+                <div className="flex items-center gap-2">
+                  <span className="font-semibold">{comment.user.username}</span>
+                  <span className="text-sm text-gray-500">
+                    {formatDistanceToNow(new Date(comment.created_at), { addSuffix: true })}
+                  </span>
+                </div>
+                <p className="text-sm text-gray-700">{comment.content}</p>
               </div>
-              <p className="text-sm text-gray-700">{comment.content}</p>
             </div>
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
+      </ScrollArea>
       <div className="flex gap-2">
         <Textarea
           value={newComment}
