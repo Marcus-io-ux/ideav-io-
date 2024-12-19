@@ -42,7 +42,7 @@ const Community = () => {
   return (
     <CommunityLayout>
       <div className="flex-1 p-4 bg-accent/5">
-        <div className="max-w-5xl mx-auto flex gap-6">
+        <div className="max-w-5xl mx-auto flex flex-col lg:flex-row gap-6">
           {/* Main Content */}
           <div className="flex-1 space-y-4">
             <div className="flex justify-between items-center mb-6">
@@ -83,9 +83,9 @@ const Community = () => {
             </div>
           </div>
 
-          {/* Guidelines Sidebar */}
-          <div className="hidden md:block w-80">
-            <Card className="p-6">
+          {/* Guidelines Sidebar - Now with responsive design */}
+          <div className="lg:w-80 order-first lg:order-last">
+            <Card className="p-6 sticky top-4">
               <h2 className="text-lg font-semibold mb-4">Community Guidelines</h2>
               <div className="space-y-4 text-sm text-muted-foreground">
                 <p>1. Be respectful and constructive in your feedback</p>
