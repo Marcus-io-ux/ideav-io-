@@ -16,6 +16,17 @@ interface Comment {
   created_at: string;
 }
 
+interface CommentResponse {
+  id: string;
+  content: string;
+  created_at: string;
+  user_id: string;
+  user: {
+    username: string | null;
+    avatar_url: string | null;
+  } | null;
+}
+
 interface IdeaCommentsProps {
   postId: string;
   onCommentAdded: () => void;
@@ -56,13 +67,14 @@ export const IdeaComments = ({
     }
 
     if (data) {
-      setComments(data.map(comment => ({
+      const typedData = data as CommentResponse[];
+      setComments(typedData.map(comment => ({
         id: comment.id,
         content: comment.content,
         created_at: comment.created_at,
         author: {
           name: comment.user?.username || 'Anonymous',
-          avatar: comment.user?.avatar_url
+          avatar: comment.user?.avatar_url || undefined
         }
       })));
     }
