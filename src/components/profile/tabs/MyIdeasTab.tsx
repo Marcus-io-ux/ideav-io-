@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { IdeaCard } from "@/components/IdeaCard";
 import { SearchBar } from "@/components/SearchBar";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
@@ -8,6 +8,9 @@ import { useToast } from "@/hooks/use-toast";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { IdeaForm } from "@/components/dashboard/IdeaForm";
 import { IdeaFormData } from "@/types/idea";
+import { Button } from "@/components/ui/button";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
+import { Trash2 } from "lucide-react";
 
 interface Idea extends Omit<IdeaFormData, 'tags'> {
   id: string;
@@ -28,14 +31,13 @@ export const MyIdeasTab = () => {
   const { data: ideas = [] } = useQuery({
     queryKey: ["my-ideas"],
     queryFn: async () => {
-      const { data: sessionData } = await supabase.auth.getUser();
-      if (!sessionData.user) throw new Error("No user found");
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error("No user found");
 
       const { data, error } = await supabase
         .from("ideas")
         .select("*")
-        .eq("user_id", sessionData.user.id)
-        .eq("deleted", false)
+        .eq("user_id", user.id)
         .order("created_at", { ascending: false });
 
       if (error) throw error;
@@ -46,40 +48,6 @@ export const MyIdeasTab = () => {
       }));
     },
   });
-
-  useEffect(() => {
-    const setupRealtimeSubscription = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return;
-
-      // Subscribe to real-time changes
-      const channel = supabase
-        .channel('ideas_changes')
-        .on(
-          'postgres_changes',
-          {
-            event: '*',
-            schema: 'public',
-            table: 'ideas',
-          },
-          async () => {
-            console.log('Ideas changed, refreshing...');
-            await queryClient.invalidateQueries({ queryKey: ["my-ideas"] });
-            toast({
-              title: "Ideas updated",
-              description: "Your ideas list has been refreshed",
-            });
-          }
-        )
-        .subscribe();
-
-      return () => {
-        supabase.removeChannel(channel);
-      };
-    };
-
-    setupRealtimeSubscription();
-  }, [queryClient, toast]);
 
   const handleEditIdea = (id: string) => {
     const ideaToEdit = ideas.find(idea => idea.id === id);
@@ -120,21 +88,71 @@ export const MyIdeasTab = () => {
     }
   };
 
+  const handleDeleteAllIdeas = async () => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error("No user found");
+
+      const { error } = await supabase
+        .from('ideas')
+        .delete()
+        .eq('user_id', user.id);
+
+      if (error) throw error;
+
+      toast({
+        title: "Success",
+        description: "All ideas have been permanently deleted",
+      });
+
+      await queryClient.invalidateQueries({ queryKey: ["my-ideas"] });
+    } catch (error) {
+      console.error('Error deleting all ideas:', error);
+      toast({
+        title: "Error",
+        description: "Failed to delete ideas. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
+
   const filteredIdeas = ideas.filter(
     idea =>
       idea.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       idea.content.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  const handleIdeaSubmit = async () => {
-    await queryClient.invalidateQueries({ queryKey: ["my-ideas"] });
-  };
-
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <SearchBar onSearch={setSearchQuery} />
-        <AddIdeaDialog buttonText="Add New Idea" onIdeaSubmit={handleIdeaSubmit} />
+        <div className="flex items-center gap-4">
+          <AddIdeaDialog buttonText="Add New Idea" onIdeaSubmit={async () => {
+            await queryClient.invalidateQueries({ queryKey: ["my-ideas"] });
+          }} />
+          <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <Button variant="destructive" className="flex items-center gap-2">
+                <Trash2 className="h-4 w-4" />
+                Delete All Ideas
+              </Button>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Delete All Ideas?</AlertDialogTitle>
+                <AlertDialogDescription>
+                  This action cannot be undone. This will permanently delete all your ideas, including those in trash.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                <AlertDialogAction onClick={handleDeleteAllIdeas} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+                  Yes, delete all
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
+        </div>
       </div>
 
       <div className="grid gap-6">
