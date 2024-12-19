@@ -1,88 +1,48 @@
 import { Auth } from "@supabase/auth-ui-react";
 import { ThemeSupa } from "@supabase/auth-ui-shared";
 import { supabase } from "@/integrations/supabase/client";
-import { useNavigate, Link } from "react-router-dom";
-import { useEffect } from "react";
-import { FAQDialog } from "@/components/auth/FAQDialog";
 import { useToast } from "@/hooks/use-toast";
 
 const Login = () => {
-  const navigate = useNavigate();
   const { toast } = useToast();
 
-  useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      if (session) {
-        navigate("/dashboard");
-      }
-    });
-
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
-      if (session) {
-        navigate("/dashboard");
-      }
-    });
-
-    return () => subscription.unsubscribe();
-  }, [navigate]);
-
   return (
-    <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white">
-      <nav className="container mx-auto px-4 py-6 flex justify-between items-center">
-        <Link 
-          to="/" 
-          className="text-2xl font-bold text-primary hover:opacity-80 transition-opacity"
-        >
-          IdeaVault
-        </Link>
-        <div className="flex gap-4 items-center">
-          <FAQDialog />
-        </div>
-      </nav>
-
-      <div className="max-w-md mx-auto px-4 py-12">
-        <div className="text-center mb-8">
-          <h2 className="text-3xl font-bold text-gray-900">Welcome Back!</h2>
-          <p className="mt-2 text-sm text-gray-600">
-            Sign in to continue your journey with Idea Vault
+    <div className="flex min-h-screen bg-background">
+      <div className="relative flex-1 hidden h-full lg:block">
+        <div className="absolute inset-0 bg-muted" />
+      </div>
+      <div className="flex flex-1 flex-col justify-center px-4 py-12">
+        <div className="mx-auto w-full max-w-sm">
+          <h1 className="text-3xl font-bold tracking-tight">Welcome back</h1>
+          <p className="mt-2 text-muted-foreground">
+            Sign in to your account to continue
           </p>
-        </div>
-
-        <div className="bg-white p-8 rounded-lg shadow-md">
-          <Auth
-            supabaseClient={supabase}
-            appearance={{
-              theme: ThemeSupa,
-              variables: {
-                default: {
-                  colors: {
-                    brand: '#2563eb',
-                    brandAccent: '#1d4ed8',
+          <div className="mt-8">
+            <Auth
+              supabaseClient={supabase}
+              appearance={{
+                theme: ThemeSupa,
+                variables: {
+                  default: {
+                    colors: {
+                      brand: "rgb(var(--primary))",
+                      brandAccent: "rgb(var(--primary))",
+                    },
                   },
                 },
-              },
-              className: {
-                container: 'space-y-4',
-                label: 'block text-sm font-medium text-gray-700',
-                input: 'mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm placeholder-gray-400 shadow-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary',
-                button: 'w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary',
-              },
-            }}
-            providers={[]}
-            redirectTo={`${window.location.origin}/dashboard`}
-            localization={{
-              variables: {
-                sign_in: {
-                  email_label: 'Email',
-                  password_label: 'Password',
-                  button_label: 'Sign In',
-                  loading_button_label: 'Signing in...',
-                }
-              }
-            }}
-          />
+              }}
+              providers={[]}
+              redirectTo={`${window.location.origin}/dashboard`}
+              localization={{
+                variables: {
+                  sign_in: {
+                    email_label: "Email address",
+                    password_label: "Password",
+                  },
+                },
+              }}
+            />
+          </div>
         </div>
       </div>
     </div>

@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { IdeaCard as CommunityIdeaCard } from "@/components/community/IdeaCard";
+import { IdeaCard } from "@/components/community/IdeaCard";
 
 interface SharedIdea {
   id: string;
@@ -41,17 +41,14 @@ export const SharedIdeasTab = () => {
         .order("created_at", { ascending: false });
 
       if (error) throw error;
-      return data.map(idea => ({
-        ...idea,
-        emoji_reactions: idea.emoji_reactions as Record<string, number> || {},
-      }));
+      return data;
     },
   });
 
   return (
     <div className="space-y-6">
       {sharedIdeas.map((idea) => (
-        <CommunityIdeaCard
+        <IdeaCard
           key={idea.id}
           id={idea.id}
           title={idea.title}
@@ -62,10 +59,9 @@ export const SharedIdeasTab = () => {
           }}
           likes={idea.likes_count}
           comments={idea.comments_count}
-          tags={idea.tags || []}
+          createdAt={idea.created_at}
           category={idea.category}
           feedbackType={idea.feedback_type}
-          createdAt={idea.created_at}
           emojiReactions={idea.emoji_reactions}
         />
       ))}

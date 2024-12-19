@@ -2,11 +2,7 @@ import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { IdeaCardActions } from "./IdeaCardActions";
 import { formatDistanceToNow } from "date-fns";
-
-interface Author {
-  name: string;
-  avatar?: string;
-}
+import { Author } from "@/types/author";
 
 interface IdeaCardProps {
   id: string;
@@ -16,8 +12,12 @@ interface IdeaCardProps {
   createdAt: string;
   likes: number;
   comments: number;
-  isLiked: boolean;
-  userId: string;
+  isLiked?: boolean;
+  userId?: string;
+  isPinned?: boolean;
+  category?: string;
+  feedbackType?: string;
+  emojiReactions?: Record<string, number>;
   onLike?: () => void;
   onComment?: () => void;
 }
@@ -30,8 +30,12 @@ export const IdeaCard = ({
   createdAt,
   likes,
   comments,
-  isLiked,
+  isLiked = false,
   userId,
+  isPinned,
+  category,
+  feedbackType,
+  emojiReactions,
   onLike,
   onComment,
 }: IdeaCardProps) => {
@@ -63,13 +67,13 @@ export const IdeaCard = ({
         <div className="border-t pt-4">
           <IdeaCardActions
             postId={id}
-            ownerId={userId}
+            ownerId={userId || ''}
             isLiked={isLiked}
             likeCount={likes}
             comments={comments}
             onLike={onLike || (() => {})}
             onComment={onComment || (() => {})}
-            currentUserId={userId}
+            currentUserId={userId || null}
             authorName={author.name}
           />
         </div>
