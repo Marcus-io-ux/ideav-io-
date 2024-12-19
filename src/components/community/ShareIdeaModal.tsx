@@ -125,6 +125,8 @@ export const ShareIdeaModal = ({ isOpen, onClose, onSubmit }: ShareIdeaModalProp
                   <SelectItem value="improvement">Ideas for improvement</SelectItem>
                   <SelectItem value="collaboration">Looking for collaborators</SelectItem>
                   <SelectItem value="feedback">General feedback</SelectItem>
+                  <SelectItem value="feature">Feature request</SelectItem>
+                  <SelectItem value="bug">Bug report</SelectItem>
                 </SelectContent>
               </Select>
             </div>

@@ -18,6 +18,8 @@ const FEEDBACK_COLORS: Record<string, string> = {
   improvement: "bg-[#E5DEFF] text-[#7E69AB]",
   collaboration: "bg-[#FDE1D3] text-[#F97316]",
   feedback: "bg-[#D3E4FD] text-[#0EA5E9]",
+  feature: "bg-[#E5FFE5] text-[#16A34A]",
+  bug: "bg-[#FFE5E5] text-[#DC2626]",
   default: "bg-[#F2FCE2] text-[#7E69AB]"
 };
 
