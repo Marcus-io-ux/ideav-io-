@@ -47,6 +47,7 @@ export const IdeaCard = ({
   const [isEditing, setIsEditing] = useState(false);
   const [editedTitle, setEditedTitle] = useState(title);
   const [editedContent, setEditedContent] = useState(content);
+  const [editedTags, setEditedTags] = useState<string[]>(tags);
 
   useEffect(() => {
     setIsCurrentlyFavorite(isFavorite);
@@ -126,7 +127,7 @@ export const IdeaCard = ({
         .update({
           title: editedTitle,
           content: editedContent,
-          tags: tags,
+          tags: editedTags,
           is_draft: isDraft
         })
         .eq('id', id);
@@ -159,7 +160,13 @@ export const IdeaCard = ({
       setIsEditing(false);
       setEditedTitle(title);
       setEditedContent(content);
+      setEditedTags(tags);
     }
+  };
+
+  const handleTagsChange = (value: string) => {
+    const newTags = value.split(',').map(tag => tag.trim()).filter(Boolean);
+    setEditedTags(newTags);
   };
 
   return (
@@ -193,9 +200,11 @@ export const IdeaCard = ({
             />
           </div>
         </div>
-        {tags && tags.length > 0 && (
-          <IdeaCardTags tags={tags} />
-        )}
+        <IdeaCardTags 
+          tags={isEditing ? editedTags : tags}
+          isEditing={isEditing}
+          onTagsChange={handleTagsChange}
+        />
       </CardHeader>
       <CardContent className="relative pb-16">
         <IdeaCardContent
@@ -220,6 +229,7 @@ export const IdeaCard = ({
               setIsEditing(false);
               setEditedTitle(title);
               setEditedContent(content);
+              setEditedTags(tags);
             }}
           />
         )}

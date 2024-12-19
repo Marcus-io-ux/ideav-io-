@@ -1,12 +1,27 @@
 import { Tag } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { Input } from "@/components/ui/input";
 
 interface IdeaCardTagsProps {
   tags: string[];
+  isEditing?: boolean;
+  onTagsChange?: (value: string) => void;
 }
 
-export const IdeaCardTags = ({ tags }: IdeaCardTagsProps) => {
-  if (!tags || tags.length === 0) return null;
+export const IdeaCardTags = ({ tags, isEditing, onTagsChange }: IdeaCardTagsProps) => {
+  if (!tags || tags.length === 0 && !isEditing) return null;
+
+  if (isEditing) {
+    return (
+      <Input
+        placeholder="Enter tags separated by commas"
+        value={tags.join(', ')}
+        onChange={(e) => onTagsChange?.(e.target.value)}
+        onClick={(e) => e.stopPropagation()}
+        className="mt-2"
+      />
+    );
+  }
 
   return (
     <div className="flex flex-wrap gap-2 mt-2">

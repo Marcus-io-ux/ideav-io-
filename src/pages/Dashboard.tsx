@@ -169,13 +169,8 @@ const Dashboard = () => {
             >
               <Star className={cn("h-4 w-4", showFavorites && "fill-current")} />
             </Button>
-            <Button
-              variant="outline"
-              size="icon"
-              className="h-10 w-10"
-            >
-              <Filter className="h-4 w-4" />
-            </Button>
+          </div>
+          <div className="flex items-center gap-2">
             <AddIdeaDialog onIdeaSubmit={handleIdeaSubmit} />
           </div>
         </div>
