@@ -7,7 +7,7 @@ import { useUserProfile } from "@/hooks/use-user-profile";
 import { AddIdeaDialog } from "@/components/dashboard/AddIdeaDialog";
 import { IdeasGrid } from "@/components/dashboard/IdeasGrid";
 import { Button } from "@/components/ui/button";
-import { Calendar, Filter, Grid, List, Search, Star } from "lucide-react";
+import { Filter, Grid, List, Search } from "lucide-react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -17,20 +17,17 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { DatePicker } from "@/components/ui/date-picker";
 
 const Dashboard = () => {
   const [isFeedbackModalOpen, setIsFeedbackModalOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
-  const [showFavorites, setShowFavorites] = useState(false);
-  const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
   const { userName } = useUserProfile();
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
   const { data: ideas = [], isLoading } = useQuery({
-    queryKey: ["my-ideas", showFavorites, selectedDate],
+    queryKey: ["my-ideas"],
     queryFn: async () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) {
@@ -42,35 +39,17 @@ const Dashboard = () => {
         throw new Error("No user found");
       }
 
-      let query = supabase
+      const { data, error } = await supabase
         .from("ideas")
-        .select("*, favorites(id)")
+        .select("*")
         .eq("user_id", user.id)
-        .eq("deleted", false);
-
-      if (showFavorites) {
-        query = query.not("favorites", "is", null);
-      }
-
-      if (selectedDate) {
-        const startOfDay = new Date(selectedDate);
-        startOfDay.setHours(0, 0, 0, 0);
-        const endOfDay = new Date(selectedDate);
-        endOfDay.setHours(23, 59, 59, 999);
-
-        query = query.gte("created_at", startOfDay.toISOString())
-          .lte("created_at", endOfDay.toISOString());
-      }
-
-      query = query.order("created_at", { ascending: false });
-
-      const { data, error } = await query;
+        .eq("deleted", false)
+        .order("created_at", { ascending: false });
 
       if (error) throw error;
       return data.map(idea => ({
         ...idea,
         createdAt: new Date(idea.created_at),
-        isFavorite: idea.favorites !== null && idea.favorites.length > 0
       }));
     },
   });
@@ -149,24 +128,10 @@ const Dashboard = () => {
             <Button
               variant="outline"
               size="icon"
-              className={`h-10 w-10 ${showFavorites ? 'text-primary' : ''}`}
-              onClick={() => setShowFavorites(!showFavorites)}
+              className="h-10 w-10"
             >
-              <Star className={`h-4 w-4 ${showFavorites ? 'fill-current' : ''}`} />
+              <Filter className="h-4 w-4" />
             </Button>
-            <Popover>
-              <PopoverTrigger asChild>
-                <Button variant="outline" size="icon" className="h-10 w-10">
-                  <Calendar className="h-4 w-4" />
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-auto p-0" align="start">
-                <DatePicker
-                  selected={selectedDate}
-                  onSelect={setSelectedDate}
-                />
-              </PopoverContent>
-            </Popover>
             <AddIdeaDialog onIdeaSubmit={handleIdeaSubmit} />
           </div>
         </div>
