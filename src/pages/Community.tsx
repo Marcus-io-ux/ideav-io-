@@ -59,7 +59,6 @@ const Community = () => {
                 title={post.title}
                 content={post.content}
                 author={{
-                  id: post.user_id,
                   name: post.author?.username || "Anonymous",
                   avatar: post.author?.avatar_url || undefined,
                 }}
@@ -68,7 +67,7 @@ const Community = () => {
                 tags={[]}
                 category={post.category}
                 feedbackType={post.feedback_type}
-                createdAt={new Date(post.created_at)}
+                createdAt={post.created_at}
                 isPinned={post.is_pinned}
                 emojiReactions={post.emoji_reactions}
               />

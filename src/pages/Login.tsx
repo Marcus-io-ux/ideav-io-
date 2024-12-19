@@ -72,13 +72,6 @@ const Login = () => {
             }}
             providers={[]}
             redirectTo={`${window.location.origin}/dashboard`}
-            onError={(error) => {
-              toast({
-                title: "Authentication Error",
-                description: error.message,
-                variant: "destructive",
-              });
-            }}
             localization={{
               variables: {
                 sign_in: {
