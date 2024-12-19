@@ -1,25 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { IdeaCard } from "@/components/community/IdeaCard";
-
-interface SharedIdea {
-  id: string;
-  title: string;
-  content: string;
-  user_id: string;
-  created_at: string;
-  tags: string[];
-  likes_count: number;
-  comments_count: number;
-  channel: string;
-  emoji_reactions: Record<string, number>;
-  category?: string;
-  feedback_type?: string;
-  profiles?: {
-    username: string | null;
-    avatar_url: string | null;
-  } | null;
-}
+import { SharedIdea } from "@/types/shared-idea";
 
 export const SharedIdeasTab = () => {
   const { data: sharedIdeas = [] } = useQuery<SharedIdea[]>({
@@ -41,7 +23,7 @@ export const SharedIdeasTab = () => {
         .order("created_at", { ascending: false });
 
       if (error) throw error;
-      return data;
+      return data as SharedIdea[];
     },
   });
 
@@ -57,12 +39,12 @@ export const SharedIdeasTab = () => {
             name: idea.profiles?.username || "Anonymous",
             avatar: idea.profiles?.avatar_url || undefined,
           }}
-          likes={idea.likes_count}
-          comments={idea.comments_count}
-          createdAt={idea.created_at}
-          category={idea.category}
-          feedbackType={idea.feedback_type}
-          emojiReactions={idea.emoji_reactions}
+          likes={idea.likes_count || 0}
+          comments={idea.comments_count || 0}
+          createdAt={idea.created_at || ""}
+          category={idea.category || undefined}
+          feedbackType={idea.feedback_type || undefined}
+          emojiReactions={idea.emoji_reactions || {}}
         />
       ))}
       {sharedIdeas.length === 0 && (

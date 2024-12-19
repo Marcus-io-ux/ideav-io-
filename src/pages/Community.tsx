@@ -64,10 +64,9 @@ const Community = () => {
                 }}
                 likes={post.likes_count}
                 comments={post.comments_count}
-                tags={[]}
+                createdAt={post.created_at}
                 category={post.category}
                 feedbackType={post.feedback_type}
-                createdAt={post.created_at}
                 isPinned={post.is_pinned}
                 emojiReactions={post.emoji_reactions}
               />
