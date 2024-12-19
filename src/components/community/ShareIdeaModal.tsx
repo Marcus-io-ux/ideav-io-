@@ -54,7 +54,6 @@ export const ShareIdeaModal = ({ isOpen, onClose, onSubmit }: ShareIdeaModalProp
       return;
     }
 
-    // Create tags array with feedback type
     const tags = feedbackType ? [feedbackType] : [];
 
     onSubmit({
@@ -115,8 +114,6 @@ export const ShareIdeaModal = ({ isOpen, onClose, onSubmit }: ShareIdeaModalProp
                   <SelectItem value="lifestyle-wellness">Lifestyle & Wellness</SelectItem>
                   <SelectItem value="design-creativity">Design & Creativity</SelectItem>
                   <SelectItem value="apps-tech-tools">Apps & Tech Tools</SelectItem>
-                  <SelectItem value="user-feedback">User Feedback</SelectItem>
-                  <SelectItem value="collaboration">Collaboration Corner</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -128,7 +125,6 @@ export const ShareIdeaModal = ({ isOpen, onClose, onSubmit }: ShareIdeaModalProp
                 </SelectTrigger>
                 <SelectContent className="bg-background border shadow-lg">
                   <SelectItem value="improvement">Ideas for improvement</SelectItem>
-                  <SelectItem value="collaboration">Looking for collaborators</SelectItem>
                   <SelectItem value="feedback">General feedback</SelectItem>
                   <SelectItem value="feature">Feature request</SelectItem>
                   <SelectItem value="bug">Bug report</SelectItem>

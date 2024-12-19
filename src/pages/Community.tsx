@@ -13,6 +13,14 @@ const Community = () => {
   const { channelId = "general-ideas" } = useParams();
   const { posts, handleIdeaSubmit } = useCommunityPosts(channelId);
 
+  // Function to format channel name
+  const formatChannelName = (channelId: string) => {
+    return channelId
+      .split('-')
+      .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(' ');
+  };
+
   const handleSubmit = async (idea: { 
     title: string; 
     content: string; 
@@ -37,7 +45,8 @@ const Community = () => {
         <div className="max-w-5xl mx-auto flex gap-6">
           {/* Main Content */}
           <div className="flex-1 space-y-4">
-            <div className="flex justify-end mb-6">
+            <div className="flex justify-between items-center mb-6">
+              <h1 className="text-2xl font-bold">{formatChannelName(channelId)}</h1>
               <Button
                 onClick={() => setIsShareModalOpen(true)}
                 className="gap-2"
