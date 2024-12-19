@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { IdeaForm } from "./IdeaForm";
 import { useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
+import { Plus } from "lucide-react";
 
 export interface AddIdeaDialogProps {
   buttonText?: string;
@@ -48,7 +49,10 @@ export function AddIdeaDialog({ buttonText = "Add Idea", onIdeaSubmit }: AddIdea
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button>{buttonText}</Button>
+        <Button className="flex items-center gap-2">
+          <Plus className="h-4 w-4" />
+          {buttonText}
+        </Button>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
