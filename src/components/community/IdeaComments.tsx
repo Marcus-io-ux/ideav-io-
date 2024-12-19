@@ -11,9 +11,9 @@ interface Comment {
   content: string;
   created_at: string;
   profiles: {
-    username: string;
-    avatar_url: string;
-  };
+    username: string | null;
+    avatar_url: string | null;
+  } | null;
 }
 
 interface IdeaCommentsProps {
@@ -38,7 +38,7 @@ export const IdeaComments = ({ postId, onCommentAdded }: IdeaCommentsProps) => {
           id,
           content,
           created_at,
-          profiles!community_comments_user_id_fkey(username, avatar_url)
+          profiles (username, avatar_url)
         `)
         .eq("post_id", postId)
         .order("created_at", { ascending: true });
@@ -96,12 +96,12 @@ export const IdeaComments = ({ postId, onCommentAdded }: IdeaCommentsProps) => {
         {comments.map((comment) => (
           <div key={comment.id} className="flex gap-3">
             <Avatar className="h-8 w-8">
-              <AvatarImage src={comment.profiles?.avatar_url} />
-              <AvatarFallback>{comment.profiles?.username?.[0]?.toUpperCase()}</AvatarFallback>
+              <AvatarImage src={comment.profiles?.avatar_url || undefined} />
+              <AvatarFallback>{comment.profiles?.username?.[0]?.toUpperCase() || '?'}</AvatarFallback>
             </Avatar>
             <div className="flex-1">
               <div className="flex items-center gap-2">
-                <span className="font-semibold">{comment.profiles?.username}</span>
+                <span className="font-semibold">{comment.profiles?.username || 'Anonymous'}</span>
                 <span className="text-sm text-gray-500">
                   {formatDistanceToNow(new Date(comment.created_at), { addSuffix: true })}
                 </span>

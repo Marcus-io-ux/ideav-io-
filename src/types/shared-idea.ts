@@ -13,6 +13,7 @@ export interface SharedIdea {
   feedback_type: string | null;
   is_pinned: boolean | null;
   likes_count: number | null;
+  tags: string[] | null;
   profiles?: {
     username: string | null;
     avatar_url: string | null;
