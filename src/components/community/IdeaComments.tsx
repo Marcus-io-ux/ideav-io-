@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -10,7 +10,7 @@ interface Comment {
   id: string;
   content: string;
   created_at: string;
-  user: {
+  profiles: {
     username: string;
     avatar_url: string;
   };
@@ -18,31 +18,40 @@ interface Comment {
 
 interface IdeaCommentsProps {
   postId: string;
+  onCommentAdded?: () => void;
 }
 
-export const IdeaComments = ({ postId }: IdeaCommentsProps) => {
+export const IdeaComments = ({ postId, onCommentAdded }: IdeaCommentsProps) => {
   const [comments, setComments] = useState<Comment[]>([]);
   const [newComment, setNewComment] = useState("");
   const { toast } = useToast();
 
+  useEffect(() => {
+    fetchComments();
+  }, [postId]);
+
   const fetchComments = async () => {
-    const { data, error } = await supabase
-      .from("community_comments")
-      .select(`
-        id,
-        content,
-        created_at,
-        user:profiles(username, avatar_url)
-      `)
-      .eq("post_id", postId)
-      .order("created_at", { ascending: true });
+    try {
+      const { data, error } = await supabase
+        .from("community_comments")
+        .select(`
+          id,
+          content,
+          created_at,
+          profiles!community_comments_user_id_fkey(username, avatar_url)
+        `)
+        .eq("post_id", postId)
+        .order("created_at", { ascending: true });
 
-    if (error) {
-      console.error("Error fetching comments:", error);
-      return;
+      if (error) {
+        console.error("Error fetching comments:", error);
+        return;
+      }
+
+      setComments(data || []);
+    } catch (error) {
+      console.error("Error in fetchComments:", error);
     }
-
-    setComments(data || []);
   };
 
   const handleSubmitComment = async () => {
@@ -76,6 +85,9 @@ export const IdeaComments = ({ postId }: IdeaCommentsProps) => {
 
     setNewComment("");
     fetchComments();
+    if (onCommentAdded) {
+      onCommentAdded();
+    }
   };
 
   return (
@@ -84,12 +96,12 @@ export const IdeaComments = ({ postId }: IdeaCommentsProps) => {
         {comments.map((comment) => (
           <div key={comment.id} className="flex gap-3">
             <Avatar className="h-8 w-8">
-              <AvatarImage src={comment.user.avatar_url} />
-              <AvatarFallback>{comment.user.username?.[0]?.toUpperCase()}</AvatarFallback>
+              <AvatarImage src={comment.profiles?.avatar_url} />
+              <AvatarFallback>{comment.profiles?.username?.[0]?.toUpperCase()}</AvatarFallback>
             </Avatar>
             <div className="flex-1">
               <div className="flex items-center gap-2">
-                <span className="font-semibold">{comment.user.username}</span>
+                <span className="font-semibold">{comment.profiles?.username}</span>
                 <span className="text-sm text-gray-500">
                   {formatDistanceToNow(new Date(comment.created_at), { addSuffix: true })}
                 </span>
