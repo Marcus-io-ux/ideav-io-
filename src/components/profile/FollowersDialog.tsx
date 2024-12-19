@@ -15,13 +15,20 @@ interface FollowersDialogProps {
   type: "followers" | "following";
 }
 
+interface Profile {
+  id: string;
+  username: string;
+  avatar_url?: string;
+  bio?: string;
+}
+
 export function FollowersDialog({
   isOpen,
   onClose,
   userId,
   type,
 }: FollowersDialogProps) {
-  const [users, setUsers] = useState<any[]>([]);
+  const [users, setUsers] = useState<Profile[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -30,18 +37,23 @@ export function FollowersDialog({
       try {
         const { data, error } = await supabase
           .from("user_follows")
-          .select(
-            `${
-              type === "followers" ? "follower:profiles!follower_id(*)" : "following:profiles!following_id(*)"
-            }`
-          )
+          .select(`
+            ${type === "followers" 
+              ? "follower:profiles!user_follows_follower_id_fkey(*)" 
+              : "following:profiles!user_follows_following_id_fkey(*)"
+            }
+          `)
           .eq(type === "followers" ? "following_id" : "follower_id", userId);
 
         if (error) throw error;
 
-        setUsers(
-          data?.map((item) => (type === "followers" ? item.follower : item.following)) || []
-        );
+        const profiles = data?.map(item => 
+          type === "followers" 
+            ? (item.follower as Profile)
+            : (item.following as Profile)
+        ) || [];
+
+        setUsers(profiles);
       } catch (error) {
         console.error(`Error fetching ${type}:`, error);
       } finally {

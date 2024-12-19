@@ -5,9 +5,9 @@ export interface Author {
 
 export interface Message {
   id: string;
-  content: string;
   sender_id: string;
   recipient_id: string;
+  content: string;
   created_at: string;
   is_read: boolean;
   sender?: {

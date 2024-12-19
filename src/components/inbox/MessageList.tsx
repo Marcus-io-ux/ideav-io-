@@ -13,19 +13,19 @@ export function MessageList({ messages }: MessageListProps) {
           <div
             key={message.id}
             className={`flex ${
-              message.senderId === "me" ? "justify-end" : "justify-start"
+              message.sender_id === "me" ? "justify-end" : "justify-start"
             }`}
           >
             <div
               className={`max-w-[70%] p-3 rounded-lg ${
-                message.senderId === "me"
+                message.sender_id === "me"
                   ? "bg-primary text-primary-foreground"
                   : "bg-accent"
               }`}
             >
               <p>{message.content}</p>
               <span className="text-xs opacity-70 mt-1 block">
-                {message.timestamp}
+                {new Date(message.created_at).toLocaleString()}
               </span>
             </div>
           </div>

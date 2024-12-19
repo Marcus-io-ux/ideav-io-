@@ -8,11 +8,14 @@ export function useRealTimeMessages(userId: string | null) {
   useEffect(() => {
     if (!userId) return;
 
-    // Fetch initial messages
     const fetchMessages = async () => {
       const { data, error } = await supabase
         .from("messages")
-        .select("*, sender:profiles!sender_id(*), recipient:profiles!recipient_id(*)")
+        .select(`
+          *,
+          sender:profiles!messages_sender_id_fkey(username, avatar_url),
+          recipient:profiles!messages_recipient_id_fkey(username, avatar_url)
+        `)
         .or(`sender_id.eq.${userId},recipient_id.eq.${userId}`)
         .order("created_at", { ascending: false });
 
@@ -21,12 +24,11 @@ export function useRealTimeMessages(userId: string | null) {
         return;
       }
 
-      setMessages(data || []);
+      setMessages(data as Message[]);
     };
 
     fetchMessages();
 
-    // Subscribe to new messages
     const channel = supabase
       .channel("messages")
       .on(
@@ -39,7 +41,7 @@ export function useRealTimeMessages(userId: string | null) {
         },
         (payload) => {
           console.log("Real-time message update:", payload);
-          fetchMessages(); // Refetch messages when there's an update
+          fetchMessages();
         }
       )
       .subscribe();
