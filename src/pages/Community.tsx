@@ -13,6 +13,19 @@ const Community = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const { posts, handleIdeaSubmit } = useCommunityPosts(activeChannel);
 
+  const handleSubmit = async (idea: { 
+    title: string; 
+    content: string; 
+    channel: string; 
+    feedbackType: string; 
+    isCollaborative: boolean;
+  }) => {
+    await handleIdeaSubmit({
+      ...idea,
+      category: idea.feedbackType // Use feedbackType as category
+    });
+  };
+
   return (
     <div className="flex h-screen">
       <Sheet open={isSidebarOpen} onOpenChange={setIsSidebarOpen}>
@@ -59,6 +72,7 @@ const Community = () => {
                 title={post.title}
                 content={post.content}
                 author={{
+                  id: post.user_id || '',
                   name: post.author?.username || "Anonymous",
                   avatar: post.author?.avatar_url || undefined,
                 }}
@@ -78,7 +92,7 @@ const Community = () => {
       <ShareIdeaModal
         isOpen={isShareModalOpen}
         onClose={() => setIsShareModalOpen(false)}
-        onSubmit={handleIdeaSubmit}
+        onSubmit={handleSubmit}
       />
     </div>
   );
