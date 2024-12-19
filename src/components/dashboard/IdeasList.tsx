@@ -37,6 +37,11 @@ export const IdeasList = ({
     setSelectedIds([]);
   };
 
+  // Calculate counts
+  const activeIdeas = ideas.filter(idea => !idea.deleted);
+  const favoriteIdeas = ideas.filter(idea => !idea.deleted && idea.isFavorite);
+  const recentIdeas = activeIdeas.slice(0, 5);
+
   return (
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row justify-between items-stretch sm:items-center gap-4">
@@ -58,9 +63,9 @@ export const IdeasList = ({
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
         <TabsList className="w-full sm:w-auto grid grid-cols-3 h-auto p-1">
-          <TabsTrigger value="recent" className="px-8 py-2">Recent Ideas</TabsTrigger>
-          <TabsTrigger value="all" className="px-8 py-2">All Ideas</TabsTrigger>
-          <TabsTrigger value="favorites" className="px-8 py-2">Favorites</TabsTrigger>
+          <TabsTrigger value="recent" className="px-8 py-2">Recent Ideas ({recentIdeas.length})</TabsTrigger>
+          <TabsTrigger value="all" className="px-8 py-2">All Ideas ({activeIdeas.length})</TabsTrigger>
+          <TabsTrigger value="favorites" className="px-8 py-2">Favorites ({favoriteIdeas.length})</TabsTrigger>
         </TabsList>
         
         <TabsContent value="recent">

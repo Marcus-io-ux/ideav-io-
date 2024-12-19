@@ -20,29 +20,22 @@ export const AllIdeasTab = ({
   const activeIdeas = ideas.filter(idea => !idea.deleted);
   
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h2 className="text-lg font-semibold text-muted-foreground">
-          All Ideas ({activeIdeas.length})
-        </h2>
-      </div>
-      <div className="grid gap-6">
-        {activeIdeas.map((idea) => (
-          <IdeaCard
-            key={idea.id}
-            {...idea}
-            isSelected={selectedIds.includes(idea.id)}
-            onSelect={onSelect}
-            onEdit={onEdit}
-            onDelete={onDelete}
-          />
-        ))}
-        {activeIdeas.length === 0 && (
-          <div className="text-center py-12">
-            <p className="text-muted-foreground">No ideas found</p>
-          </div>
-        )}
-      </div>
+    <div className="grid gap-6">
+      {activeIdeas.map((idea) => (
+        <IdeaCard
+          key={idea.id}
+          {...idea}
+          isSelected={selectedIds.includes(idea.id)}
+          onSelect={onSelect}
+          onEdit={onEdit}
+          onDelete={onDelete}
+        />
+      ))}
+      {activeIdeas.length === 0 && (
+        <div className="text-center py-12">
+          <p className="text-muted-foreground">No ideas found</p>
+        </div>
+      )}
     </div>
   );
 };
