@@ -25,6 +25,7 @@ interface IdeaCardProps {
   category?: string;
   feedbackType?: string;
   emojiReactions?: Record<string, number>;
+  tags?: string[];
   onLike?: () => void;
   onComment?: () => void;
 }

@@ -27,7 +27,7 @@ const Community = () => {
       channel: idea.channel,
       category: idea.feedbackType,
       feedbackType: idea.feedbackType,
-      tags: idea.tags,
+      tags: [...idea.tags, idea.feedbackType],
     });
   };
 
@@ -77,17 +77,17 @@ const Community = () => {
                 title={post.title}
                 content={post.content}
                 author={{
-                  id: post.user_id,
-                  name: post.author?.username || "Anonymous",
-                  avatar: post.author?.avatar_url,
+                  id: post.user_id || '',
+                  name: post.profiles?.username || "Anonymous",
+                  avatar: post.profiles?.avatar_url,
                 }}
-                likes={post.likes_count}
-                comments={post.comments_count}
-                createdAt={post.created_at}
+                likes={post.likes_count || 0}
+                comments={post.comments_count || 0}
+                createdAt={post.created_at || ""}
                 category={post.category}
                 feedbackType={post.feedback_type}
                 isPinned={post.is_pinned}
-                emojiReactions={post.emoji_reactions}
+                emojiReactions={post.emoji_reactions || {}}
                 tags={post.tags || []}
               />
             ))}

@@ -18,4 +18,9 @@ export interface SharedIdea {
     username: string | null;
     avatar_url: string | null;
   } | null;
+  author?: {
+    id: string;
+    name: string;
+    avatar?: string;
+  };
 }

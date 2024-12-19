@@ -23,7 +23,15 @@ export const SharedIdeasTab = () => {
         .order("created_at", { ascending: false });
 
       if (error) throw error;
-      return data as SharedIdea[];
+      
+      return data.map((post: SharedIdea) => ({
+        ...post,
+        author: {
+          id: post.user_id || '',
+          name: post.profiles?.username || "Anonymous",
+          avatar: post.profiles?.avatar_url,
+        }
+      }));
     },
   });
 
@@ -35,16 +43,14 @@ export const SharedIdeasTab = () => {
           id={idea.id}
           title={idea.title}
           content={idea.content}
-          author={{
-            name: idea.profiles?.username || "Anonymous",
-            avatar: idea.profiles?.avatar_url || undefined,
-          }}
+          author={idea.author!}
           likes={idea.likes_count || 0}
           comments={idea.comments_count || 0}
           createdAt={idea.created_at || ""}
           category={idea.category || undefined}
           feedbackType={idea.feedback_type || undefined}
           emojiReactions={idea.emoji_reactions || {}}
+          tags={idea.tags || []}
         />
       ))}
       {sharedIdeas.length === 0 && (
