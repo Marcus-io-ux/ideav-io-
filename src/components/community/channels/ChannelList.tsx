@@ -8,6 +8,7 @@ interface Channel {
   id: string;
   name: string;
   icon: React.ReactNode;
+  unreadCount?: number; // Added this optional property
 }
 
 const channels: Channel[] = [
