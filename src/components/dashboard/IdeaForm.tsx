@@ -7,6 +7,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Switch } from "@/components/ui/switch";
 import { Save, X, Tag } from "lucide-react";
 import { IdeaFormData } from "@/types/idea";
+import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 
 interface IdeaFormProps {
   idea: IdeaFormData;
@@ -23,6 +25,48 @@ export const IdeaForm = ({
   onSaveDraft,
   onSubmit,
 }: IdeaFormProps) => {
+  const { toast } = useToast();
+
+  const handleSubmit = async () => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        toast({
+          title: "Authentication required",
+          description: "Please sign in to save ideas",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      const { error } = await supabase
+        .from('ideas')
+        .insert([
+          {
+            title: idea.title,
+            content: idea.content,
+            user_id: user.id,
+          }
+        ]);
+
+      if (error) throw error;
+
+      toast({
+        title: "Success",
+        description: "Your idea has been saved",
+      });
+
+      onSubmit();
+    } catch (error) {
+      console.error('Error saving idea:', error);
+      toast({
+        title: "Error",
+        description: "Failed to save idea. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
+
   return (
     <div className="space-y-6 py-4">
       <div className="space-y-2">
@@ -45,71 +89,6 @@ export const IdeaForm = ({
           className="min-h-[100px]"
         />
       </div>
-      <div className="grid grid-cols-2 gap-4">
-        <div className="space-y-2">
-          <Label htmlFor="channel">Channel</Label>
-          <Select 
-            value={idea.channel} 
-            onValueChange={(value) => onIdeaChange("channel", value)}
-          >
-            <SelectTrigger>
-              <SelectValue placeholder="Select channel" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="general-ideas">General Ideas</SelectItem>
-              <SelectItem value="startups-business">Startups & Business</SelectItem>
-              <SelectItem value="tech-innovation">Tech & Innovation</SelectItem>
-              <SelectItem value="lifestyle-wellness">Lifestyle & Wellness</SelectItem>
-              <SelectItem value="design-creativity">Design & Creativity</SelectItem>
-              <SelectItem value="apps-tech-tools">Apps & Tech Tools</SelectItem>
-              <SelectItem value="user-feedback">User Feedback</SelectItem>
-              <SelectItem value="collaboration">Collaboration Corner</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-        <div className="space-y-2">
-          <Label htmlFor="category">Category</Label>
-          <Select 
-            value={idea.category} 
-            onValueChange={(value) => onIdeaChange("category", value)}
-          >
-            <SelectTrigger>
-              <SelectValue placeholder="Select category" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="tech">Tech</SelectItem>
-              <SelectItem value="design">Design</SelectItem>
-              <SelectItem value="health">Health</SelectItem>
-              <SelectItem value="business">Business</SelectItem>
-              <SelectItem value="other">Other</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-      </div>
-      <div className="space-y-2">
-        <Label htmlFor="feedbackType">Feedback Type</Label>
-        <Select 
-          value={idea.feedbackType} 
-          onValueChange={(value) => onIdeaChange("feedbackType", value)}
-        >
-          <SelectTrigger>
-            <SelectValue placeholder="What feedback?" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="improvement">Ideas for improvement</SelectItem>
-            <SelectItem value="collaboration">Looking for collaborators</SelectItem>
-            <SelectItem value="feedback">General feedback</SelectItem>
-          </SelectContent>
-        </Select>
-      </div>
-      <div className="flex items-center space-x-2">
-        <Switch
-          id="share-community"
-          checked={idea.shareToCommunity}
-          onCheckedChange={(checked) => onIdeaChange("shareToCommunity", checked)}
-        />
-        <Label htmlFor="share-community">Share with Community</Label>
-      </div>
       <DialogFooter className="flex justify-between sm:justify-between">
         <div className="flex items-center gap-4">
           <Button
@@ -131,7 +110,7 @@ export const IdeaForm = ({
             Save Draft
           </Button>
         </div>
-        <Button onClick={onSubmit} className="gap-2">
+        <Button onClick={handleSubmit} className="gap-2">
           <Tag className="h-4 w-4" />
           Save Idea
         </Button>

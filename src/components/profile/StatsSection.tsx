@@ -2,6 +2,8 @@ import { useQuery } from "@tanstack/react-query";
 import { Card } from "@/components/ui/card";
 import { Lightbulb, Rocket, Users, Heart, MessageSquare } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { useEffect } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 
 interface StatCardProps {
   icon: React.ReactNode;
@@ -24,6 +26,8 @@ const StatCard = ({ icon, label, value, description }: StatCardProps) => (
 );
 
 export const StatsSection = ({ userId }: { userId: string }) => {
+  const queryClient = useQueryClient();
+
   const { data: stats } = useQuery({
     queryKey: ["user-stats", userId],
     queryFn: async () => {
@@ -39,7 +43,7 @@ export const StatsSection = ({ userId }: { userId: string }) => {
           .from("ideas")
           .select("*", { count: "exact", head: true })
           .eq("user_id", userId)
-          .eq("deleted", false), // Only count non-deleted ideas
+          .eq("deleted", false),
         supabase
           .from("community_posts")
           .select("*", { count: "exact", head: true })
@@ -73,6 +77,29 @@ export const StatsSection = ({ userId }: { userId: string }) => {
       };
     },
   });
+
+  useEffect(() => {
+    // Subscribe to changes in ideas table
+    const channel = supabase
+      .channel('stats_changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'ideas',
+          filter: `user_id=eq.${userId}`,
+        },
+        async () => {
+          await queryClient.invalidateQueries({ queryKey: ["user-stats", userId] });
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [userId, queryClient]);
 
   return (
     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">

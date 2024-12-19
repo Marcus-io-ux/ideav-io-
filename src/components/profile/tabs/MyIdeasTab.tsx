@@ -1,12 +1,16 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { IdeaCard } from "@/components/IdeaCard";
 import { SearchBar } from "@/components/SearchBar";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { AddIdeaDialog } from "@/components/dashboard/AddIdeaDialog";
+import { useToast } from "@/hooks/use-toast";
+import { useQueryClient } from "@tanstack/react-query";
 
 export const MyIdeasTab = () => {
   const [searchQuery, setSearchQuery] = useState("");
+  const queryClient = useQueryClient();
+  const { toast } = useToast();
 
   const { data: ideas = [] } = useQuery({
     queryKey: ["my-ideas"],
@@ -29,17 +33,52 @@ export const MyIdeasTab = () => {
     },
   });
 
+  useEffect(() => {
+    const { data: { user } } = supabase.auth.getUser();
+    if (!user) return;
+
+    // Subscribe to real-time changes
+    const channel = supabase
+      .channel('ideas_changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'ideas',
+          filter: `user_id=eq.${user.id}`,
+        },
+        async () => {
+          console.log('Ideas changed, refreshing...');
+          await queryClient.invalidateQueries({ queryKey: ["my-ideas"] });
+          toast({
+            title: "Ideas updated",
+            description: "Your ideas list has been refreshed",
+          });
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [queryClient, toast]);
+
   const filteredIdeas = ideas.filter(
     idea =>
       idea.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       idea.content.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
+  const handleIdeaSubmit = async () => {
+    await queryClient.invalidateQueries({ queryKey: ["my-ideas"] });
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <SearchBar onSearch={setSearchQuery} />
-        <AddIdeaDialog buttonText="Add New Idea" onIdeaSubmit={() => {}} />
+        <AddIdeaDialog buttonText="Add New Idea" onIdeaSubmit={handleIdeaSubmit} />
       </div>
 
       <div className="grid gap-6">
