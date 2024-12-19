@@ -128,16 +128,22 @@ const Dashboard = () => {
     idea.content.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
+  const dailyQuote = "The best way to predict the future is to create it."; // You can make this dynamic later
+
   return (
     <div className="min-h-screen bg-background">
       <div className="container max-w-7xl mx-auto p-6 space-y-8">
         <PageHeader
-          title="My Ideas"
+          title={`Welcome back, ${userName}!`}
           description="Your personal vault of saved and developing ideas."
         />
+        <div className="text-center text-muted-foreground italic mb-8">
+          "{dailyQuote}"
+        </div>
         
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-          <div className="flex items-center gap-2">
+          <div className="flex-1" /> {/* This empty div pushes everything to the right */}
+          <div className="flex items-center gap-2 ml-auto">
             <Button
               variant="outline"
               size="icon"
@@ -169,8 +175,6 @@ const Dashboard = () => {
             >
               <Star className={cn("h-4 w-4", showFavorites && "fill-current")} />
             </Button>
-          </div>
-          <div className="flex items-center gap-2">
             <AddIdeaDialog onIdeaSubmit={handleIdeaSubmit} />
           </div>
         </div>
