@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Users } from "lucide-react";
+import { UserPlus } from "lucide-react";
 import { CollaborationDialog } from "./CollaborationDialog";
 
 interface CollaborateButtonProps {
@@ -26,17 +26,19 @@ export const CollaborateButton = ({
         className="gap-2"
         onClick={() => setIsCollaborateOpen(true)}
       >
-        <Users className="h-4 w-4" />
+        <UserPlus className="h-4 w-4" />
         <span>Collaborate</span>
       </Button>
 
-      <CollaborationDialog
-        isOpen={isCollaborateOpen}
-        onClose={() => setIsCollaborateOpen(false)}
-        postId={postId}
-        ownerId={ownerId}
-        currentUserId={currentUserId}
-      />
+      {isCollaborateOpen && (
+        <CollaborationDialog
+          isOpen={isCollaborateOpen}
+          onClose={() => setIsCollaborateOpen(false)}
+          postId={postId}
+          ownerId={ownerId}
+          currentUserId={currentUserId}
+        />
+      )}
     </>
   );
 };

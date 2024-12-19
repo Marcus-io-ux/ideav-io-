@@ -16,17 +16,6 @@ interface Comment {
   created_at: string;
 }
 
-interface CommentResponse {
-  id: string;
-  content: string;
-  created_at: string;
-  user_id: string;
-  profiles: {
-    username: string | null;
-    avatar_url: string | null;
-  } | null;
-}
-
 interface IdeaCommentsProps {
   postId: string;
   onCommentAdded: () => void;
@@ -52,7 +41,6 @@ export const IdeaComments = ({
         id,
         content,
         created_at,
-        user_id,
         profiles:user_id (
           username,
           avatar_url
@@ -66,18 +54,15 @@ export const IdeaComments = ({
       return;
     }
 
-    if (data) {
-      const formattedComments = data.map(comment => ({
-        id: comment.id,
-        content: comment.content,
-        created_at: comment.created_at,
-        author: {
-          name: comment.profiles?.username || 'Anonymous',
-          avatar: comment.profiles?.avatar_url || undefined
-        }
-      }));
-      setComments(formattedComments);
-    }
+    setComments(data.map(comment => ({
+      id: comment.id,
+      content: comment.content,
+      created_at: comment.created_at,
+      author: {
+        name: comment.profiles?.username || 'Anonymous',
+        avatar: comment.profiles?.avatar_url
+      }
+    })));
   };
 
   const subscribeToComments = () => {

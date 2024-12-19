@@ -8,8 +8,8 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
+import { useCollaborationRequest } from "@/hooks/use-collaboration-request";
 import { useToast } from "@/hooks/use-toast";
-import { supabase } from "@/integrations/supabase/client";
 
 interface CollaborationDialogProps {
   isOpen: boolean;
@@ -27,42 +27,15 @@ export const CollaborationDialog = ({
   currentUserId,
 }: CollaborationDialogProps) => {
   const [message, setMessage] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
+  const { sendCollaborationRequest, isLoading } = useCollaborationRequest();
   const { toast } = useToast();
 
-  const handleSubmit = async () => {
+  const handleCollaborate = async () => {
     if (!message.trim()) return;
     
-    setIsLoading(true);
-    try {
-      const { error } = await supabase
-        .from('collaboration_requests')
-        .insert({
-          post_id: postId,
-          requester_id: currentUserId,
-          owner_id: ownerId,
-          message: message.trim(),
-          status: 'pending'
-        });
-
-      if (error) throw error;
-
-      toast({
-        title: "Success",
-        description: "Collaboration request sent successfully",
-      });
-      
-      onClose();
-    } catch (error) {
-      console.error('Error sending collaboration request:', error);
-      toast({
-        title: "Error",
-        description: "Failed to send collaboration request",
-        variant: "destructive",
-      });
-    } finally {
-      setIsLoading(false);
-    }
+    await sendCollaborationRequest(postId, ownerId, message);
+    setMessage("");
+    onClose();
   };
 
   return (
@@ -84,7 +57,7 @@ export const CollaborationDialog = ({
             Cancel
           </Button>
           <Button
-            onClick={handleSubmit}
+            onClick={handleCollaborate}
             disabled={!message.trim() || isLoading}
           >
             {isLoading ? "Sending..." : "Send Request"}
