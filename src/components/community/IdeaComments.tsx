@@ -41,8 +41,7 @@ export const IdeaComments = ({
         id,
         content,
         created_at,
-        user_id,
-        profiles!community_comments_user_id_fkey (
+        profiles:user_id (
           username,
           avatar_url
         )
