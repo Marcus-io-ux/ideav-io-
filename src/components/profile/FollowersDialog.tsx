@@ -22,6 +22,11 @@ interface Profile {
   bio?: string;
 }
 
+interface UserFollowData {
+  follower?: Profile;
+  following?: Profile;
+}
+
 export function FollowersDialog({
   isOpen,
   onClose,
@@ -39,19 +44,17 @@ export function FollowersDialog({
           .from("user_follows")
           .select(`
             ${type === "followers" 
-              ? "follower:profiles!user_follows_follower_id_fkey(*)" 
-              : "following:profiles!user_follows_following_id_fkey(*)"
+              ? "follower:profiles!user_follows_follower_id_fkey(id, username, avatar_url, bio)" 
+              : "following:profiles!user_follows_following_id_fkey(id, username, avatar_url, bio)"
             }
           `)
           .eq(type === "followers" ? "following_id" : "follower_id", userId);
 
         if (error) throw error;
 
-        const profiles = data?.map(item => 
-          type === "followers" 
-            ? (item.follower as Profile)
-            : (item.following as Profile)
-        ) || [];
+        const profiles = (data as UserFollowData[])?.map(item => 
+          type === "followers" ? item.follower! : item.following!
+        ).filter(Boolean) || [];
 
         setUsers(profiles);
       } catch (error) {

@@ -2,6 +2,23 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Message } from "@/types/inbox";
 
+interface MessageResponse {
+  id: string;
+  content: string;
+  sender_id: string;
+  recipient_id: string;
+  created_at: string;
+  is_read: boolean;
+  sender: {
+    username: string;
+    avatar_url?: string;
+  };
+  recipient: {
+    username: string;
+    avatar_url?: string;
+  };
+}
+
 export function useRealTimeMessages(userId: string | null) {
   const [messages, setMessages] = useState<Message[]>([]);
 
