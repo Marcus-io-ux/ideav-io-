@@ -36,6 +36,7 @@ export const SharedIdeasTab = () => {
           title={idea.title}
           content={idea.content}
           author={{
+            id: idea.user_id,
             name: idea.profiles?.username || "Anonymous",
             avatar: idea.profiles?.avatar_url || undefined,
           }}

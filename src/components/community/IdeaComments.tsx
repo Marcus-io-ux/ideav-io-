@@ -35,9 +35,7 @@ export const IdeaComments = ({ postId, onCommentAdded }: IdeaCommentsProps) => {
           id,
           content,
           created_at,
-          user:user_id (
-            username:profiles!inner(username, avatar_url)
-          )
+          user:profiles!community_comments_user_id_fkey(username, avatar_url)
         `)
         .eq("post_id", postId)
         .order("created_at", { ascending: true });
@@ -47,14 +45,13 @@ export const IdeaComments = ({ postId, onCommentAdded }: IdeaCommentsProps) => {
         return;
       }
 
-      // Transform the data to match our Comment interface
       const formattedComments = data.map(comment => ({
         id: comment.id,
         content: comment.content,
         created_at: comment.created_at,
         user: {
-          username: comment.user?.username?.[0]?.username || "Anonymous",
-          avatar_url: comment.user?.username?.[0]?.avatar_url || ""
+          username: comment.user?.username || "Anonymous",
+          avatar_url: comment.user?.avatar_url || ""
         }
       }));
 
