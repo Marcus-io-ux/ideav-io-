@@ -1,7 +1,11 @@
 import { Button } from "@/components/ui/button";
 import { AddIdeaDialog } from "@/components/dashboard/AddIdeaDialog";
 
-export const EmptyState = () => {
+interface EmptyStateProps {
+  onIdeaSubmit?: () => Promise<void>;
+}
+
+export const EmptyState = ({ onIdeaSubmit }: EmptyStateProps) => {
   return (
     <div className="flex flex-col items-center justify-center py-12 text-center space-y-4">
       <div className="rounded-full bg-primary/10 p-4">
@@ -11,7 +15,7 @@ export const EmptyState = () => {
       <p className="text-muted-foreground max-w-sm">
         You haven't saved any ideas yet. Click '+ Add New Idea' to get started!
       </p>
-      <AddIdeaDialog />
+      <AddIdeaDialog onIdeaSubmit={onIdeaSubmit} />
     </div>
   );
 };

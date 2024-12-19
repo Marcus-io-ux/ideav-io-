@@ -6,6 +6,9 @@ import { useState, useEffect } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { IdeaCardHeader } from "@/components/dashboard/idea-card/IdeaCardHeader";
 import { IdeaCardContent } from "@/components/dashboard/idea-card/IdeaCardContent";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
+import { Button } from "@/components/ui/button";
+import { Trash2 } from "lucide-react";
 
 interface IdeaCardProps {
   id: string;
@@ -107,10 +110,6 @@ export const IdeaCard = ({
 
   const handleDelete = () => {
     onDelete?.(id);
-    toast({
-      title: "Idea moved to trash",
-      description: "You can restore it from the trash tab",
-    });
   };
 
   const handleSaveEdit = async () => {
@@ -188,6 +187,43 @@ export const IdeaCard = ({
           onDelete={onDelete ? handleDelete : undefined}
         />
       </CardContent>
+      
+      {onDelete && (
+        <div className="absolute bottom-4 right-4">
+          <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-8 w-8 text-muted-foreground hover:text-destructive"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <Trash2 className="h-4 w-4" />
+              </Button>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Delete Idea</AlertDialogTitle>
+                <AlertDialogDescription>
+                  Are you sure you want to delete this idea? This action can be undone from the trash.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel onClick={(e) => e.stopPropagation()}>Cancel</AlertDialogCancel>
+                <AlertDialogAction
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleDelete();
+                  }}
+                  className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                >
+                  Delete
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
+        </div>
+      )}
     </Card>
   );
 };

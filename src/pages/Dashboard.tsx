@@ -8,10 +8,11 @@ import { AddIdeaDialog } from "@/components/dashboard/AddIdeaDialog";
 import { IdeasGrid } from "@/components/dashboard/IdeasGrid";
 import { SearchBar } from "@/components/SearchBar";
 import { Button } from "@/components/ui/button";
-import { Filter, Grid, List } from "lucide-react";
-import { useQuery } from "@tanstack/react-query";
+import { Filter, Grid, List, Trash2 } from "lucide-react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 
 const Dashboard = () => {
   const [isFeedbackModalOpen, setIsFeedbackModalOpen] = useState(false);
@@ -20,6 +21,7 @@ const Dashboard = () => {
   const [sortBy, setSortBy] = useState<"recent" | "oldest" | "alphabetical">("recent");
   const { userName } = useUserProfile();
   const { toast } = useToast();
+  const queryClient = useQueryClient();
 
   const { data: ideas = [], isLoading } = useQuery({
     queryKey: ["my-ideas"],
@@ -41,6 +43,31 @@ const Dashboard = () => {
       }));
     },
   });
+
+  const handleDeleteIdea = async (id: string) => {
+    try {
+      const { error } = await supabase
+        .from('ideas')
+        .update({ deleted: true, deleted_at: new Date().toISOString() })
+        .eq('id', id);
+
+      if (error) throw error;
+
+      await queryClient.invalidateQueries({ queryKey: ["my-ideas"] });
+      
+      toast({
+        title: "Success",
+        description: "Idea moved to trash",
+      });
+    } catch (error) {
+      console.error('Error deleting idea:', error);
+      toast({
+        title: "Error",
+        description: "Failed to delete idea. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
 
   const filteredIdeas = ideas.filter(idea =>
     idea.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -92,6 +119,7 @@ const Dashboard = () => {
           ideas={filteredIdeas}
           isLoading={isLoading}
           viewMode={viewMode}
+          onDelete={handleDeleteIdea}
         />
       </div>
 
