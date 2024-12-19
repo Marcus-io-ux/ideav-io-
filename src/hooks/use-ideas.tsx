@@ -48,61 +48,22 @@ export const useIdeas = () => {
     try {
       const { error } = await supabase
         .from('ideas')
-        .update({ 
-          deleted: true,
-          deleted_at: new Date().toISOString()
-        })
+        .delete()
         .in('id', ids);
 
       if (error) throw error;
 
-      setIdeas(ideas.map(idea => 
-        ids.includes(idea.id) 
-          ? { ...idea, deleted: true }
-          : idea
-      ));
+      setIdeas(ideas.filter(idea => !ids.includes(idea.id)));
 
       toast({
         title: "Success",
-        description: `${ids.length} idea(s) moved to trash`,
+        description: `${ids.length} idea(s) deleted`,
       });
     } catch (error) {
       console.error('Error deleting ideas:', error);
       toast({
         title: "Error",
         description: "Failed to delete ideas. Please try again.",
-        variant: "destructive",
-      });
-    }
-  };
-
-  const handleRestoreIdeas = async (ids: string[]) => {
-    try {
-      const { error } = await supabase
-        .from('ideas')
-        .update({ 
-          deleted: false,
-          deleted_at: null
-        })
-        .in('id', ids);
-
-      if (error) throw error;
-
-      setIdeas(ideas.map(idea => 
-        ids.includes(idea.id) 
-          ? { ...idea, deleted: false }
-          : idea
-      ));
-
-      toast({
-        title: "Success",
-        description: `${ids.length} idea(s) restored`,
-      });
-    } catch (error) {
-      console.error('Error restoring ideas:', error);
-      toast({
-        title: "Error",
-        description: "Failed to restore ideas. Please try again.",
         variant: "destructive",
       });
     }
@@ -115,7 +76,6 @@ export const useIdeas = () => {
   return {
     ideas,
     handleDeleteIdeas,
-    handleRestoreIdeas,
     fetchIdeas
   };
 };

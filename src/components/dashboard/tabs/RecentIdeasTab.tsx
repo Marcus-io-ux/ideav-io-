@@ -16,7 +16,7 @@ export const RecentIdeasTab = ({
   onEdit,
   onDelete,
 }: RecentIdeasTabProps) => {
-  // Filter out deleted ideas and get the most recent 5
+  // Get the most recent 5 active ideas
   const recentIdeas = ideas
     .filter(idea => !idea.deleted)
     .slice(0, 5);

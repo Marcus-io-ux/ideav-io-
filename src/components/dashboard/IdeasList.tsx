@@ -1,34 +1,12 @@
+import { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
-import { Trash2, RotateCcw } from "lucide-react";
-import { useState } from "react";
+import { Trash2 } from "lucide-react";
 import { AddIdeaDialog } from "@/components/dashboard/AddIdeaDialog";
-import { supabase } from "@/integrations/supabase/client";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
 import { RecentIdeasTab } from "./tabs/RecentIdeasTab";
 import { AllIdeasTab } from "./tabs/AllIdeasTab";
 import { FavoritesTab } from "./tabs/FavoritesTab";
-import { TrashTab } from "./tabs/TrashTab";
-
-interface Idea {
-  id: string;
-  title: string;
-  content: string;
-  tags: string[];
-  createdAt: Date;
-  isFavorite?: boolean;
-  sharedToCommunity?: boolean;
-  deleted?: boolean;
-}
+import { Idea } from "@/types/idea";
 
 interface IdeasListProps {
   ideas: Idea[];
@@ -36,23 +14,15 @@ interface IdeasListProps {
   onToggleFavorites: () => void;
   onEditIdea: (id: string) => void;
   onDeleteIdeas: (ids: string[]) => void;
-  onRestoreIdeas: (ids: string[]) => void;
 }
 
 export const IdeasList = ({
   ideas,
   onEditIdea,
   onDeleteIdeas,
-  onRestoreIdeas,
 }: IdeasListProps) => {
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [activeTab, setActiveTab] = useState("recent");
-  const [isEmptyTrashDialogOpen, setIsEmptyTrashDialogOpen] = useState(false);
-
-  // Filter ideas based on their status
-  const activeIdeas = ideas.filter(idea => !idea.deleted);
-  const favoriteIdeas = activeIdeas.filter(idea => idea.isFavorite);
-  const trashedIdeas = ideas.filter(idea => idea.deleted);
 
   const handleSelect = (id: string) => {
     setSelectedIds(prev => 
@@ -67,34 +37,11 @@ export const IdeasList = ({
     setSelectedIds([]);
   };
 
-  const handleBulkRestore = () => {
-    onRestoreIdeas(selectedIds);
-    setSelectedIds([]);
-  };
-
-  const handleEmptyTrash = async () => {
-    try {
-      const trashedIds = trashedIdeas.map(idea => idea.id);
-      
-      const { error } = await supabase
-        .from('ideas')
-        .delete()
-        .in('id', trashedIds);
-
-      if (error) throw error;
-
-      onDeleteIdeas(trashedIds);
-      setIsEmptyTrashDialogOpen(false);
-    } catch (error) {
-      console.error('Error emptying trash:', error);
-    }
-  };
-
   return (
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row justify-between items-stretch sm:items-center gap-4">
         <div className="flex flex-row items-center gap-2 w-full sm:w-auto">
-          {selectedIds.length > 0 && activeTab !== "trash" && (
+          {selectedIds.length > 0 && (
             <Button
               variant="destructive"
               size="sm"
@@ -105,62 +52,20 @@ export const IdeasList = ({
               Delete Selected ({selectedIds.length})
             </Button>
           )}
-          {selectedIds.length > 0 && activeTab === "trash" && (
-            <Button
-              variant="default"
-              size="sm"
-              onClick={handleBulkRestore}
-              className="flex-1 sm:flex-none items-center justify-center gap-2 px-4"
-            >
-              <RotateCcw className="h-4 w-4" />
-              Restore Selected ({selectedIds.length})
-            </Button>
-          )}
         </div>
-        <div className="flex flex-col gap-2">
-          <AddIdeaDialog onIdeaSubmit={() => {}} />
-          {activeTab === "trash" && trashedIdeas.length > 0 && (
-            <Button
-              variant="destructive"
-              size="sm"
-              onClick={() => setIsEmptyTrashDialogOpen(true)}
-              className="flex items-center justify-center gap-2"
-            >
-              <Trash2 className="h-4 w-4" />
-              Empty Trash ({trashedIdeas.length})
-            </Button>
-          )}
-        </div>
+        <AddIdeaDialog onIdeaSubmit={() => {}} />
       </div>
 
-      <AlertDialog open={isEmptyTrashDialogOpen} onOpenChange={setIsEmptyTrashDialogOpen}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Empty Trash?</AlertDialogTitle>
-            <AlertDialogDescription>
-              This action cannot be undone. This will permanently delete all {trashedIdeas.length} items in the trash.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>No, keep ideas</AlertDialogCancel>
-            <AlertDialogAction onClick={handleEmptyTrash} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
-              Yes, empty trash
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
-
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="w-full sm:w-auto grid grid-cols-4 h-auto p-1">
+        <TabsList className="w-full sm:w-auto grid grid-cols-3 h-auto p-1">
           <TabsTrigger value="recent" className="px-8 py-2">Recent Ideas</TabsTrigger>
-          <TabsTrigger value="all" className="px-8 py-2">All Ideas ({activeIdeas.length})</TabsTrigger>
-          <TabsTrigger value="favorites" className="px-8 py-2">Favorites ({favoriteIdeas.length})</TabsTrigger>
-          <TabsTrigger value="trash" className="px-8 py-2">Trash ({trashedIdeas.length})</TabsTrigger>
+          <TabsTrigger value="all" className="px-8 py-2">All Ideas</TabsTrigger>
+          <TabsTrigger value="favorites" className="px-8 py-2">Favorites</TabsTrigger>
         </TabsList>
         
         <TabsContent value="recent">
           <RecentIdeasTab
-            ideas={activeIdeas}
+            ideas={ideas}
             selectedIds={selectedIds}
             onSelect={handleSelect}
             onEdit={onEditIdea}
@@ -170,7 +75,7 @@ export const IdeasList = ({
         
         <TabsContent value="all">
           <AllIdeasTab
-            ideas={activeIdeas}
+            ideas={ideas}
             selectedIds={selectedIds}
             onSelect={handleSelect}
             onEdit={onEditIdea}
@@ -180,19 +85,10 @@ export const IdeasList = ({
 
         <TabsContent value="favorites">
           <FavoritesTab
-            ideas={favoriteIdeas}
+            ideas={ideas}
             selectedIds={selectedIds}
             onSelect={handleSelect}
             onEdit={onEditIdea}
-            onDelete={(id) => onDeleteIdeas([id])}
-          />
-        </TabsContent>
-
-        <TabsContent value="trash">
-          <TrashTab
-            ideas={trashedIdeas}
-            selectedIds={selectedIds}
-            onSelect={handleSelect}
             onDelete={(id) => onDeleteIdeas([id])}
           />
         </TabsContent>
