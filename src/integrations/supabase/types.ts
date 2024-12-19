@@ -267,6 +267,7 @@ export type Database = {
           deleted: boolean | null
           deleted_at: string | null
           id: string
+          is_draft: boolean | null
           title: string
           user_id: string | null
         }
@@ -276,6 +277,7 @@ export type Database = {
           deleted?: boolean | null
           deleted_at?: string | null
           id?: string
+          is_draft?: boolean | null
           title: string
           user_id?: string | null
         }
@@ -285,6 +287,7 @@ export type Database = {
           deleted?: boolean | null
           deleted_at?: string | null
           id?: string
+          is_draft?: boolean | null
           title?: string
           user_id?: string | null
         }

@@ -6,6 +6,7 @@ import { useState, useEffect } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { IdeaCardHeader } from "@/components/dashboard/idea-card/IdeaCardHeader";
 import { IdeaCardContent } from "@/components/dashboard/idea-card/IdeaCardContent";
+import { IdeaCardActions } from "@/components/dashboard/idea-card/IdeaCardActions";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { Trash2 } from "lucide-react";
@@ -17,6 +18,7 @@ interface IdeaCardProps {
   createdAt: Date;
   isFavorite?: boolean;
   isSelected?: boolean;
+  isDraft?: boolean;
   onSelect?: (id: string) => void;
   onEdit?: (id: string) => void;
   onDelete?: (id: string) => void;
@@ -30,6 +32,7 @@ export const IdeaCard = ({
   createdAt, 
   isFavorite = false,
   isSelected = false,
+  isDraft = false,
   onSelect,
   onDelete,
   onToggleFavorite 
@@ -119,6 +122,7 @@ export const IdeaCard = ({
         .update({
           title: editedTitle,
           content: editedContent,
+          is_draft: isDraft
         })
         .eq('id', id);
 
@@ -129,7 +133,7 @@ export const IdeaCard = ({
       
       toast({
         title: "Success",
-        description: "Your idea has been updated",
+        description: isDraft ? "Draft saved successfully" : "Your idea has been updated",
       });
     } catch (error) {
       console.error('Error updating idea:', error);
@@ -158,7 +162,8 @@ export const IdeaCard = ({
       className={cn(
         "w-full transition-shadow duration-300 animate-fade-in group relative dark:bg-card dark:text-card-foreground dark:border-border cursor-pointer",
         "hover:shadow-lg dark:hover:shadow-primary/5",
-        isSelected && "border-primary dark:border-primary"
+        isSelected && "border-primary dark:border-primary",
+        isDraft && "border-dashed"
       )}
       onClick={() => setIsEditing(true)}
     >
@@ -173,6 +178,7 @@ export const IdeaCard = ({
           onTitleChange={setEditedTitle}
           onKeyDown={handleKeyDown}
           id={id}
+          isDraft={isDraft}
         />
       </CardHeader>
       <CardContent>
@@ -187,6 +193,16 @@ export const IdeaCard = ({
           onDelete={onDelete ? handleDelete : undefined}
         />
       </CardContent>
+      
+      <IdeaCardActions
+        isEditing={isEditing}
+        onSave={handleSaveEdit}
+        onCancel={() => {
+          setIsEditing(false);
+          setEditedTitle(title);
+          setEditedContent(content);
+        }}
+      />
       
       {onDelete && (
         <div className="absolute bottom-4 right-4">

@@ -1,6 +1,7 @@
 import { format } from "date-fns";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
 
 interface IdeaCardHeaderProps {
   title: string;
@@ -12,6 +13,7 @@ interface IdeaCardHeaderProps {
   onTitleChange: (value: string) => void;
   onKeyDown: (e: React.KeyboardEvent) => void;
   id: string;
+  isDraft?: boolean;
 }
 
 export const IdeaCardHeader = ({
@@ -24,6 +26,7 @@ export const IdeaCardHeader = ({
   onTitleChange,
   onKeyDown,
   id,
+  isDraft,
 }: IdeaCardHeaderProps) => {
   return (
     <div className="flex items-center justify-between space-y-0 pb-2">
@@ -37,7 +40,14 @@ export const IdeaCardHeader = ({
             onClick={(e) => e.stopPropagation()}
           />
         ) : (
-          <h3 className="text-xl font-semibold">{title}</h3>
+          <div className="flex items-center gap-2">
+            <h3 className="text-xl font-semibold">{title}</h3>
+            {isDraft && (
+              <Badge variant="outline" className="text-muted-foreground">
+                Draft
+              </Badge>
+            )}
+          </div>
         )}
       </div>
       <div className="flex items-center gap-4">
