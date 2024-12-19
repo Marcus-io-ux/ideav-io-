@@ -41,16 +41,6 @@ const channels: Channel[] = [
     name: "Apps & Tech Tools", 
     path: "/community/apps-tech-tools"
   },
-  { 
-    id: "user-feedback", 
-    name: "User Feedback", 
-    path: "/community/user-feedback"
-  },
-  { 
-    id: "collaboration", 
-    name: "Collaboration Corner", 
-    path: "/community/collaboration"
-  },
 ];
 
 interface ChannelListProps {
