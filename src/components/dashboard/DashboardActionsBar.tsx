@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { Filter, Grid, List, Search, Star, Save } from "lucide-react";
+import { Filter, Grid, List, Search, Star, FileText } from "lucide-react";
 import { AddIdeaDialog } from "@/components/dashboard/AddIdeaDialog";
 import {
   Popover,
@@ -69,7 +69,7 @@ export const DashboardActionsBar = ({
           className="h-10 w-10"
           onClick={() => setShowDrafts(!showDrafts)}
         >
-          <Save className="h-4 w-4" />
+          <FileText className="h-4 w-4" />
         </Button>
         <Button
           variant={showFavorites ? "default" : "outline"}

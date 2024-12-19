@@ -2,20 +2,22 @@ export interface Idea {
   id: string;
   title: string;
   content: string;
-  createdAt: Date;
+  tags: string[];
   images?: string[];
+  createdAt: Date;
   isFavorite?: boolean;
-  isDraft?: boolean;
+  sharedToCommunity?: boolean;
   deleted?: boolean;
 }
 
 export interface IdeaFormData {
   title: string;
   content: string;
-  channel?: string;
+  tags: string[];
+  images?: string[];
   category?: string;
   feedbackType?: string;
+  channel?: string;
+  isCollaborative?: boolean;
   shareToCommunity?: boolean;
-  tags?: string[];
-  images?: string[];
 }
