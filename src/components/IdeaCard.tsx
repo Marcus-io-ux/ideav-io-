@@ -5,7 +5,10 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { cn } from "@/lib/utils";
 import { CardHeaderActions } from "@/components/dashboard/CardHeaderActions";
 import { supabase } from "@/integrations/supabase/client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { useQueryClient } from "@tanstack/react-query";
 
 interface IdeaCardProps {
   id: string;
@@ -33,11 +36,22 @@ export const IdeaCard = ({
   onToggleFavorite 
 }: IdeaCardProps) => {
   const { toast } = useToast();
+  const queryClient = useQueryClient();
   const [isCurrentlyFavorite, setIsCurrentlyFavorite] = useState(isFavorite);
+  const [isEditing, setIsEditing] = useState(false);
+  const [editedTitle, setEditedTitle] = useState(title);
+  const [editedContent, setEditedContent] = useState(content);
+  const titleInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     setIsCurrentlyFavorite(isFavorite);
   }, [isFavorite]);
+
+  useEffect(() => {
+    if (isEditing && titleInputRef.current) {
+      titleInputRef.current.focus();
+    }
+  }, [isEditing]);
 
   const handleToggleFavorite = async () => {
     try {
@@ -55,7 +69,6 @@ export const IdeaCard = ({
       }
 
       if (!isCurrentlyFavorite) {
-        // First check if the favorite already exists
         const { data: existingFavorite } = await supabase
           .from('favorites')
           .select()
@@ -65,7 +78,6 @@ export const IdeaCard = ({
           .maybeSingle();
 
         if (existingFavorite) {
-          // If it exists, just update the UI state
           setIsCurrentlyFavorite(true);
           onToggleFavorite?.(id);
           return;
@@ -112,34 +124,79 @@ export const IdeaCard = ({
     });
   };
 
-  const handleEdit = (e: React.MouseEvent) => {
+  const handleStartEdit = (e: React.MouseEvent) => {
     e.stopPropagation();
-    if (onEdit) {
-      onEdit(id);
+    setIsEditing(true);
+  };
+
+  const handleSaveEdit = async () => {
+    try {
+      const { error } = await supabase
+        .from('ideas')
+        .update({
+          title: editedTitle,
+          content: editedContent,
+        })
+        .eq('id', id);
+
+      if (error) throw error;
+
+      setIsEditing(false);
+      await queryClient.invalidateQueries({ queryKey: ["my-ideas"] });
+      
+      toast({
+        title: "Success",
+        description: "Your idea has been updated",
+      });
+    } catch (error) {
+      console.error('Error updating idea:', error);
+      toast({
+        title: "Error",
+        description: "Failed to update idea. Please try again.",
+        variant: "destructive",
+      });
     }
   };
 
-  const handleCardClick = () => {
-    if (onEdit) {
-      onEdit(id);
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      handleSaveEdit();
+    }
+    if (e.key === 'Escape') {
+      setIsEditing(false);
+      setEditedTitle(title);
+      setEditedContent(content);
     }
   };
 
   return (
     <Card 
-      onClick={handleCardClick}
       className={cn(
         "w-full transition-shadow duration-300 animate-fade-in group relative dark:bg-card dark:text-card-foreground dark:border-border",
         "hover:shadow-lg dark:hover:shadow-primary/5",
-        isSelected && "border-primary dark:border-primary",
-        onEdit && "cursor-pointer hover:bg-accent/50 dark:hover:bg-accent/10"
+        isSelected && "border-primary dark:border-primary"
       )}
     >
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-        <div className="flex items-center gap-2">
-          <CardTitle className="text-xl font-semibold">
-            {title}
-          </CardTitle>
+        <div className="flex items-center gap-2 flex-1">
+          {isEditing ? (
+            <Input
+              ref={titleInputRef}
+              value={editedTitle}
+              onChange={(e) => setEditedTitle(e.target.value)}
+              onKeyDown={handleKeyDown}
+              className="text-xl font-semibold"
+              onClick={(e) => e.stopPropagation()}
+            />
+          ) : (
+            <CardTitle 
+              className="text-xl font-semibold cursor-pointer"
+              onClick={handleStartEdit}
+            >
+              {title}
+            </CardTitle>
+          )}
         </div>
         <div className="flex items-center gap-4">
           <span className="text-sm text-muted-foreground">
@@ -155,7 +212,23 @@ export const IdeaCard = ({
         </div>
       </CardHeader>
       <CardContent className="text-muted-foreground">
-        <p>{content}</p>
+        {isEditing ? (
+          <Textarea
+            value={editedContent}
+            onChange={(e) => setEditedContent(e.target.value)}
+            onKeyDown={handleKeyDown}
+            className="min-h-[100px]"
+            onClick={(e) => e.stopPropagation()}
+            onBlur={handleSaveEdit}
+          />
+        ) : (
+          <p 
+            className="cursor-pointer"
+            onClick={handleStartEdit}
+          >
+            {content}
+          </p>
+        )}
         <div className="absolute bottom-4 right-4">
           <CardHeaderActions
             isFavorite={isCurrentlyFavorite}
