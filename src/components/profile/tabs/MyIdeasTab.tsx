@@ -56,15 +56,16 @@ export const MyIdeasTab = () => {
     }
   };
 
-  const handleUpdateIdea = async () => {
+  const handleUpdateIdea = async (data: IdeaFormData) => {
     if (!editingIdea) return;
 
     try {
       const { error } = await supabase
         .from('ideas')
         .update({
-          title: editingIdea.title,
-          content: editingIdea.content,
+          title: data.title,
+          content: data.content,
+          images: data.images,
           updated_at: new Date().toISOString(),
         })
         .eq('id', editingIdea.id);
@@ -177,11 +178,13 @@ export const MyIdeasTab = () => {
           </DialogHeader>
           {editingIdea && (
             <IdeaForm
-              idea={editingIdea}
-              onIdeaChange={(field, value) => setEditingIdea(prev => prev ? { ...prev, [field]: value } : null)}
-              onCancel={() => setEditingIdea(null)}
-              onSaveDraft={() => {}}
+              initialData={{
+                title: editingIdea.title,
+                content: editingIdea.content,
+                images: editingIdea.images,
+              }}
               onSubmit={handleUpdateIdea}
+              onCancel={() => setEditingIdea(null)}
             />
           )}
         </DialogContent>

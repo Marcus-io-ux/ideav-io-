@@ -7,16 +7,25 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { Image, X } from "lucide-react";
 
-interface IdeaFormProps {
-  onSubmit: (data: { title: string; content: string; images: string[] }) => void;
-  initialData?: {
-    title: string;
-    content: string;
-    images?: string[];
-  };
+export interface IdeaFormData {
+  title: string;
+  content: string;
+  channel?: string;
+  category?: string;
+  feedbackType?: string;
+  shareToCommunity?: boolean;
+  tags?: string[];
+  images?: string[];
 }
 
-export const IdeaForm = ({ onSubmit, initialData }: IdeaFormProps) => {
+interface IdeaFormProps {
+  initialData?: IdeaFormData;
+  onSubmit: (data: IdeaFormData) => void;
+  onCancel?: () => void;
+  onSaveDraft?: () => void;
+}
+
+export const IdeaForm = ({ initialData, onSubmit, onCancel, onSaveDraft }: IdeaFormProps) => {
   const [title, setTitle] = useState(initialData?.title || "");
   const [content, setContent] = useState(initialData?.content || "");
   const [images, setImages] = useState<string[]>(initialData?.images || []);
@@ -67,7 +76,12 @@ export const IdeaForm = ({ onSubmit, initialData }: IdeaFormProps) => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onSubmit({ title, content, images });
+    onSubmit({ 
+      title, 
+      content,
+      images,
+      ...initialData,
+    });
   };
 
   return (
@@ -131,7 +145,17 @@ export const IdeaForm = ({ onSubmit, initialData }: IdeaFormProps) => {
         </div>
       </div>
 
-      <div className="flex justify-end">
+      <div className="flex justify-end gap-2">
+        {onCancel && (
+          <Button type="button" variant="outline" onClick={onCancel}>
+            Cancel
+          </Button>
+        )}
+        {onSaveDraft && (
+          <Button type="button" variant="outline" onClick={onSaveDraft}>
+            Save as Draft
+          </Button>
+        )}
         <Button type="submit" disabled={uploading}>
           {uploading ? "Uploading..." : "Save Idea"}
         </Button>
