@@ -10,7 +10,7 @@ export const IdeaCardTags = ({ tags }: IdeaCardTagsProps) => {
       {tags.map((tag) => (
         <span
           key={tag}
-          className="px-2 py-1 bg-accent text-accent-foreground rounded-full text-sm font-medium"
+          className="px-2 py-1 bg-accent text-accent-foreground rounded-full text-sm"
         >
           {tag}
         </span>
