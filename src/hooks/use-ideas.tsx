@@ -88,6 +88,28 @@ export const useIdeas = () => {
 
   useEffect(() => {
     fetchIdeas();
+
+    // Subscribe to real-time changes
+    const channel = supabase
+      .channel('public:ideas')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'ideas'
+        },
+        async () => {
+          console.log('Real-time update received for ideas');
+          await fetchIdeas(); // Refresh the ideas list
+        }
+      )
+      .subscribe();
+
+    // Cleanup subscription
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, []);
 
   return {
