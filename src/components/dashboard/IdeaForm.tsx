@@ -8,7 +8,6 @@ import { IdeaFormData } from "@/types/idea";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useQueryClient } from "@tanstack/react-query";
-import { useState } from "react";
 
 interface IdeaFormProps {
   idea: IdeaFormData;
@@ -48,6 +47,7 @@ export const IdeaForm = ({
             content: idea.content,
             tags: idea.tags,
             user_id: user.id,
+            is_draft: false
           }
         ]);
 
@@ -66,6 +66,50 @@ export const IdeaForm = ({
       toast({
         title: "Error",
         description: "Failed to save idea. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleSaveDraft = async () => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        toast({
+          title: "Authentication required",
+          description: "Please sign in to save drafts",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      const { error } = await supabase
+        .from('ideas')
+        .insert([
+          {
+            title: idea.title,
+            content: idea.content,
+            tags: idea.tags,
+            user_id: user.id,
+            is_draft: true
+          }
+        ]);
+
+      if (error) throw error;
+
+      await queryClient.invalidateQueries({ queryKey: ["my-ideas"] });
+
+      toast({
+        title: "Success",
+        description: "Your draft has been saved",
+      });
+
+      onSaveDraft();
+    } catch (error) {
+      console.error('Error saving draft:', error);
+      toast({
+        title: "Error",
+        description: "Failed to save draft. Please try again.",
         variant: "destructive",
       });
     }
@@ -121,7 +165,7 @@ export const IdeaForm = ({
           <Button
             type="button"
             variant="outline"
-            onClick={onSaveDraft}
+            onClick={handleSaveDraft}
             className="gap-2"
           >
             <Save className="h-4 w-4" />
