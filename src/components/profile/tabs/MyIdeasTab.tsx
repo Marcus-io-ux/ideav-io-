@@ -8,9 +8,20 @@ import { useToast } from "@/hooks/use-toast";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { IdeaForm } from "@/components/dashboard/IdeaForm";
 
+interface Idea {
+  id: string;
+  title: string;
+  content: string;
+  created_at: string;
+  user_id: string;
+  deleted: boolean;
+  deleted_at: string;
+  createdAt: Date;
+}
+
 export const MyIdeasTab = () => {
   const [searchQuery, setSearchQuery] = useState("");
-  const [editingIdea, setEditingIdea] = useState<any>(null);
+  const [editingIdea, setEditingIdea] = useState<Idea | null>(null);
   const queryClient = useQueryClient();
   const { toast } = useToast();
 
@@ -36,46 +47,49 @@ export const MyIdeasTab = () => {
   });
 
   useEffect(() => {
-    const { data: { subscription } } = supabase.auth.getUser();
-    if (!subscription) return;
+    const setupRealtimeSubscription = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
 
-    // Subscribe to real-time changes
-    const channel = supabase
-      .channel('ideas_changes')
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'ideas',
-        },
-        async () => {
-          console.log('Ideas changed, refreshing...');
-          await queryClient.invalidateQueries({ queryKey: ["my-ideas"] });
-          toast({
-            title: "Ideas updated",
-            description: "Your ideas list has been refreshed",
-          });
-        }
-      )
-      .subscribe();
+      // Subscribe to real-time changes
+      const channel = supabase
+        .channel('ideas_changes')
+        .on(
+          'postgres_changes',
+          {
+            event: '*',
+            schema: 'public',
+            table: 'ideas',
+          },
+          async () => {
+            console.log('Ideas changed, refreshing...');
+            await queryClient.invalidateQueries({ queryKey: ["my-ideas"] });
+            toast({
+              title: "Ideas updated",
+              description: "Your ideas list has been refreshed",
+            });
+          }
+        )
+        .subscribe();
 
-    return () => {
-      supabase.removeChannel(channel);
+      return () => {
+        supabase.removeChannel(channel);
+      };
     };
+
+    setupRealtimeSubscription();
   }, [queryClient, toast]);
 
   const handleEditIdea = (id: string) => {
     const ideaToEdit = ideas.find(idea => idea.id === id);
     if (ideaToEdit) {
-      setEditingIdea({
-        ...ideaToEdit,
-        tags: ideaToEdit.tags || [],
-      });
+      setEditingIdea(ideaToEdit);
     }
   };
 
   const handleUpdateIdea = async () => {
+    if (!editingIdea) return;
+
     try {
       const { error } = await supabase
         .from('ideas')
@@ -145,7 +159,7 @@ export const MyIdeasTab = () => {
           {editingIdea && (
             <IdeaForm
               idea={editingIdea}
-              onIdeaChange={(field, value) => setEditingIdea(prev => ({ ...prev, [field]: value }))}
+              onIdeaChange={(field, value) => setEditingIdea(prev => prev ? { ...prev, [field]: value } : null)}
               onCancel={() => setEditingIdea(null)}
               onSaveDraft={() => {}}
               onSubmit={handleUpdateIdea}
