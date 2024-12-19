@@ -55,6 +55,22 @@ export const IdeaCard = ({
       }
 
       if (!isCurrentlyFavorite) {
+        // First check if the favorite already exists
+        const { data: existingFavorite } = await supabase
+          .from('favorites')
+          .select()
+          .eq('user_id', session.user.id)
+          .eq('idea_id', id)
+          .eq('item_type', 'idea')
+          .maybeSingle();
+
+        if (existingFavorite) {
+          // If it exists, just update the UI state
+          setIsCurrentlyFavorite(true);
+          onToggleFavorite?.(id);
+          return;
+        }
+
         const { error } = await supabase
           .from('favorites')
           .insert([
