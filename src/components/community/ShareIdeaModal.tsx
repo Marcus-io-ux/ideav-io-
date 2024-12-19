@@ -23,6 +23,7 @@ interface ShareIdeaModalProps {
     channel: string;
     feedbackType: string;
     isCollaborative: boolean;
+    tags: string[];
   }) => void;
 }
 
@@ -53,12 +54,16 @@ export const ShareIdeaModal = ({ isOpen, onClose, onSubmit }: ShareIdeaModalProp
       return;
     }
 
+    // Create tags array with feedback type
+    const tags = feedbackType ? [feedbackType] : [];
+
     onSubmit({
       title,
       content,
       channel,
       feedbackType,
       isCollaborative,
+      tags,
     });
 
     setTitle("");

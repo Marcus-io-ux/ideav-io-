@@ -18,14 +18,16 @@ const Community = () => {
     content: string; 
     channel: string; 
     feedbackType: string; 
-    isCollaborative: boolean; 
+    isCollaborative: boolean;
+    tags: string[];
   }) => {
     await handleIdeaSubmit({
       title: idea.title,
       content: idea.content,
       channel: idea.channel,
-      category: idea.feedbackType, // Use feedbackType as category
+      category: idea.feedbackType,
       feedbackType: idea.feedbackType,
+      tags: idea.tags,
     });
   };
 
@@ -86,6 +88,7 @@ const Community = () => {
                 feedbackType={post.feedback_type}
                 isPinned={post.is_pinned}
                 emojiReactions={post.emoji_reactions}
+                tags={post.tags || []}
               />
             ))}
           </div>
