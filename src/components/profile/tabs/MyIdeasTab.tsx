@@ -1,14 +1,16 @@
 import { useState, useEffect } from "react";
 import { IdeaCard } from "@/components/IdeaCard";
 import { SearchBar } from "@/components/SearchBar";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { AddIdeaDialog } from "@/components/dashboard/AddIdeaDialog";
 import { useToast } from "@/hooks/use-toast";
-import { useQueryClient } from "@tanstack/react-query";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { IdeaForm } from "@/components/dashboard/IdeaForm";
 
 export const MyIdeasTab = () => {
   const [searchQuery, setSearchQuery] = useState("");
+  const [editingIdea, setEditingIdea] = useState<any>(null);
   const queryClient = useQueryClient();
   const { toast } = useToast();
 
@@ -34,8 +36,8 @@ export const MyIdeasTab = () => {
   });
 
   useEffect(() => {
-    const { data: { user } } = supabase.auth.getUser();
-    if (!user) return;
+    const { data: { subscription } } = supabase.auth.getUser();
+    if (!subscription) return;
 
     // Subscribe to real-time changes
     const channel = supabase
@@ -46,7 +48,6 @@ export const MyIdeasTab = () => {
           event: '*',
           schema: 'public',
           table: 'ideas',
-          filter: `user_id=eq.${user.id}`,
         },
         async () => {
           console.log('Ideas changed, refreshing...');
@@ -63,6 +64,46 @@ export const MyIdeasTab = () => {
       supabase.removeChannel(channel);
     };
   }, [queryClient, toast]);
+
+  const handleEditIdea = (id: string) => {
+    const ideaToEdit = ideas.find(idea => idea.id === id);
+    if (ideaToEdit) {
+      setEditingIdea({
+        ...ideaToEdit,
+        tags: ideaToEdit.tags || [],
+      });
+    }
+  };
+
+  const handleUpdateIdea = async () => {
+    try {
+      const { error } = await supabase
+        .from('ideas')
+        .update({
+          title: editingIdea.title,
+          content: editingIdea.content,
+          updated_at: new Date().toISOString(),
+        })
+        .eq('id', editingIdea.id);
+
+      if (error) throw error;
+
+      toast({
+        title: "Success",
+        description: "Your idea has been updated",
+      });
+
+      setEditingIdea(null);
+      await queryClient.invalidateQueries({ queryKey: ["my-ideas"] });
+    } catch (error) {
+      console.error('Error updating idea:', error);
+      toast({
+        title: "Error",
+        description: "Failed to update idea. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
 
   const filteredIdeas = ideas.filter(
     idea =>
@@ -86,6 +127,7 @@ export const MyIdeasTab = () => {
           <IdeaCard
             key={idea.id}
             {...idea}
+            onEdit={handleEditIdea}
           />
         ))}
         {filteredIdeas.length === 0 && (
@@ -94,6 +136,23 @@ export const MyIdeasTab = () => {
           </div>
         )}
       </div>
+
+      <Dialog open={!!editingIdea} onOpenChange={() => setEditingIdea(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Edit Idea</DialogTitle>
+          </DialogHeader>
+          {editingIdea && (
+            <IdeaForm
+              idea={editingIdea}
+              onIdeaChange={(field, value) => setEditingIdea(prev => ({ ...prev, [field]: value }))}
+              onCancel={() => setEditingIdea(null)}
+              onSaveDraft={() => {}}
+              onSubmit={handleUpdateIdea}
+            />
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
