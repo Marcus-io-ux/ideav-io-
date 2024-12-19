@@ -53,7 +53,7 @@ export const IdeaComments = ({
         content,
         created_at,
         user_id,
-        profiles!community_comments_user_id_fkey (
+        profiles:user_id(
           username,
           avatar_url
         )
@@ -67,7 +67,7 @@ export const IdeaComments = ({
     }
 
     if (data) {
-      const typedData = data as CommentResponse[];
+      const typedData = data as unknown as CommentResponse[];
       setComments(typedData.map(comment => ({
         id: comment.id,
         content: comment.content,
