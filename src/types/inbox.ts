@@ -10,11 +10,11 @@ export interface Message {
   content: string;
   created_at: string;
   is_read: boolean;
-  sender?: {
+  sender: {
     username: string;
     avatar_url?: string;
   };
-  recipient?: {
+  recipient: {
     username: string;
     avatar_url?: string;
   };

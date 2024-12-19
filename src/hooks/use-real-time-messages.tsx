@@ -2,23 +2,6 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Message } from "@/types/inbox";
 
-interface MessageResponse {
-  id: string;
-  content: string;
-  sender_id: string;
-  recipient_id: string;
-  created_at: string;
-  is_read: boolean;
-  sender: {
-    username: string;
-    avatar_url?: string;
-  };
-  recipient: {
-    username: string;
-    avatar_url?: string;
-  };
-}
-
 export function useRealTimeMessages(userId: string | null) {
   const [messages, setMessages] = useState<Message[]>([]);
 
@@ -30,8 +13,8 @@ export function useRealTimeMessages(userId: string | null) {
         .from("messages")
         .select(`
           *,
-          sender:profiles!messages_sender_id_fkey(username, avatar_url),
-          recipient:profiles!messages_recipient_id_fkey(username, avatar_url)
+          profiles!messages_sender_id_fkey(username, avatar_url),
+          profiles!messages_recipient_id_fkey(username, avatar_url)
         `)
         .or(`sender_id.eq.${userId},recipient_id.eq.${userId}`)
         .order("created_at", { ascending: false });
@@ -41,7 +24,24 @@ export function useRealTimeMessages(userId: string | null) {
         return;
       }
 
-      setMessages(data as Message[]);
+      const formattedMessages: Message[] = data.map(msg => ({
+        id: msg.id,
+        sender_id: msg.sender_id,
+        recipient_id: msg.recipient_id,
+        content: msg.content,
+        created_at: msg.created_at,
+        is_read: msg.is_read,
+        sender: {
+          username: msg.profiles?.username || "Unknown",
+          avatar_url: msg.profiles?.avatar_url
+        },
+        recipient: {
+          username: msg.profiles?.username || "Unknown",
+          avatar_url: msg.profiles?.avatar_url
+        }
+      }));
+
+      setMessages(formattedMessages);
     };
 
     fetchMessages();
@@ -56,8 +56,8 @@ export function useRealTimeMessages(userId: string | null) {
           table: "messages",
           filter: `sender_id=eq.${userId},recipient_id=eq.${userId}`,
         },
-        (payload) => {
-          console.log("Real-time message update:", payload);
+        () => {
+          console.log("Real-time message update received");
           fetchMessages();
         }
       )
