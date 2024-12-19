@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
@@ -6,8 +6,30 @@ import { X } from "lucide-react";
 
 export const DashboardTutorial = () => {
   const [currentStep, setCurrentStep] = useState(1);
-  const [isVisible, setIsVisible] = useState(true);
+  const [isVisible, setIsVisible] = useState(false);
   const { toast } = useToast();
+
+  useEffect(() => {
+    const checkTutorialStatus = async () => {
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) return;
+
+        const { data: profile } = await supabase
+          .from("profiles")
+          .select("tutorial_completed")
+          .eq("user_id", user.id)
+          .single();
+
+        // Only show tutorial if it hasn't been completed
+        setIsVisible(!profile?.tutorial_completed);
+      } catch (error) {
+        console.error("Error checking tutorial status:", error);
+      }
+    };
+
+    checkTutorialStatus();
+  }, []);
 
   const steps = [
     {
