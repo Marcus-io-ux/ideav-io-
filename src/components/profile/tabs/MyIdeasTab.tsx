@@ -7,16 +7,16 @@ import { AddIdeaDialog } from "@/components/dashboard/AddIdeaDialog";
 import { useToast } from "@/hooks/use-toast";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { IdeaForm } from "@/components/dashboard/IdeaForm";
+import { IdeaFormData } from "@/types/idea";
 
-interface Idea {
+interface Idea extends Omit<IdeaFormData, 'tags'> {
   id: string;
-  title: string;
-  content: string;
   created_at: string;
   user_id: string;
   deleted: boolean;
   deleted_at: string;
   createdAt: Date;
+  tags: string[];
 }
 
 export const MyIdeasTab = () => {
@@ -42,6 +42,7 @@ export const MyIdeasTab = () => {
       return data.map(idea => ({
         ...idea,
         createdAt: new Date(idea.created_at),
+        tags: [], // Initialize empty tags array since it's not in the database
       }));
     },
   });
