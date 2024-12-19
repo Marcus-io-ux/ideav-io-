@@ -28,9 +28,23 @@ interface IdeaFormProps {
 export const IdeaForm = ({ initialData, onSubmit, onCancel, onSaveDraft }: IdeaFormProps) => {
   const [title, setTitle] = useState(initialData?.title || "");
   const [content, setContent] = useState(initialData?.content || "");
+  const [tags, setTags] = useState<string[]>(initialData?.tags || []);
+  const [tagInput, setTagInput] = useState("");
   const [images, setImages] = useState<string[]>(initialData?.images || []);
   const [uploading, setUploading] = useState(false);
   const { toast } = useToast();
+
+  const handleAddTag = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter' && tagInput.trim()) {
+      e.preventDefault();
+      setTags([...tags, tagInput.trim()]);
+      setTagInput("");
+    }
+  };
+
+  const handleRemoveTag = (tagToRemove: string) => {
+    setTags(tags.filter(tag => tag !== tagToRemove));
+  };
 
   const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     try {
@@ -79,6 +93,7 @@ export const IdeaForm = ({ initialData, onSubmit, onCancel, onSaveDraft }: IdeaF
     onSubmit({ 
       title, 
       content,
+      tags,
       images,
       ...initialData,
     });
@@ -106,6 +121,34 @@ export const IdeaForm = ({ initialData, onSubmit, onCancel, onSaveDraft }: IdeaF
           placeholder="Describe your idea..."
           required
           className="min-h-[100px]"
+        />
+      </div>
+
+      <div className="space-y-2">
+        <Label htmlFor="tags">Tags</Label>
+        <div className="flex flex-wrap gap-2 mb-2">
+          {tags.map((tag, index) => (
+            <span
+              key={index}
+              className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary/10 text-primary"
+            >
+              {tag}
+              <button
+                type="button"
+                onClick={() => handleRemoveTag(tag)}
+                className="ml-1 hover:text-primary-foreground"
+              >
+                <X className="h-3 w-3" />
+              </button>
+            </span>
+          ))}
+        </div>
+        <Input
+          id="tags"
+          value={tagInput}
+          onChange={(e) => setTagInput(e.target.value)}
+          onKeyDown={handleAddTag}
+          placeholder="Type a tag and press Enter..."
         />
       </div>
 
