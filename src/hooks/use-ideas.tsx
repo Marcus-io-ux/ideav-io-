@@ -12,24 +12,36 @@ export const useIdeas = () => {
 
   const fetchIdeas = async () => {
     try {
-      const { data, error } = await supabase
-        .from('ideas')
-        .select('*')
-        .eq('deleted', false)
-        .order('created_at', { ascending: false });
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session?.user) return;
 
-      if (error) {
-        throw error;
-      }
+      // Fetch ideas and favorites in parallel
+      const [ideasResponse, favoritesResponse] = await Promise.all([
+        supabase
+          .from('ideas')
+          .select('*')
+          .eq('deleted', false)
+          .order('created_at', { ascending: false }),
+        supabase
+          .from('favorites')
+          .select('idea_id')
+          .eq('user_id', session.user.id)
+          .eq('item_type', 'idea')
+      ]);
 
-      if (data) {
-        const mappedIdeas: DashboardIdea[] = data.map((idea: IdeaDB) => ({
+      if (ideasResponse.error) throw ideasResponse.error;
+      if (favoritesResponse.error) throw favoritesResponse.error;
+
+      const favoriteIdeaIds = new Set(favoritesResponse.data.map(f => f.idea_id));
+
+      if (ideasResponse.data) {
+        const mappedIdeas: DashboardIdea[] = ideasResponse.data.map((idea: IdeaDB) => ({
           id: idea.id,
           title: idea.title,
           content: idea.content,
           tags: [],
           createdAt: new Date(idea.created_at),
-          isFavorite: false,
+          isFavorite: favoriteIdeaIds.has(idea.id),
           sharedToCommunity: false,
           deleted: idea.deleted || false
         }));
