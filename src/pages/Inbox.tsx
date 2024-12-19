@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { ConversationList } from "@/components/inbox/ConversationList";
@@ -43,8 +43,17 @@ export default function Inbox() {
   const [filter, setFilter] = useState("all");
   const isMobile = useIsMobile();
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
-  const { data: { user } } = await supabase.auth.getUser();
-  const messages = useRealTimeMessages(user?.id);
+  const [userId, setUserId] = useState<string | null>(null);
+  const messages = useRealTimeMessages(userId);
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      setUserId(user?.id || null);
+    };
+    
+    fetchUser();
+  }, []);
 
   const handleSendMessage = () => {
     if (!newMessage.trim()) return;
