@@ -4,20 +4,11 @@ import { FeedbackButton } from "@/components/feedback/FeedbackButton";
 import { FeedbackModal } from "@/components/feedback/FeedbackModal";
 import { DashboardTutorial } from "@/components/dashboard/DashboardTutorial";
 import { useUserProfile } from "@/hooks/use-user-profile";
-import { AddIdeaDialog } from "@/components/dashboard/AddIdeaDialog";
-import { IdeasGrid } from "@/components/dashboard/IdeasGrid";
-import { Button } from "@/components/ui/button";
-import { Filter, Grid, List, Search, Star } from "lucide-react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { Input } from "@/components/ui/input";
-import { cn } from "@/lib/utils";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
+import { IdeasGrid } from "@/components/dashboard/IdeasGrid";
+import { DashboardActionsBar } from "@/components/dashboard/DashboardActionsBar";
 
 const Dashboard = () => {
   const [isFeedbackModalOpen, setIsFeedbackModalOpen] = useState(false);
@@ -41,7 +32,6 @@ const Dashboard = () => {
         throw new Error("No user found");
       }
 
-      // First, get all ideas for the user
       const { data: ideas, error: ideasError } = await supabase
         .from("ideas")
         .select("*")
@@ -51,7 +41,6 @@ const Dashboard = () => {
 
       if (ideasError) throw ideasError;
 
-      // If showing favorites, get the user's favorites
       if (showFavorites) {
         const { data: favorites, error: favoritesError } = await supabase
           .from("favorites")
@@ -71,7 +60,6 @@ const Dashboard = () => {
           }));
       }
 
-      // Get all favorites to mark favorite ideas
       const { data: favorites, error: favoritesError } = await supabase
         .from("favorites")
         .select("idea_id")
@@ -128,7 +116,7 @@ const Dashboard = () => {
     idea.content.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  const dailyQuote = "The best way to predict the future is to create it."; // You can make this dynamic later
+  const dailyQuote = "The best way to predict the future is to create it.";
 
   return (
     <div className="min-h-screen bg-background">
@@ -141,43 +129,16 @@ const Dashboard = () => {
           "{dailyQuote}"
         </div>
         
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-          <div className="flex-1" />
-          <div className="flex items-center gap-2 ml-auto">
-            <Button
-              variant="outline"
-              size="icon"
-              onClick={() => setViewMode(viewMode === "grid" ? "list" : "grid")}
-              className="hidden md:flex h-10 w-10" // Hide on mobile, show on md and up
-            >
-              {viewMode === "grid" ? <List className="h-4 w-4" /> : <Grid className="h-4 w-4" />}
-            </Button>
-            <Popover>
-              <PopoverTrigger asChild>
-                <Button variant="outline" size="icon" className="h-10 w-10">
-                  <Search className="h-4 w-4" />
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-80">
-                <Input
-                  placeholder="Search ideas..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full"
-                />
-              </PopoverContent>
-            </Popover>
-            <Button
-              variant={showFavorites ? "default" : "outline"}
-              size="icon"
-              className="h-10 w-10"
-              onClick={() => setShowFavorites(!showFavorites)}
-            >
-              <Star className={cn("h-4 w-4", showFavorites && "fill-current")} />
-            </Button>
-            <AddIdeaDialog onIdeaSubmit={handleIdeaSubmit} />
-          </div>
-        </div>
+        <DashboardActionsBar
+          totalIdeas={ideasData.length}
+          searchQuery={searchQuery}
+          setSearchQuery={setSearchQuery}
+          viewMode={viewMode}
+          setViewMode={setViewMode}
+          showFavorites={showFavorites}
+          setShowFavorites={setShowFavorites}
+          handleIdeaSubmit={handleIdeaSubmit}
+        />
 
         <IdeasGrid
           ideas={filteredIdeas}
