@@ -11,7 +11,13 @@ const Login = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white">
-      <nav className="container mx-auto px-4 py-6 flex justify-end items-center">
+      <nav className="container mx-auto px-4 py-6 flex justify-between items-center">
+        <Link 
+          to="/" 
+          className="text-2xl font-bold text-primary hover:opacity-80 transition-opacity"
+        >
+          IdeaVault
+        </Link>
         <div className="flex gap-4 items-center">
           <FAQDialog />
         </div>
