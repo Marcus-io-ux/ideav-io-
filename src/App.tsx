@@ -81,6 +81,12 @@ const App = () => {
             <Route
               path="/community"
               element={
+                isAuthenticated ? <Navigate to="/community/general-ideas" replace /> : <Navigate to="/login" replace />
+              }
+            />
+            <Route
+              path="/community/:channelId"
+              element={
                 isAuthenticated ? <Community /> : <Navigate to="/login" replace />
               }
             />

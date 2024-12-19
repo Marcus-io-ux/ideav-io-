@@ -4,13 +4,14 @@ import { Plus } from "lucide-react";
 import { ShareIdeaModal } from "@/components/community/ShareIdeaModal";
 import { useCommunityPosts } from "@/hooks/use-community-posts";
 import { CommunityLayout } from "@/components/community/layout/CommunityLayout";
-import { CommunityContentHeader } from "@/components/community/layout/CommunityContent";
 import { IdeaCard } from "@/components/community/IdeaCard";
 import { Card } from "@/components/ui/card";
+import { useParams } from "react-router-dom";
 
 const Community = () => {
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
-  const { posts, handleIdeaSubmit } = useCommunityPosts("general-ideas");
+  const { channelId = "general-ideas" } = useParams();
+  const { posts, handleIdeaSubmit } = useCommunityPosts(channelId);
 
   const handleSubmit = async (idea: { 
     title: string; 
@@ -32,11 +33,6 @@ const Community = () => {
 
   return (
     <CommunityLayout>
-      <CommunityContentHeader 
-        title="Community"
-        onSearch={(query) => console.log("Search:", query)}
-      />
-      
       <div className="flex-1 p-4 bg-accent/5">
         <div className="max-w-5xl mx-auto flex gap-6">
           {/* Main Content */}

@@ -1,11 +1,14 @@
 import { useState } from "react";
 import { CommunityChannels } from "./CommunityChannels";
-import { CommunityContentHeader } from "./CommunityContent";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { Menu } from "lucide-react";
 
-export const CommunityLayout = ({ children }: { children: React.ReactNode }) => {
+interface CommunityLayoutProps {
+  children: React.ReactNode;
+}
+
+export const CommunityLayout = ({ children }: CommunityLayoutProps) => {
   const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);
 
   return (
