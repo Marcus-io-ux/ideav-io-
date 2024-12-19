@@ -31,6 +31,11 @@ export const AllIdeasTab = ({
           onDelete={onDelete}
         />
       ))}
+      {activeIdeas.length === 0 && (
+        <div className="text-center py-12">
+          <p className="text-muted-foreground">No ideas found</p>
+        </div>
+      )}
     </div>
   );
 };

@@ -16,12 +16,14 @@ export const RecentIdeasTab = ({
   onEdit,
   onDelete,
 }: RecentIdeasTabProps) => {
-  // Filter out deleted ideas before showing the most recent 5
-  const activeIdeas = ideas.filter(idea => !idea.deleted);
+  // Filter out deleted ideas and get the most recent 5
+  const recentIdeas = ideas
+    .filter(idea => !idea.deleted)
+    .slice(0, 5);
   
   return (
     <div className="grid gap-6 mt-6">
-      {activeIdeas.slice(0, 5).map((idea) => (
+      {recentIdeas.map((idea) => (
         <IdeaCard
           key={idea.id}
           {...idea}
@@ -31,6 +33,11 @@ export const RecentIdeasTab = ({
           onDelete={onDelete}
         />
       ))}
+      {recentIdeas.length === 0 && (
+        <div className="text-center py-12">
+          <p className="text-muted-foreground">No recent ideas found</p>
+        </div>
+      )}
     </div>
   );
 };
