@@ -21,7 +21,7 @@ interface CommentResponse {
   content: string;
   created_at: string;
   user_id: string;
-  user: {
+  profiles: {
     username: string | null;
     avatar_url: string | null;
   } | null;
@@ -53,7 +53,7 @@ export const IdeaComments = ({
         content,
         created_at,
         user_id,
-        user:profiles!community_comments_user_id_fkey (
+        profiles!community_comments_user_id_fkey (
           username,
           avatar_url
         )
@@ -73,8 +73,8 @@ export const IdeaComments = ({
         content: comment.content,
         created_at: comment.created_at,
         author: {
-          name: comment.user?.username || 'Anonymous',
-          avatar: comment.user?.avatar_url || undefined
+          name: comment.profiles?.username || 'Anonymous',
+          avatar: comment.profiles?.avatar_url || undefined
         }
       })));
     }
