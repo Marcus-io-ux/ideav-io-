@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { UserPlus } from "lucide-react";
+import { Users } from "lucide-react";
 import { CollaborationDialog } from "./CollaborationDialog";
 
 interface CollaborateButtonProps {
@@ -26,7 +26,7 @@ export const CollaborateButton = ({
         className="gap-2"
         onClick={() => setIsCollaborateOpen(true)}
       >
-        <UserPlus className="h-4 w-4" />
+        <Users className="h-4 w-4" />
         <span>Collaborate</span>
       </Button>
 
