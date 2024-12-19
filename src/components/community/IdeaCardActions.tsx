@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { Heart, MessageCircle, UserPlus, Star } from "lucide-react";
+import { Heart, MessageCircle, UserPlus, UserPlus2 } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -8,11 +8,11 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useCollaborationRequest } from "@/hooks/use-collaboration-request";
 import { useToast } from "@/hooks/use-toast";
 import { MessageButton } from "./messaging/MessageButton";
-import { toggleFavorite } from "@/utils/favorites";
+import { supabase } from "@/integrations/supabase/client";
 
 interface IdeaCardActionsProps {
   postId: string;
@@ -24,8 +24,6 @@ interface IdeaCardActionsProps {
   onComment: () => void;
   currentUserId: string | null;
   authorName: string;
-  isFavorite: boolean;
-  onFavoriteChange: (newState: boolean) => void;
 }
 
 export const IdeaCardActions = ({
@@ -38,28 +36,93 @@ export const IdeaCardActions = ({
   onComment,
   currentUserId,
   authorName,
-  isFavorite,
-  onFavoriteChange,
 }: IdeaCardActionsProps) => {
   const [isCollaborateOpen, setIsCollaborateOpen] = useState(false);
   const [message, setMessage] = useState("");
+  const [isFollowing, setIsFollowing] = useState(false);
   const { sendCollaborationRequest, isLoading } = useCollaborationRequest();
   const { toast } = useToast();
 
+  useEffect(() => {
+    const checkFollowStatus = async () => {
+      if (!currentUserId) return;
+      
+      const { data } = await supabase
+        .from('user_follows')
+        .select()
+        .eq('follower_id', currentUserId)
+        .eq('following_id', ownerId)
+        .single();
+      
+      setIsFollowing(!!data);
+    };
+
+    checkFollowStatus();
+  }, [currentUserId, ownerId]);
+
   const handleCollaborate = async () => {
+    if (!currentUserId) {
+      toast({
+        title: "Authentication required",
+        description: "Please sign in to send collaboration requests",
+        variant: "destructive",
+      });
+      return;
+    }
+
     await sendCollaborationRequest(postId, ownerId, message);
+    
+    // Send notification message
+    await supabase.from("messages").insert({
+      sender_id: currentUserId,
+      recipient_id: ownerId,
+      content: `New collaboration request for your idea: ${message}`,
+      is_read: false,
+    });
+
     setMessage("");
     setIsCollaborateOpen(false);
   };
 
-  const handleToggleFavorite = async () => {
-    const newState = await toggleFavorite(postId, 'community_post', currentUserId, isFavorite);
-    onFavoriteChange(newState);
-    
-    toast({
-      title: newState ? "Added to favorites" : "Removed from favorites",
-      description: `Post has been ${newState ? 'added to' : 'removed from'} your favorites`,
-    });
+  const handleFollow = async () => {
+    if (!currentUserId) {
+      toast({
+        title: "Authentication required",
+        description: "Please sign in to follow users",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    try {
+      if (isFollowing) {
+        await supabase
+          .from('user_follows')
+          .delete()
+          .eq('follower_id', currentUserId)
+          .eq('following_id', ownerId);
+      } else {
+        await supabase
+          .from('user_follows')
+          .insert({
+            follower_id: currentUserId,
+            following_id: ownerId,
+          });
+      }
+
+      setIsFollowing(!isFollowing);
+      toast({
+        title: isFollowing ? "Unfollowed" : "Following",
+        description: isFollowing ? `You unfollowed ${authorName}` : `You are now following ${authorName}`,
+      });
+    } catch (error) {
+      console.error('Error toggling follow:', error);
+      toast({
+        title: "Error",
+        description: "Failed to update follow status",
+        variant: "destructive",
+      });
+    }
   };
 
   return (
@@ -81,20 +144,23 @@ export const IdeaCardActions = ({
         <Button
           variant="ghost"
           size="sm"
-          className={`gap-2 ${isFavorite ? "text-yellow-500" : ""}`}
-          onClick={handleToggleFavorite}
-        >
-          <Star className={`h-4 w-4 ${isFavorite ? "fill-current" : ""}`} />
-        </Button>
-        <Button
-          variant="ghost"
-          size="sm"
           className="gap-2"
           onClick={() => setIsCollaborateOpen(true)}
         >
           <UserPlus className="h-4 w-4" />
           <span>Collaborate</span>
         </Button>
+        {currentUserId && currentUserId !== ownerId && (
+          <Button
+            variant="ghost"
+            size="sm"
+            className={`gap-2 ${isFollowing ? "text-primary" : ""}`}
+            onClick={handleFollow}
+          >
+            <UserPlus2 className="h-4 w-4" />
+            <span>{isFollowing ? "Following" : "Follow"}</span>
+          </Button>
+        )}
         <MessageButton
           currentUserId={currentUserId}
           ownerId={ownerId}
