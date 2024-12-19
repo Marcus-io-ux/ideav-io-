@@ -142,13 +142,13 @@ const Dashboard = () => {
         </div>
         
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-          <div className="flex-1" /> {/* This empty div pushes everything to the right */}
+          <div className="flex-1" />
           <div className="flex items-center gap-2 ml-auto">
             <Button
               variant="outline"
               size="icon"
               onClick={() => setViewMode(viewMode === "grid" ? "list" : "grid")}
-              className="h-10 w-10"
+              className="hidden md:flex h-10 w-10" // Hide on mobile, show on md and up
             >
               {viewMode === "grid" ? <List className="h-4 w-4" /> : <Grid className="h-4 w-4" />}
             </Button>
