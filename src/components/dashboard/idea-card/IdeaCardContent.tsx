@@ -9,7 +9,6 @@ interface IdeaCardContentProps {
   onKeyDown: (e: React.KeyboardEvent) => void;
   isCurrentlyFavorite: boolean;
   onToggleFavorite: () => void;
-  onDelete?: () => void;
 }
 
 export const IdeaCardContent = ({
@@ -20,7 +19,6 @@ export const IdeaCardContent = ({
   onKeyDown,
   isCurrentlyFavorite,
   onToggleFavorite,
-  onDelete,
 }: IdeaCardContentProps) => {
   return (
     <div className="text-muted-foreground relative">
@@ -39,7 +37,6 @@ export const IdeaCardContent = ({
         <CardHeaderActions
           isFavorite={isCurrentlyFavorite}
           onToggleFavorite={onToggleFavorite}
-          onDelete={onDelete}
           size="sm"
         />
       </div>
