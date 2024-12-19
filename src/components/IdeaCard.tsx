@@ -11,6 +11,7 @@ import { IdeaCardMetadata } from "@/components/dashboard/idea-card/IdeaCardMetad
 import { IdeaCardTitle } from "@/components/dashboard/idea-card/IdeaCardTitle";
 import { IdeaCardSelection } from "@/components/dashboard/idea-card/IdeaCardSelection";
 import { IdeaCardFooter } from "@/components/dashboard/idea-card/IdeaCardFooter";
+import { IdeaCardTags } from "@/components/dashboard/idea-card/IdeaCardTags";
 
 interface IdeaCardProps {
   id: string;
@@ -35,6 +36,7 @@ export const IdeaCard = ({
   isFavorite = false,
   isSelected = false,
   isDraft = false,
+  tags = [],
   onSelect,
   onDelete,
   onToggleFavorite 
@@ -124,6 +126,7 @@ export const IdeaCard = ({
         .update({
           title: editedTitle,
           content: editedContent,
+          tags: tags,
           is_draft: isDraft
         })
         .eq('id', id);
@@ -190,6 +193,9 @@ export const IdeaCard = ({
             />
           </div>
         </div>
+        {tags && tags.length > 0 && (
+          <IdeaCardTags tags={tags} />
+        )}
       </CardHeader>
       <CardContent className="relative pb-16">
         <IdeaCardContent

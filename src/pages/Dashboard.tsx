@@ -7,7 +7,7 @@ import { useUserProfile } from "@/hooks/use-user-profile";
 import { AddIdeaDialog } from "@/components/dashboard/AddIdeaDialog";
 import { IdeasGrid } from "@/components/dashboard/IdeasGrid";
 import { Button } from "@/components/ui/button";
-import { Filter, Grid, List, Search } from "lucide-react";
+import { Filter, Grid, List, Search, Star } from "lucide-react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -22,12 +22,13 @@ const Dashboard = () => {
   const [isFeedbackModalOpen, setIsFeedbackModalOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
+  const [showFavorites, setShowFavorites] = useState(false);
   const { userName } = useUserProfile();
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
   const { data: ideas = [], isLoading } = useQuery({
-    queryKey: ["my-ideas"],
+    queryKey: ["my-ideas", showFavorites],
     queryFn: async () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) {
@@ -39,17 +40,23 @@ const Dashboard = () => {
         throw new Error("No user found");
       }
 
-      const { data, error } = await supabase
+      let query = supabase
         .from("ideas")
-        .select("*")
+        .select("*, favorites!inner(*)")
         .eq("user_id", user.id)
-        .eq("deleted", false)
-        .order("created_at", { ascending: false });
+        .eq("deleted", false);
+
+      if (showFavorites) {
+        query = query.not("favorites", "is", null);
+      }
+
+      const { data, error } = await query.order("created_at", { ascending: false });
 
       if (error) throw error;
       return data.map(idea => ({
         ...idea,
         createdAt: new Date(idea.created_at),
+        isFavorite: true, // Since we're using an inner join, all returned ideas are favorites
       }));
     },
   });
@@ -125,6 +132,14 @@ const Dashboard = () => {
                 />
               </PopoverContent>
             </Popover>
+            <Button
+              variant={showFavorites ? "default" : "outline"}
+              size="icon"
+              className="h-10 w-10"
+              onClick={() => setShowFavorites(!showFavorites)}
+            >
+              <Star className={cn("h-4 w-4", showFavorites && "fill-current")} />
+            </Button>
             <Button
               variant="outline"
               size="icon"
