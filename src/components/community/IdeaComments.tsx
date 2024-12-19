@@ -2,6 +2,9 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Send } from "lucide-react";
+import { useState, useEffect } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
 
 interface Comment {
   id: string;
@@ -10,22 +13,118 @@ interface Comment {
     name: string;
     avatar?: string;
   };
-  createdAt: Date;
+  created_at: string;
 }
 
 interface IdeaCommentsProps {
-  comments: Comment[];
-  newComment: string;
-  onNewCommentChange: (value: string) => void;
-  onAddComment: () => void;
+  postId: string;
+  onCommentAdded: () => void;
 }
 
 export const IdeaComments = ({
-  comments,
-  newComment,
-  onNewCommentChange,
-  onAddComment,
+  postId,
+  onCommentAdded
 }: IdeaCommentsProps) => {
+  const [comments, setComments] = useState<Comment[]>([]);
+  const [newComment, setNewComment] = useState("");
+  const { toast } = useToast();
+
+  useEffect(() => {
+    fetchComments();
+    subscribeToComments();
+  }, [postId]);
+
+  const fetchComments = async () => {
+    const { data, error } = await supabase
+      .from('community_comments')
+      .select(`
+        id,
+        content,
+        created_at,
+        profiles:user_id (
+          username,
+          avatar_url
+        )
+      `)
+      .eq('post_id', postId)
+      .order('created_at', { ascending: true });
+
+    if (error) {
+      console.error('Error fetching comments:', error);
+      return;
+    }
+
+    setComments(data.map(comment => ({
+      id: comment.id,
+      content: comment.content,
+      created_at: comment.created_at,
+      author: {
+        name: comment.profiles?.username || 'Anonymous',
+        avatar: comment.profiles?.avatar_url
+      }
+    })));
+  };
+
+  const subscribeToComments = () => {
+    const channel = supabase
+      .channel('public:community_comments')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'community_comments',
+          filter: `post_id=eq.${postId}`
+        },
+        () => {
+          fetchComments();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  };
+
+  const handleAddComment = async () => {
+    if (!newComment.trim()) return;
+
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session?.user) {
+        toast({
+          title: "Authentication required",
+          description: "Please sign in to comment",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      const { error } = await supabase
+        .from('community_comments')
+        .insert([
+          {
+            content: newComment,
+            post_id: postId,
+            user_id: session.user.id
+          }
+        ]);
+
+      if (error) throw error;
+
+      setNewComment("");
+      onCommentAdded();
+    } catch (error) {
+      console.error('Error adding comment:', error);
+      toast({
+        title: "Error",
+        description: "Failed to add comment",
+        variant: "destructive",
+      });
+    }
+  };
+
   return (
     <div className="mt-4 space-y-4">
       <div className="max-h-48 overflow-y-auto space-y-2">
@@ -40,7 +139,7 @@ export const IdeaComments = ({
                 <span className="font-medium text-sm">{comment.author.name}</span>
               </div>
               <span className="text-xs text-gray-500">
-                {new Date(comment.createdAt).toLocaleDateString()}
+                {new Date(comment.created_at).toLocaleDateString()}
               </span>
             </div>
             <p className="text-sm mt-1 ml-8">{comment.content}</p>
@@ -52,11 +151,11 @@ export const IdeaComments = ({
         <Input
           placeholder="Write a comment..."
           value={newComment}
-          onChange={(e) => onNewCommentChange(e.target.value)}
-          onKeyPress={(e) => e.key === 'Enter' && onAddComment()}
+          onChange={(e) => setNewComment(e.target.value)}
+          onKeyPress={(e) => e.key === 'Enter' && handleAddComment()}
           className="flex-1"
         />
-        <Button onClick={onAddComment} size="icon">
+        <Button onClick={handleAddComment} size="icon">
           <Send className="h-4 w-4" />
         </Button>
       </div>
