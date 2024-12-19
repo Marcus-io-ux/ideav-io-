@@ -66,7 +66,7 @@ export const SharedIdeasTab = () => {
           tags={idea.tags || []}
           category={idea.category}
           feedbackType={idea.feedback_type}
-          createdAt={new Date(idea.created_at)}
+          createdAt={idea.created_at}
           emojiReactions={idea.emoji_reactions}
         />
       ))}

@@ -3,24 +3,20 @@ import { ThemeSupa } from "@supabase/auth-ui-shared";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate, Link } from "react-router-dom";
 import { useEffect } from "react";
-import { Button } from "@/components/ui/button";
-import { HelpCircle } from "lucide-react";
 import { FAQDialog } from "@/components/auth/FAQDialog";
-import { useToast } from "@/components/ui/use-toast";
+import { useToast } from "@/hooks/use-toast";
 
 const Login = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
 
   useEffect(() => {
-    // Check current auth status
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (session) {
         navigate("/dashboard");
       }
     });
 
-    // Listen for auth changes
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, session) => {
@@ -78,7 +74,7 @@ const Login = () => {
             redirectTo={`${window.location.origin}/dashboard`}
             onError={(error) => {
               toast({
-                title: "Error",
+                title: "Authentication Error",
                 description: error.message,
                 variant: "destructive",
               });
