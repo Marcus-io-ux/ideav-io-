@@ -66,6 +66,8 @@ export function AddIdeaDialog({ buttonText = "Add Idea", onIdeaSubmit }: AddIdea
             handleCancel();
           }}
           onSubmit={handleSubmitSuccess}
+          titlePlaceholder="Enter your idea title..."
+          contentPlaceholder="Describe your idea in detail..."
         />
       </DialogContent>
     </Dialog>
