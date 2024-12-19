@@ -5,25 +5,25 @@ import { Button } from "@/components/ui/button";
 
 interface CollaborationRequest {
   id: string;
+  message: string;
+  status: string;
   post: {
     title: string;
-  } | null;
+  };
   requester: {
     id: string;
     user_id: string;
-    username: string | null;
-    avatar_url: string | null;
-  } | null;
-  message: string | null;
-  status: string | null;
+    username: string;
+    avatar_url: string;
+  };
 }
 
-export function CollaborationsTab() {
+export const CollaborationsTab = () => {
   const { data: collaborations, isLoading } = useQuery({
-    queryKey: ['collaborations'],
+    queryKey: ["collaborations"],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from('collaboration_requests')
+        .from("collaboration_requests")
         .select(`
           id,
           message,
@@ -52,45 +52,33 @@ export function CollaborationsTab() {
         <Card key={collab.id} className="p-4">
           <div className="flex justify-between items-start">
             <div>
-              <h3 className="font-medium">{collab.post?.title}</h3>
-              <p className="text-sm text-muted-foreground">
-                Requested by: {collab.requester?.username}
+              <h3 className="font-semibold">{collab.post.title}</h3>
+              <p className="text-sm text-gray-600">{collab.message}</p>
+              <p className="text-sm text-gray-500">
+                From: {collab.requester.username}
               </p>
-              <p className="mt-2">{collab.message}</p>
             </div>
             <div className="space-x-2">
-              {collab.status === 'pending' && (
-                <>
-                  <Button
-                    variant="default"
-                    onClick={() => {
-                      // Handle accept
-                    }}
-                  >
-                    Accept
-                  </Button>
-                  <Button
-                    variant="outline"
-                    onClick={() => {
-                      // Handle decline
-                    }}
-                  >
-                    Decline
-                  </Button>
-                </>
-              )}
-              <div className="text-sm text-muted-foreground mt-2">
-                Status: {collab.status}
-              </div>
+              <Button
+                variant="outline"
+                size="sm"
+                className={
+                  collab.status === "pending"
+                    ? "bg-yellow-100"
+                    : collab.status === "accepted"
+                    ? "bg-green-100"
+                    : "bg-red-100"
+                }
+              >
+                {collab.status.charAt(0).toUpperCase() + collab.status.slice(1)}
+              </Button>
             </div>
           </div>
         </Card>
       ))}
-      {collaborations?.length === 0 && (
-        <p className="text-center text-muted-foreground">
-          No collaboration requests yet
-        </p>
+      {!collaborations?.length && (
+        <p className="text-center text-gray-500">No collaboration requests yet</p>
       )}
     </div>
   );
-}
+};

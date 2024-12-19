@@ -1,26 +1,25 @@
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import { IdeaCardHeader } from "./idea-card/IdeaCardHeader";
-import { IdeaCardContent } from "./IdeaCardContent";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { IdeaCardActions } from "./IdeaCardActions";
-import { IdeaCardMetadata } from "./idea-card/IdeaCardMetadata";
+import { formatDistanceToNow } from "date-fns";
+
+interface Author {
+  name: string;
+  avatar?: string;
+}
 
 interface IdeaCardProps {
   id: string;
   title: string;
   content: string;
-  author: {
-    id: string;
-    name: string;
-    avatar?: string;
-  };
+  author: Author;
+  createdAt: string;
   likes: number;
   comments: number;
-  tags: string[];
-  category?: string;
-  feedbackType?: string;
-  createdAt: Date;
-  isPinned?: boolean;
-  emojiReactions?: Record<string, number>;
+  isLiked: boolean;
+  userId: string;
+  onLike?: () => void;
+  onComment?: () => void;
 }
 
 export const IdeaCard = ({
@@ -28,48 +27,49 @@ export const IdeaCard = ({
   title,
   content,
   author,
+  createdAt,
   likes,
   comments,
-  tags,
-  category,
-  feedbackType,
-  createdAt,
-  isPinned,
-  emojiReactions = {},
+  isLiked,
+  userId,
+  onLike,
+  onComment,
 }: IdeaCardProps) => {
+  const getInitials = (name: string) => {
+    return name
+      .split(" ")
+      .map((n) => n[0])
+      .join("")
+      .toUpperCase();
+  };
+
   return (
-    <Card className="w-full max-w-full transition-shadow duration-300 animate-fade-in hover:shadow-lg overflow-hidden">
-      <CardHeader className="space-y-2 pb-3">
-        <IdeaCardHeader
-          title={title}
-          isPinned={isPinned}
-          category={category}
-          feedbackType={feedbackType}
-        />
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-          <IdeaCardMetadata author={author} createdAt={createdAt} />
+    <Card className="w-full mb-4">
+      <CardHeader className="flex flex-row items-center gap-4">
+        <Avatar>
+          <AvatarImage src={author.avatar} />
+          <AvatarFallback>{getInitials(author.name)}</AvatarFallback>
+        </Avatar>
+        <div className="flex flex-col">
+          <p className="font-semibold">{author.name}</p>
+          <p className="text-sm text-gray-500">
+            {formatDistanceToNow(new Date(createdAt), { addSuffix: true })}
+          </p>
         </div>
       </CardHeader>
-      
-      <CardContent className="space-y-4">
-        <IdeaCardContent
-          content={content}
-          tags={tags}
-          category={category}
-          feedbackType={feedbackType}
-          emojiReactions={emojiReactions}
-        />
-        
-        <div className="pt-2">
+      <CardContent>
+        <h3 className="text-xl font-semibold mb-2">{title}</h3>
+        <p className="text-gray-600 mb-4">{content}</p>
+        <div className="border-t pt-4">
           <IdeaCardActions
             postId={id}
-            ownerId={author.id}
-            isLiked={false}
+            ownerId={userId}
+            isLiked={isLiked}
             likeCount={likes}
             comments={comments}
-            onLike={() => {}}
-            onComment={() => {}}
-            currentUserId={null}
+            onLike={onLike || (() => {})}
+            onComment={onComment || (() => {})}
+            currentUserId={userId}
             authorName={author.name}
           />
         </div>

@@ -6,9 +6,11 @@ import { useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { HelpCircle } from "lucide-react";
 import { FAQDialog } from "@/components/auth/FAQDialog";
+import { useToast } from "@/components/ui/use-toast";
 
 const Login = () => {
   const navigate = useNavigate();
+  const { toast } = useToast();
 
   useEffect(() => {
     // Check current auth status
@@ -29,10 +31,6 @@ const Login = () => {
 
     return () => subscription.unsubscribe();
   }, [navigate]);
-
-  const scrollToFAQ = () => {
-    document.getElementById('faq-section')?.scrollIntoView({ behavior: 'smooth' });
-  };
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white">
@@ -78,6 +76,13 @@ const Login = () => {
             }}
             providers={[]}
             redirectTo={`${window.location.origin}/dashboard`}
+            onError={(error) => {
+              toast({
+                title: "Error",
+                description: error.message,
+                variant: "destructive",
+              });
+            }}
             localization={{
               variables: {
                 sign_in: {
@@ -89,13 +94,6 @@ const Login = () => {
               }
             }}
           />
-
-          <p className="mt-4 text-center text-sm text-gray-600">
-            Don't have an account?{" "}
-            <a href="/signup" className="text-primary hover:underline">
-              Sign up
-            </a>
-          </p>
         </div>
       </div>
     </div>
