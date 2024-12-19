@@ -67,8 +67,7 @@ export const IdeaComments = ({
     }
 
     if (data) {
-      const typedData = data as unknown as CommentResponse[];
-      setComments(typedData.map(comment => ({
+      const formattedComments = data.map(comment => ({
         id: comment.id,
         content: comment.content,
         created_at: comment.created_at,
@@ -76,7 +75,8 @@ export const IdeaComments = ({
           name: comment.profiles?.username || 'Anonymous',
           avatar: comment.profiles?.avatar_url || undefined
         }
-      })));
+      }));
+      setComments(formattedComments);
     }
   };
 
