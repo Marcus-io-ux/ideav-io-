@@ -1,5 +1,4 @@
 import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { MessageSquare, ThumbsUp } from "lucide-react";
@@ -8,9 +7,9 @@ import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { CommentList } from "./comments/CommentList";
+import { CreatePost } from "./CreatePost";
 
 export const CommunityFeed = () => {
-  const [postContent, setPostContent] = useState("");
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [expandedPost, setExpandedPost] = useState<string | null>(null);
@@ -32,42 +31,6 @@ export const CommunityFeed = () => {
       
       if (error) throw error;
       return data;
-    }
-  });
-
-  // Create post mutation
-  const createPost = useMutation({
-    mutationFn: async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error("Not authenticated");
-
-      const { error } = await supabase
-        .from('community_posts')
-        .insert([
-          {
-            user_id: user.id,
-            title: "New Post",
-            content: postContent,
-            channel: 'general'
-          }
-        ]);
-
-      if (error) throw error;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['community-posts'] });
-      setPostContent("");
-      toast({
-        title: "Post created",
-        description: "Your idea has been shared with the community!",
-      });
-    },
-    onError: () => {
-      toast({
-        title: "Error",
-        description: "Failed to create post. Please try again.",
-        variant: "destructive",
-      });
     }
   });
 
@@ -124,38 +87,13 @@ export const CommunityFeed = () => {
     }
   });
 
-  const handlePost = () => {
-    if (!postContent.trim()) {
-      toast({
-        title: "Error",
-        description: "Please enter some content for your post.",
-        variant: "destructive",
-      });
-      return;
-    }
-    createPost.mutate();
-  };
-
   const toggleComments = (postId: string) => {
     setExpandedPost(expandedPost === postId ? null : postId);
   };
 
   return (
     <div className="space-y-6">
-      <div className="bg-card rounded-lg p-6 shadow-sm">
-        <h2 className="text-xl font-semibold mb-4">What's on your mind?</h2>
-        <Textarea
-          placeholder="Share your latest idea, ask a question, or start a discussion..."
-          value={postContent}
-          onChange={(e) => setPostContent(e.target.value)}
-          className="mb-4"
-        />
-        <div className="flex justify-end">
-          <Button onClick={handlePost} disabled={createPost.isPending}>
-            {createPost.isPending ? "Posting..." : "Post"}
-          </Button>
-        </div>
-      </div>
+      <CreatePost />
 
       {isLoading ? (
         <div>Loading posts...</div>
