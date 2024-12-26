@@ -71,7 +71,25 @@ export const CreatePost = ({ selectedChannel }: CreatePostProps) => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error("Not authenticated");
 
-      const { error } = await supabase
+      // First create the idea
+      const { data: idea, error: ideaError } = await supabase
+        .from('ideas')
+        .insert([
+          {
+            title: "Community Post",
+            content: postContent,
+            user_id: user.id,
+            tags: tags,
+            shared_to_community: true
+          }
+        ])
+        .select()
+        .single();
+
+      if (ideaError) throw ideaError;
+
+      // Then create the community post
+      const { error: postError } = await supabase
         .from('community_posts')
         .insert([
           {
@@ -83,15 +101,21 @@ export const CreatePost = ({ selectedChannel }: CreatePostProps) => {
           }
         ]);
 
-      if (error) throw error;
+      if (postError) throw postError;
 
-      queryClient.invalidateQueries({ queryKey: ['community-posts'] });
+      // Invalidate both queries to refresh the UI
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ['community-posts'] }),
+        queryClient.invalidateQueries({ queryKey: ['my-ideas'] })
+      ]);
+
       setPostContent("");
       setTags([]);
       setTagInput("");
+      
       toast({
         title: "Success",
-        description: "Your idea has been shared! Let's see what the community thinks.",
+        description: "Your idea has been shared and saved to your ideas!",
       });
     } catch (error) {
       console.error('Error creating post:', error);
@@ -118,7 +142,7 @@ export const CreatePost = ({ selectedChannel }: CreatePostProps) => {
               </Button>
             </TooltipTrigger>
             <TooltipContent>
-              <p>Click to share your idea with the community and get feedback!</p>
+              <p>Click to share your idea with the community and save it to your ideas!</p>
             </TooltipContent>
           </Tooltip>
         </TooltipProvider>
