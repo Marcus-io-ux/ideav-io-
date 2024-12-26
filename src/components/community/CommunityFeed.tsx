@@ -1,16 +1,16 @@
 import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { MessageSquare, ThumbsUp, Plus } from "lucide-react";
+import { MessageSquare, ThumbsUp } from "lucide-react";
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { CommentList } from "./comments/CommentList";
-import { CreatePostDialog } from "./CreatePostDialog";
 
 export const CommunityFeed = () => {
-  const [isPostDialogOpen, setIsPostDialogOpen] = useState(false);
+  const [postContent, setPostContent] = useState("");
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [expandedPost, setExpandedPost] = useState<string | null>(null);
@@ -124,27 +124,38 @@ export const CommunityFeed = () => {
     }
   });
 
+  const handlePost = () => {
+    if (!postContent.trim()) {
+      toast({
+        title: "Error",
+        description: "Please enter some content for your post.",
+        variant: "destructive",
+      });
+      return;
+    }
+    createPost.mutate();
+  };
+
   const toggleComments = (postId: string) => {
     setExpandedPost(expandedPost === postId ? null : postId);
   };
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-end mb-6">
-        <Button 
-          onClick={() => setIsPostDialogOpen(true)}
-          size="lg"
-          className="shadow-lg hover:shadow-xl transition-all duration-300"
-        >
-          <Plus className="mr-2" size={20} />
-          Share your idea
-        </Button>
+      <div className="bg-card rounded-lg p-6 shadow-sm">
+        <h2 className="text-xl font-semibold mb-4">What's on your mind?</h2>
+        <Textarea
+          placeholder="Share your latest idea, ask a question, or start a discussion..."
+          value={postContent}
+          onChange={(e) => setPostContent(e.target.value)}
+          className="mb-4"
+        />
+        <div className="flex justify-end">
+          <Button onClick={handlePost} disabled={createPost.isPending}>
+            {createPost.isPending ? "Posting..." : "Post"}
+          </Button>
+        </div>
       </div>
-
-      <CreatePostDialog 
-        isOpen={isPostDialogOpen} 
-        onClose={() => setIsPostDialogOpen(false)} 
-      />
 
       {isLoading ? (
         <div>Loading posts...</div>
