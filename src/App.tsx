@@ -16,6 +16,7 @@ import Announcements from "./pages/Announcements";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import Profile from "./pages/Profile";
+import Community from "./pages/Community";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -115,6 +116,12 @@ const App = () => {
               path="/profile"
               element={
                 isAuthenticated ? <Profile /> : <Navigate to="/login" replace />
+              }
+            />
+            <Route
+              path="/community"
+              element={
+                isAuthenticated ? <Community /> : <Navigate to="/login" replace />
               }
             />
           </Routes>
