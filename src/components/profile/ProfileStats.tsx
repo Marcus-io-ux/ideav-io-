@@ -19,15 +19,6 @@ export function ProfileStats({ userId }: ProfileStatsProps) {
 
   return (
     <div className="flex gap-4 items-center">
-      <Button
-        variant="ghost"
-        onClick={() =>
-          setDialogConfig({ isOpen: true, type: "followers" })
-        }
-      >
-        <span className="font-bold">{stats?.followers || 0}</span>
-        <span className="ml-1">Followers</span>
-      </Button>
       <div>
         <span className="font-bold">{stats?.ideas || 0}</span>
         <span className="ml-1">Ideas</span>
