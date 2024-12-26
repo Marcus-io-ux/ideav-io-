@@ -11,6 +11,13 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Tag } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 
@@ -22,8 +29,18 @@ export const CreatePost = ({ selectedChannel }: CreatePostProps) => {
   const [postContent, setPostContent] = useState("");
   const [tagInput, setTagInput] = useState("");
   const [tags, setTags] = useState<string[]>([]);
+  const [channel, setChannel] = useState(selectedChannel);
   const { toast } = useToast();
   const queryClient = useQueryClient();
+
+  const channels = [
+    { id: "general", label: "General Ideas" },
+    { id: "business", label: "Startups & Business" },
+    { id: "tech", label: "Tech & Innovation" },
+    { id: "lifestyle", label: "Lifestyle & Wellness" },
+    { id: "design", label: "Design & Creativity" },
+    { id: "apps", label: "Apps & Tech Tools" },
+  ];
 
   const handleTagInput = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter' || e.key === ',') {
@@ -61,7 +78,7 @@ export const CreatePost = ({ selectedChannel }: CreatePostProps) => {
             user_id: user.id,
             title: "New Post",
             content: postContent,
-            channel: selectedChannel,
+            channel: channel,
             tags: tags
           }
         ]);
@@ -107,39 +124,56 @@ export const CreatePost = ({ selectedChannel }: CreatePostProps) => {
         </TooltipProvider>
       </div>
 
-      <Textarea
-        placeholder="Share your latest idea, ask a question, or start a discussion..."
-        value={postContent}
-        onChange={(e) => setPostContent(e.target.value)}
-        className="mb-4 min-h-[100px]"
-      />
-
-      <div className="space-y-2">
-        <div className="flex items-center gap-2">
-          <Tag className="w-4 h-4 text-muted-foreground" />
-          <Input
-            placeholder="Add tags (press Enter or comma to add)"
-            value={tagInput}
-            onChange={(e) => setTagInput(e.target.value)}
-            onKeyDown={handleTagInput}
-            className="flex-1"
-          />
+      <div className="space-y-4">
+        <div className="w-full">
+          <Select value={channel} onValueChange={setChannel}>
+            <SelectTrigger className="w-full">
+              <SelectValue placeholder="Select a channel" />
+            </SelectTrigger>
+            <SelectContent>
+              {channels.map((ch) => (
+                <SelectItem key={ch.id} value={ch.id}>
+                  {ch.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
-        
-        {tags.length > 0 && (
-          <div className="flex flex-wrap gap-2">
-            {tags.map((tag) => (
-              <Badge
-                key={tag}
-                variant="secondary"
-                className="cursor-pointer hover:bg-destructive/20"
-                onClick={() => removeTag(tag)}
-              >
-                {tag} ×
-              </Badge>
-            ))}
+
+        <Textarea
+          placeholder="Share your latest idea, ask a question, or start a discussion..."
+          value={postContent}
+          onChange={(e) => setPostContent(e.target.value)}
+          className="mb-4 min-h-[100px]"
+        />
+
+        <div className="space-y-2">
+          <div className="flex items-center gap-2">
+            <Tag className="w-4 h-4 text-muted-foreground" />
+            <Input
+              placeholder="Add tags (press Enter or comma to add)"
+              value={tagInput}
+              onChange={(e) => setTagInput(e.target.value)}
+              onKeyDown={handleTagInput}
+              className="flex-1"
+            />
           </div>
-        )}
+          
+          {tags.length > 0 && (
+            <div className="flex flex-wrap gap-2">
+              {tags.map((tag) => (
+                <Badge
+                  key={tag}
+                  variant="secondary"
+                  className="cursor-pointer hover:bg-destructive/20"
+                  onClick={() => removeTag(tag)}
+                >
+                  {tag} ×
+                </Badge>
+              ))}
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );
