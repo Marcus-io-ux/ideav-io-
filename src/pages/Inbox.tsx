@@ -13,7 +13,7 @@ import { Badge } from "@/components/ui/badge";
 
 const Inbox = () => {
   const [isNewMessageOpen, setIsNewMessageOpen] = useState(false);
-  const { sendMessage, deleteMessage } = useMessages();
+  const { sendMessage } = useMessages();
 
   const { data: requests, isLoading: isLoadingRequests } = useQuery({
     queryKey: ['collaboration-requests'],
@@ -125,7 +125,6 @@ const Inbox = () => {
               onReply={(message) => {
                 setIsNewMessageOpen(true);
               }}
-              onDelete={deleteMessage}
             />
           )}
         </TabsContent>
