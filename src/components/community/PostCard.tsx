@@ -1,8 +1,13 @@
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { MessageSquare, ThumbsUp, Trash2 } from "lucide-react";
+import { MessageSquare, ThumbsUp, Trash2, UserPlus } from "lucide-react";
 import { CommentList } from "./comments/CommentList";
+import { useCollaborationRequest } from "@/hooks/use-collaboration-request";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
+import { useState } from "react";
+import { Textarea } from "@/components/ui/textarea";
+import { useToast } from "@/hooks/use-toast";
 
 interface PostCardProps {
   post: any;
@@ -21,6 +26,35 @@ export const PostCard = ({
   onLike,
   onDelete,
 }: PostCardProps) => {
+  const [isCollabDialogOpen, setIsCollabDialogOpen] = useState(false);
+  const [collabMessage, setCollabMessage] = useState("");
+  const { sendCollaborationRequest, isLoading } = useCollaborationRequest();
+  const { toast } = useToast();
+
+  const handleCollabRequest = async () => {
+    if (!currentUserId) {
+      toast({
+        title: "Authentication required",
+        description: "Please sign in to send collaboration requests",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (currentUserId === post.user_id) {
+      toast({
+        title: "Cannot collaborate with yourself",
+        description: "You cannot send a collaboration request to your own post",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    await sendCollaborationRequest(post.id, post.user_id, collabMessage);
+    setIsCollabDialogOpen(false);
+    setCollabMessage("");
+  };
+
   return (
     <div className="bg-card rounded-lg p-4 md:p-6 shadow-sm">
       <div className="flex flex-col md:flex-row md:items-center justify-between mb-4 gap-4">
@@ -72,6 +106,15 @@ export const PostCard = ({
           <MessageSquare className="w-4 h-4 mr-2" />
           {post.comments_count || 0}
         </Button>
+        <Button 
+          variant="ghost" 
+          size="sm" 
+          onClick={() => setIsCollabDialogOpen(true)}
+          className="text-primary hover:text-primary/80"
+        >
+          <UserPlus className="w-4 h-4 mr-2" />
+          Collaborate
+        </Button>
       </div>
       
       {isExpanded && (
@@ -79,6 +122,39 @@ export const PostCard = ({
           <CommentList postId={post.id} />
         </div>
       )}
+
+      <Dialog open={isCollabDialogOpen} onOpenChange={setIsCollabDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Request Collaboration</DialogTitle>
+            <DialogDescription>
+              Send a message to the author explaining why you'd like to collaborate on this idea.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="py-4">
+            <Textarea
+              value={collabMessage}
+              onChange={(e) => setCollabMessage(e.target.value)}
+              placeholder="I'm interested in collaborating because..."
+              className="min-h-[100px]"
+            />
+          </div>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setIsCollabDialogOpen(false)}
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={handleCollabRequest}
+              disabled={!collabMessage.trim() || isLoading}
+            >
+              Send Request
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
