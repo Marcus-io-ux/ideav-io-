@@ -50,7 +50,6 @@ export const CommunityFeed = () => {
     }
   });
 
-  // Like post mutation
   const likePost = useMutation({
     mutationFn: async (postId: string) => {
       const { data: { user } } = await supabase.auth.getUser();
@@ -103,25 +102,25 @@ export const CommunityFeed = () => {
     }
   });
 
-  // Add delete post mutation
+  // Fix delete post mutation
   const deletePost = useMutation({
     mutationFn: async (postId: string) => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error("Not authenticated");
+      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+      if (sessionError) throw sessionError;
+      if (!session?.user) throw new Error("Not authenticated");
 
       const { error } = await supabase
         .from('community_posts')
         .delete()
-        .eq('id', postId)
-        .eq('user_id', user.id);
+        .eq('id', postId);
 
       if (error) throw error;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['community-posts'] });
       toast({
-        title: "Post deleted",
-        description: "Your post has been successfully deleted",
+        title: "Success",
+        description: "Your post has been deleted",
       });
     },
     onError: (error) => {
@@ -181,7 +180,7 @@ export const CommunityFeed = () => {
                   </p>
                 </div>
               </div>
-              {post.user_id === (supabase.auth.getUser() as any)._data?.user?.id && (
+              {post.user_id === supabase.auth.getSession().then(({ data }) => data.session?.user?.id) && (
                 <Button
                   variant="ghost"
                   size="icon"
