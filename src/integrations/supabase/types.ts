@@ -276,6 +276,7 @@ export type Database = {
           id: string
           images: string[] | null
           is_draft: boolean | null
+          shared_to_community: boolean | null
           tags: string[] | null
           title: string
           user_id: string | null
@@ -288,6 +289,7 @@ export type Database = {
           id?: string
           images?: string[] | null
           is_draft?: boolean | null
+          shared_to_community?: boolean | null
           tags?: string[] | null
           title: string
           user_id?: string | null
@@ -300,6 +302,7 @@ export type Database = {
           id?: string
           images?: string[] | null
           is_draft?: boolean | null
+          shared_to_community?: boolean | null
           tags?: string[] | null
           title?: string
           user_id?: string | null

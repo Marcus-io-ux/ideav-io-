@@ -1,13 +1,10 @@
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { MessageSquare, ThumbsUp, Database, Building, Cpu, Leaf, Palette, Smartphone, Trash2 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { CommentList } from "./comments/CommentList";
 import { CreatePost } from "./CreatePost";
+import { ChannelSelector } from "./ChannelSelector";
+import { PostCard } from "./PostCard";
 
 export const CommunityFeed = () => {
   const { toast } = useToast();
@@ -23,15 +20,6 @@ export const CommunityFeed = () => {
     };
     getUser();
   }, []);
-
-  const channels = [
-    { id: "general", icon: Database, label: "General" },
-    { id: "business", icon: Building, label: "Business" },
-    { id: "tech", icon: Cpu, label: "Tech" },
-    { id: "lifestyle", icon: Leaf, label: "Lifestyle" },
-    { id: "design", icon: Palette, label: "Design" },
-    { id: "apps", icon: Smartphone, label: "Apps" },
-  ];
 
   // Fetch posts with channel filter
   const { data: posts, isLoading } = useQuery({
@@ -64,7 +52,6 @@ export const CommunityFeed = () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error("Not authenticated");
 
-      // First check if the user has already liked this post
       const { data: existingLike } = await supabase
         .from('community_post_likes')
         .select('id')
@@ -73,7 +60,6 @@ export const CommunityFeed = () => {
         .maybeSingle();
 
       if (existingLike) {
-        // If like exists, remove it (unlike)
         const { error } = await supabase
           .from('community_post_likes')
           .delete()
@@ -83,7 +69,6 @@ export const CommunityFeed = () => {
         if (error) throw error;
         return { action: 'unliked' };
       } else {
-        // If no like exists, create one
         const { error } = await supabase
           .from('community_post_likes')
           .insert([
@@ -111,13 +96,31 @@ export const CommunityFeed = () => {
     }
   });
 
-  // Fix delete post mutation
   const deletePost = useMutation({
     mutationFn: async (postId: string) => {
       const { data: { session }, error: sessionError } = await supabase.auth.getSession();
       if (sessionError) throw sessionError;
       if (!session?.user) throw new Error("Not authenticated");
 
+      // First, update the corresponding idea if it exists
+      const { data: post } = await supabase
+        .from('community_posts')
+        .select('title, content, user_id')
+        .eq('id', postId)
+        .single();
+
+      if (post) {
+        await supabase
+          .from('ideas')
+          .update({ shared_to_community: false })
+          .match({
+            title: post.title,
+            content: post.content,
+            user_id: post.user_id
+          });
+      }
+
+      // Then delete the community post
       const { error } = await supabase
         .from('community_posts')
         .delete()
@@ -148,22 +151,10 @@ export const CommunityFeed = () => {
 
   return (
     <div className="space-y-6">
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2 mb-6">
-        {channels.map((channel) => {
-          const Icon = channel.icon;
-          return (
-            <Button
-              key={channel.id}
-              variant={selectedChannel === channel.id ? "default" : "outline"}
-              className="w-full h-8 px-2 text-sm flex items-center gap-1.5"
-              onClick={() => setSelectedChannel(channel.id)}
-            >
-              <Icon className="w-4 h-4 flex-shrink-0" />
-              <span className="truncate">{channel.label}</span>
-            </Button>
-          );
-        })}
-      </div>
+      <ChannelSelector 
+        selectedChannel={selectedChannel}
+        onChannelSelect={setSelectedChannel}
+      />
 
       <CreatePost selectedChannel={selectedChannel} />
 
@@ -171,64 +162,15 @@ export const CommunityFeed = () => {
         <div>Loading posts...</div>
       ) : (
         posts?.map((post) => (
-          <div key={post.id} className="bg-card rounded-lg p-4 md:p-6 shadow-sm">
-            <div className="flex flex-col md:flex-row md:items-center justify-between mb-4 gap-4">
-              <div className="flex items-center gap-4">
-                <Avatar>
-                  <AvatarImage src={post.profiles?.avatar_url} />
-                  <AvatarFallback>
-                    {post.profiles?.username?.[0]?.toUpperCase() || 'U'}
-                  </AvatarFallback>
-                </Avatar>
-                <div>
-                  <h3 className="font-semibold">{post.profiles?.username || 'Anonymous'}</h3>
-                  <p className="text-sm text-muted-foreground">
-                    Posted {new Date(post.created_at).toLocaleDateString()}
-                  </p>
-                </div>
-              </div>
-              {post.user_id === currentUserId && (
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => deletePost.mutate(post.id)}
-                  className="text-muted-foreground hover:text-destructive self-start md:self-auto"
-                >
-                  <Trash2 className="h-4 w-4" />
-                </Button>
-              )}
-            </div>
-            <p className="mb-4">{post.content}</p>
-            {post.tags && post.tags.length > 0 && (
-              <div className="flex flex-wrap gap-2 mb-4">
-                {post.tags.map((tag, index) => (
-                  <Badge 
-                    key={index} 
-                    variant="secondary"
-                    className="px-2 md:px-3 py-1 text-xs md:text-sm bg-primary/10 text-primary hover:bg-primary/20 transition-colors"
-                  >
-                    #{tag}
-                  </Badge>
-                ))}
-              </div>
-            )}
-            <div className="flex gap-4">
-              <Button variant="ghost" size="sm" onClick={() => likePost.mutate(post.id)}>
-                <ThumbsUp className="w-4 h-4 mr-2" />
-                {post.likes_count || 0}
-              </Button>
-              <Button variant="ghost" size="sm" onClick={() => toggleComments(post.id)}>
-                <MessageSquare className="w-4 h-4 mr-2" />
-                {post.comments_count || 0}
-              </Button>
-            </div>
-            
-            {expandedPost === post.id && (
-              <div className="mt-4 pt-4 border-t">
-                <CommentList postId={post.id} />
-              </div>
-            )}
-          </div>
+          <PostCard
+            key={post.id}
+            post={post}
+            currentUserId={currentUserId}
+            isExpanded={expandedPost === post.id}
+            onToggleComments={toggleComments}
+            onLike={(postId) => likePost.mutate(postId)}
+            onDelete={(postId) => deletePost.mutate(postId)}
+          />
         ))
       )}
     </div>
