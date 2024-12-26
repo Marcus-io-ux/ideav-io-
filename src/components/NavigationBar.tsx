@@ -1,10 +1,9 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Home, Users, Inbox, Settings, LogOut, Menu, Bell, User } from "lucide-react";
+import { Home, Settings, LogOut, Menu, Bell, User } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useState, useEffect } from "react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { Badge } from "@/components/ui/badge";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 
@@ -12,40 +11,7 @@ export const NavigationBar = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
-  const [unreadCount, setUnreadCount] = useState(0);
   const { toast } = useToast();
-
-  useEffect(() => {
-    const fetchUnreadCount = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (user) {
-        const { count } = await supabase
-          .from('messages')
-          .select('*', { count: 'exact', head: true })
-          .eq('recipient_id', user.id)
-          .eq('is_read', false);
-        
-        setUnreadCount(count || 0);
-      }
-    };
-
-    fetchUnreadCount();
-
-    // Subscribe to realtime changes
-    const channel = supabase
-      .channel('messages_channel')
-      .on('postgres_changes', 
-        { event: '*', schema: 'public', table: 'messages' },
-        () => {
-          fetchUnreadCount();
-        }
-      )
-      .subscribe();
-
-    return () => {
-      channel.unsubscribe();
-    };
-  }, []);
 
   const handleLogout = async () => {
     try {
@@ -71,14 +37,7 @@ export const NavigationBar = () => {
   const navItems = [
     { label: "My Ideas", icon: Home, path: "/dashboard" },
     { label: "Announcements", icon: Bell, path: "/announcements" },
-    { label: "Community", icon: Users, path: "/community" },
     { label: "Profile", icon: User, path: "/profile" },
-    { 
-      label: "Inbox", 
-      icon: Inbox, 
-      path: "/inbox",
-      badge: unreadCount > 0 ? unreadCount : null
-    },
     { label: "Settings", icon: Settings, path: "/settings" },
   ];
 
@@ -109,11 +68,6 @@ export const NavigationBar = () => {
                 >
                   <item.icon className="h-4 w-4" />
                   <span>{item.label}</span>
-                  {item.badge && (
-                    <Badge variant="destructive" className="ml-1">
-                      {item.badge}
-                    </Badge>
-                  )}
                 </Link>
               ))}
             </div>
@@ -141,11 +95,6 @@ export const NavigationBar = () => {
                     >
                       <item.icon className="h-4 w-4" />
                       <span>{item.label}</span>
-                      {item.badge && (
-                        <Badge variant="destructive" className="ml-1">
-                          {item.badge}
-                        </Badge>
-                      )}
                     </Link>
                   ))}
                   <Button

@@ -6,13 +6,11 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { NavigationBar } from "./components/NavigationBar";
 import Index from "./pages/Index";
 import Dashboard from "./pages/Dashboard";
-import Community from "./pages/Community";
 import Landing from "./pages/Landing";
 import Features from "./pages/Features";
 import Pricing from "./pages/Pricing";
 import AboutUs from "./pages/AboutUs";
 import Onboarding from "./pages/Onboarding";
-import Inbox from "./pages/Inbox";
 import Settings from "./pages/Settings";
 import Announcements from "./pages/Announcements";
 import Login from "./pages/Login";
@@ -78,18 +76,6 @@ const App = () => {
                 isAuthenticated ? <Dashboard /> : <Navigate to="/login" replace />
               }
             />
-            <Route
-              path="/community"
-              element={
-                isAuthenticated ? <Navigate to="/community/general-ideas" replace /> : <Navigate to="/login" replace />
-              }
-            />
-            <Route
-              path="/community/:channelId"
-              element={
-                isAuthenticated ? <Community /> : <Navigate to="/login" replace />
-              }
-            />
             <Route path="/features" element={<Features />} />
             <Route path="/pricing" element={<Pricing />} />
             <Route path="/about" element={<AboutUs />} />
@@ -101,12 +87,6 @@ const App = () => {
                 ) : (
                   <Navigate to="/login" replace />
                 )
-              }
-            />
-            <Route
-              path="/inbox"
-              element={
-                isAuthenticated ? <Inbox /> : <Navigate to="/login" replace />
               }
             />
             <Route
