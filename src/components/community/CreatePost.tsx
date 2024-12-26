@@ -55,7 +55,7 @@ export const CreatePost = () => {
 
   return (
     <div className="bg-card rounded-lg p-6 shadow-sm">
-      <div className="flex justify-between items-center mb-4">
+      <div className="flex items-center justify-between mb-4">
         <h2 className="text-xl font-semibold">What's on your mind?</h2>
         <Button onClick={handlePost} className="shadow-sm hover:shadow-md transition-all duration-300">
           + Share your idea
