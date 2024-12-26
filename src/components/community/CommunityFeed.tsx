@@ -25,12 +25,12 @@ export const CommunityFeed = () => {
   }, []);
 
   const channels = [
-    { id: "general", icon: Database, label: "General Ideas" },
-    { id: "business", icon: Building, label: "Startups & Business" },
-    { id: "tech", icon: Cpu, label: "Tech & Innovation" },
-    { id: "lifestyle", icon: Leaf, label: "Lifestyle & Wellness" },
-    { id: "design", icon: Palette, label: "Design & Creativity" },
-    { id: "apps", icon: Smartphone, label: "Apps & Tech Tools" },
+    { id: "general", icon: Database, label: "General" },
+    { id: "business", icon: Building, label: "Business" },
+    { id: "tech", icon: Cpu, label: "Tech" },
+    { id: "lifestyle", icon: Leaf, label: "Lifestyle" },
+    { id: "design", icon: Palette, label: "Design" },
+    { id: "apps", icon: Smartphone, label: "Apps" },
   ];
 
   // Fetch posts with channel filter
@@ -155,15 +155,17 @@ export const CommunityFeed = () => {
             <Button
               key={channel.id}
               variant={selectedChannel === channel.id ? "default" : "outline"}
-              className="w-full h-8 py-1 px-3 text-sm flex items-center justify-start space-x-2"
+              className="w-full h-8 px-2 text-sm flex items-center gap-1.5"
               onClick={() => setSelectedChannel(channel.id)}
             >
               <Icon className="w-4 h-4 flex-shrink-0" />
-              <span className="whitespace-normal text-left">{channel.label}</span>
+              <span className="truncate">{channel.label}</span>
             </Button>
           );
         })}
       </div>
+
+      <CreatePost selectedChannel={selectedChannel} />
 
       {isLoading ? (
         <div>Loading posts...</div>
