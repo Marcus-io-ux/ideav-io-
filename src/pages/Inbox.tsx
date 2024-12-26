@@ -6,6 +6,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { formatDistanceToNow } from "date-fns";
+import { Badge } from "@/components/ui/badge";
 
 const Inbox = () => {
   const { data: requests, isLoading: isLoadingRequests } = useQuery({
@@ -74,6 +75,9 @@ const Inbox = () => {
     }
   });
 
+  const pendingRequestsCount = requests?.filter(req => req.status === 'pending').length || 0;
+  const unreadMessagesCount = messages?.filter(msg => !msg.is_read).length || 0;
+
   return (
     <div className="container max-w-4xl mx-auto p-6">
       <PageHeader
@@ -83,8 +87,22 @@ const Inbox = () => {
 
       <Tabs defaultValue="requests" className="mt-8">
         <TabsList className="grid w-full grid-cols-2">
-          <TabsTrigger value="requests">Collaboration Requests</TabsTrigger>
-          <TabsTrigger value="messages">Messages</TabsTrigger>
+          <TabsTrigger value="requests" className="flex items-center gap-2">
+            Collaboration Requests
+            {pendingRequestsCount > 0 && (
+              <Badge variant="secondary" className="ml-2">
+                {pendingRequestsCount}
+              </Badge>
+            )}
+          </TabsTrigger>
+          <TabsTrigger value="messages" className="flex items-center gap-2">
+            Messages
+            {unreadMessagesCount > 0 && (
+              <Badge variant="secondary" className="ml-2">
+                {unreadMessagesCount}
+              </Badge>
+            )}
+          </TabsTrigger>
         </TabsList>
 
         <TabsContent value="requests" className="mt-4 space-y-4">
