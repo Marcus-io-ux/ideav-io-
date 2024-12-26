@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { MessageSquare, ThumbsUp, Hash, Rss, Github, Twitter, Linkedin } from "lucide-react";
+import { MessageSquare, ThumbsUp, Database, Building, Cpu, Leaf, Palette, Smartphone } from "lucide-react";
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
@@ -16,12 +16,12 @@ export const CommunityFeed = () => {
   const [selectedChannel, setSelectedChannel] = useState("general");
 
   const channels = [
-    { id: "general", icon: Hash, label: "General" },
-    { id: "discussions", icon: MessageSquare, label: "Discussions" },
-    { id: "announcements", icon: Rss, label: "Announcements" },
-    { id: "github", icon: Github, label: "GitHub" },
-    { id: "twitter", icon: Twitter, label: "Twitter" },
-    { id: "linkedin", icon: Linkedin, label: "LinkedIn" },
+    { id: "general", icon: Database, label: "General Ideas" },
+    { id: "business", icon: Building, label: "Startups & Business" },
+    { id: "tech", icon: Cpu, label: "Tech & Innovation" },
+    { id: "lifestyle", icon: Leaf, label: "Lifestyle & Wellness" },
+    { id: "design", icon: Palette, label: "Design & Creativity" },
+    { id: "apps", icon: Smartphone, label: "Apps & Tech Tools" },
   ];
 
   // Fetch posts with channel filter
@@ -109,7 +109,7 @@ export const CommunityFeed = () => {
 
   return (
     <div className="space-y-6">
-      <div className="grid grid-cols-3 md:grid-cols-6 gap-2 mb-6">
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-2 mb-6">
         {channels.map((channel) => {
           const Icon = channel.icon;
           return (
@@ -120,7 +120,9 @@ export const CommunityFeed = () => {
               onClick={() => setSelectedChannel(channel.id)}
             >
               <Icon className="w-4 h-4 mr-2" />
-              {channel.label}
+              <span className="text-sm whitespace-nowrap overflow-hidden text-ellipsis">
+                {channel.label}
+              </span>
             </Button>
           );
         })}
