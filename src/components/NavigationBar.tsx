@@ -1,8 +1,8 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Home, Settings, LogOut, Menu, Bell, User } from "lucide-react";
+import { Home, Settings, LogOut, Menu, Bell, User, Users } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -36,6 +36,7 @@ export const NavigationBar = () => {
 
   const navItems = [
     { label: "My Ideas", icon: Home, path: "/dashboard" },
+    { label: "Community", icon: Users, path: "/community" },
     { label: "Announcements", icon: Bell, path: "/announcements" },
     { label: "Profile", icon: User, path: "/profile" },
     { label: "Settings", icon: Settings, path: "/settings" },
