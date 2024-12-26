@@ -155,13 +155,11 @@ export const CommunityFeed = () => {
             <Button
               key={channel.id}
               variant={selectedChannel === channel.id ? "default" : "outline"}
-              className="w-full h-auto py-2 px-1 md:px-3 text-xs md:text-sm"
+              className="w-full h-auto py-3 px-4 text-sm flex items-center justify-start space-x-2"
               onClick={() => setSelectedChannel(channel.id)}
             >
-              <Icon className="w-4 h-4 mr-1 md:mr-2 flex-shrink-0" />
-              <span className="truncate">
-                {channel.label}
-              </span>
+              <Icon className="w-4 h-4 flex-shrink-0" />
+              <span className="whitespace-normal text-left">{channel.label}</span>
             </Button>
           );
         })}
