@@ -1,9 +1,7 @@
 import { useState, useEffect } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Card } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { Camera } from "lucide-react";
-import { AddIdeaDialog } from "@/components/dashboard/AddIdeaDialog";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 
@@ -137,16 +135,7 @@ export const ProfileHeader = ({ profile }: ProfileHeaderProps) => {
               {profile.bio && (
                 <p className="text-muted-foreground mt-1">{profile.bio}</p>
               )}
-              <div className="flex gap-4 mt-2">
-                <span className="text-sm">
-                  <strong>{followersCount}</strong> followers
-                </span>
-                <span className="text-sm">
-                  <strong>{followingCount}</strong> following
-                </span>
-              </div>
             </div>
-            <AddIdeaDialog onIdeaSubmit={() => {}} />
           </div>
         </div>
       </div>
