@@ -6,6 +6,9 @@ import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useQueryClient } from "@tanstack/react-query";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { Textarea } from "@/components/ui/textarea";
+import { MessageSquare } from "lucide-react";
 
 interface CollaborationRequestCardProps {
   request: any;
@@ -13,6 +16,8 @@ interface CollaborationRequestCardProps {
 
 export const CollaborationRequestCard = ({ request }: CollaborationRequestCardProps) => {
   const [isLoading, setIsLoading] = useState(false);
+  const [isMessageDialogOpen, setIsMessageDialogOpen] = useState(false);
+  const [message, setMessage] = useState("");
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -41,6 +46,38 @@ export const CollaborationRequestCard = ({ request }: CollaborationRequestCardPr
       });
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const handleSendMessage = async () => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error("Not authenticated");
+
+      const { error } = await supabase
+        .from('messages')
+        .insert({
+          sender_id: user.id,
+          recipient_id: request.requester_id,
+          content: message,
+        });
+
+      if (error) throw error;
+
+      toast({
+        title: "Message sent",
+        description: "Your message has been sent successfully",
+      });
+
+      setMessage("");
+      setIsMessageDialogOpen(false);
+    } catch (error) {
+      console.error('Error sending message:', error);
+      toast({
+        title: "Error",
+        description: "Failed to send message",
+        variant: "destructive",
+      });
     }
   };
 
@@ -91,12 +128,57 @@ export const CollaborationRequestCard = ({ request }: CollaborationRequestCardPr
               </Button>
             </>
           ) : (
-            <Badge variant={request.status === 'accepted' ? 'default' : 'secondary'}>
-              {request.status.charAt(0).toUpperCase() + request.status.slice(1)}
-            </Badge>
+            <div className="flex items-center gap-2">
+              <Badge variant={request.status === 'accepted' ? 'default' : 'secondary'}>
+                {request.status.charAt(0).toUpperCase() + request.status.slice(1)}
+              </Badge>
+              {request.status === 'accepted' && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setIsMessageDialogOpen(true)}
+                >
+                  <MessageSquare className="h-4 w-4 mr-2" />
+                  Message
+                </Button>
+              )}
+            </div>
           )}
         </div>
       </div>
+
+      <Dialog open={isMessageDialogOpen} onOpenChange={setIsMessageDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Send Message to {request.requester?.username}</DialogTitle>
+          </DialogHeader>
+          <div className="py-4">
+            <Textarea
+              value={message}
+              onChange={(e) => setMessage(e.target.value)}
+              placeholder="Type your message here..."
+              className="min-h-[100px]"
+            />
+          </div>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => {
+                setIsMessageDialogOpen(false);
+                setMessage("");
+              }}
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={handleSendMessage}
+              disabled={!message.trim()}
+            >
+              Send Message
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </Card>
   );
 };
