@@ -19,13 +19,16 @@ export const IdeaCardFooter = ({
       <Button
         variant="ghost"
         size="icon"
-        className="h-8 w-8 text-muted-foreground hover:text-primary"
+        className={cn(
+          "h-8 w-8",
+          isCurrentlyFavorite ? "text-primary" : "text-muted-foreground hover:text-primary"
+        )}
         onClick={(e) => {
           e.stopPropagation();
           onToggleFavorite();
         }}
       >
-        <Star className={cn("h-4 w-4", isCurrentlyFavorite && "fill-current text-primary")} />
+        <Star className={cn("h-4 w-4", isCurrentlyFavorite && "fill-current")} />
       </Button>
       
       {onDelete && (
@@ -37,7 +40,7 @@ export const IdeaCardFooter = ({
               className="h-8 w-8 text-muted-foreground hover:text-destructive"
               onClick={(e) => e.stopPropagation()}
             >
-              <Trash2 className="h-4 w-4" />
+              <Trash2 className="h-5 w-5" />
             </Button>
           </AlertDialogTrigger>
           <AlertDialogContent>
