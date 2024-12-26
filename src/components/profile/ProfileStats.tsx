@@ -28,15 +28,6 @@ export function ProfileStats({ userId }: ProfileStatsProps) {
         <span className="font-bold">{stats?.followers || 0}</span>
         <span className="ml-1">Followers</span>
       </Button>
-      <Button
-        variant="ghost"
-        onClick={() =>
-          setDialogConfig({ isOpen: true, type: "following" })
-        }
-      >
-        <span className="font-bold">{stats?.following || 0}</span>
-        <span className="ml-1">Following</span>
-      </Button>
       <div>
         <span className="font-bold">{stats?.ideas || 0}</span>
         <span className="ml-1">Ideas</span>
