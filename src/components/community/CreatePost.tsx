@@ -4,6 +4,12 @@ import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useQueryClient } from "@tanstack/react-query";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 export const CreatePost = () => {
   const [postContent, setPostContent] = useState("");
@@ -41,7 +47,7 @@ export const CreatePost = () => {
       setPostContent("");
       toast({
         title: "Success",
-        description: "Your idea has been shared with the community!",
+        description: "Your idea has been shared! Let's see what the community thinks.",
       });
     } catch (error) {
       console.error('Error creating post:', error);
@@ -57,9 +63,21 @@ export const CreatePost = () => {
     <div className="bg-card rounded-lg p-6 shadow-sm">
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-xl font-semibold">What's on your mind?</h2>
-        <Button onClick={handlePost} className="shadow-sm hover:shadow-md transition-all duration-300">
-          + Share your idea
-        </Button>
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button 
+                onClick={handlePost} 
+                className="shadow-sm hover:shadow-md transition-all duration-300"
+              >
+                Share Your Idea
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>Click to share your idea with the community and get feedback!</p>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
       </div>
       <Textarea
         placeholder="Share your latest idea, ask a question, or start a discussion..."
