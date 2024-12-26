@@ -63,7 +63,7 @@ export const CollaborationRequestCard = ({ request }: CollaborationRequestCardPr
         title: "Request deleted",
         description: "The collaboration request has been deleted",
       });
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error deleting request:', error);
       toast({
         title: "Error",
