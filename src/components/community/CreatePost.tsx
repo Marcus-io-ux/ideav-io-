@@ -11,25 +11,19 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { Tag, Hash, MessageSquare, Rss, Github, Twitter, Linkedin } from "lucide-react";
+import { Tag } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 
-export const CreatePost = () => {
+interface CreatePostProps {
+  selectedChannel: string;
+}
+
+export const CreatePost = ({ selectedChannel }: CreatePostProps) => {
   const [postContent, setPostContent] = useState("");
   const [tagInput, setTagInput] = useState("");
   const [tags, setTags] = useState<string[]>([]);
-  const [selectedChannel, setSelectedChannel] = useState("general");
   const { toast } = useToast();
   const queryClient = useQueryClient();
-
-  const channels = [
-    { id: "general", icon: Hash, label: "General" },
-    { id: "discussions", icon: MessageSquare, label: "Discussions" },
-    { id: "announcements", icon: Rss, label: "Announcements" },
-    { id: "github", icon: Github, label: "GitHub" },
-    { id: "twitter", icon: Twitter, label: "Twitter" },
-    { id: "linkedin", icon: Linkedin, label: "LinkedIn" },
-  ];
 
   const handleTagInput = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter' || e.key === ',') {
@@ -146,23 +140,6 @@ export const CreatePost = () => {
             ))}
           </div>
         )}
-      </div>
-
-      <div className="grid grid-cols-3 md:grid-cols-6 gap-2 pt-4">
-        {channels.map((channel) => {
-          const Icon = channel.icon;
-          return (
-            <Button
-              key={channel.id}
-              variant={selectedChannel === channel.id ? "default" : "outline"}
-              className="w-full"
-              onClick={() => setSelectedChannel(channel.id)}
-            >
-              <Icon className="w-4 h-4 mr-2" />
-              {channel.label}
-            </Button>
-          );
-        })}
       </div>
     </div>
   );

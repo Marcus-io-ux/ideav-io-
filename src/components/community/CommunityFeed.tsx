@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { MessageSquare, ThumbsUp } from "lucide-react";
+import { MessageSquare, ThumbsUp, Hash, Rss, Github, Twitter, Linkedin } from "lucide-react";
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
@@ -13,12 +13,22 @@ export const CommunityFeed = () => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [expandedPost, setExpandedPost] = useState<string | null>(null);
+  const [selectedChannel, setSelectedChannel] = useState("general");
 
-  // Fetch posts
+  const channels = [
+    { id: "general", icon: Hash, label: "General" },
+    { id: "discussions", icon: MessageSquare, label: "Discussions" },
+    { id: "announcements", icon: Rss, label: "Announcements" },
+    { id: "github", icon: Github, label: "GitHub" },
+    { id: "twitter", icon: Twitter, label: "Twitter" },
+    { id: "linkedin", icon: Linkedin, label: "LinkedIn" },
+  ];
+
+  // Fetch posts with channel filter
   const { data: posts, isLoading } = useQuery({
-    queryKey: ['community-posts'],
+    queryKey: ['community-posts', selectedChannel],
     queryFn: async () => {
-      const { data, error } = await supabase
+      const query = supabase
         .from('community_posts')
         .select(`
           *,
@@ -28,6 +38,12 @@ export const CommunityFeed = () => {
           )
         `)
         .order('created_at', { ascending: false });
+
+      if (selectedChannel !== 'all') {
+        query.eq('channel', selectedChannel);
+      }
+
+      const { data, error } = await query;
       
       if (error) throw error;
       return data;
@@ -93,7 +109,24 @@ export const CommunityFeed = () => {
 
   return (
     <div className="space-y-6">
-      <CreatePost />
+      <div className="grid grid-cols-3 md:grid-cols-6 gap-2 mb-6">
+        {channels.map((channel) => {
+          const Icon = channel.icon;
+          return (
+            <Button
+              key={channel.id}
+              variant={selectedChannel === channel.id ? "default" : "outline"}
+              className="w-full"
+              onClick={() => setSelectedChannel(channel.id)}
+            >
+              <Icon className="w-4 h-4 mr-2" />
+              {channel.label}
+            </Button>
+          );
+        })}
+      </div>
+
+      <CreatePost selectedChannel={selectedChannel} />
 
       {isLoading ? (
         <div>Loading posts...</div>
