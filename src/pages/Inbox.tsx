@@ -10,7 +10,7 @@ const Inbox = () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error("Not authenticated");
 
-      // Fetch collaboration requests with post data
+      // First get the collaboration requests with post data
       const { data: collaborationRequests, error } = await supabase
         .from('collaboration_requests')
         .select(`
@@ -19,10 +19,6 @@ const Inbox = () => {
             title,
             content,
             tags
-          ),
-          requester:profiles(
-            username,
-            avatar_url
           )
         `)
         .eq('owner_id', user.id)
@@ -33,7 +29,23 @@ const Inbox = () => {
         throw error;
       }
 
-      return collaborationRequests;
+      // Then fetch the requester profiles separately
+      const requestsWithProfiles = await Promise.all(
+        (collaborationRequests || []).map(async (request) => {
+          const { data: requesterProfile } = await supabase
+            .from('profiles')
+            .select('username, avatar_url')
+            .eq('user_id', request.requester_id)
+            .maybeSingle();
+
+          return {
+            ...request,
+            requester: requesterProfile
+          };
+        })
+      );
+
+      return requestsWithProfiles;
     }
   });
 
