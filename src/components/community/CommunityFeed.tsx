@@ -2,18 +2,18 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { MessageSquare, ThumbsUp, Share2, Bookmark } from "lucide-react";
+import { MessageSquare, ThumbsUp } from "lucide-react";
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { useNavigate } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { CommentList } from "./comments/CommentList";
 
 export const CommunityFeed = () => {
   const [postContent, setPostContent] = useState("");
   const { toast } = useToast();
-  const navigate = useNavigate();
   const queryClient = useQueryClient();
+  const [expandedPost, setExpandedPost] = useState<string | null>(null);
 
   // Fetch posts
   const { data: posts, isLoading } = useQuery({
@@ -62,7 +62,7 @@ export const CommunityFeed = () => {
         description: "Your idea has been shared with the community!",
       });
     },
-    onError: (error) => {
+    onError: () => {
       toast({
         title: "Error",
         description: "Failed to create post. Please try again.",
@@ -94,32 +94,6 @@ export const CommunityFeed = () => {
     }
   });
 
-  // Save post mutation
-  const savePost = useMutation({
-    mutationFn: async (postId: string) => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error("Not authenticated");
-
-      const { error } = await supabase
-        .from('favorites')
-        .insert([
-          { 
-            idea_id: postId, 
-            user_id: user.id,
-            item_type: 'community_post'
-          }
-        ]);
-
-      if (error) throw error;
-    },
-    onSuccess: () => {
-      toast({
-        title: "Post saved",
-        description: "Post has been saved to your favorites!",
-      });
-    }
-  });
-
   const handlePost = () => {
     if (!postContent.trim()) {
       toast({
@@ -132,20 +106,8 @@ export const CommunityFeed = () => {
     createPost.mutate();
   };
 
-  const handleShare = async (postId: string) => {
-    try {
-      await navigator.share({
-        title: 'Check out this post on IdeaVault',
-        text: 'I found this interesting post on IdeaVault',
-        url: `${window.location.origin}/community/post/${postId}`
-      });
-    } catch (error) {
-      toast({
-        title: "Share failed",
-        description: "Unable to share the post. Try copying the link instead.",
-        variant: "destructive",
-      });
-    }
+  const toggleComments = (postId: string) => {
+    setExpandedPost(expandedPost === postId ? null : postId);
   };
 
   return (
@@ -158,12 +120,7 @@ export const CommunityFeed = () => {
           onChange={(e) => setPostContent(e.target.value)}
           className="mb-4"
         />
-        <div className="flex justify-between items-center">
-          <div className="flex gap-2">
-            <Button variant="outline" size="sm">Attach Files</Button>
-            <Button variant="outline" size="sm">Add Tags</Button>
-            <Button variant="outline" size="sm">Tag Users</Button>
-          </div>
+        <div className="flex justify-end">
           <Button onClick={handlePost} disabled={createPost.isPending}>
             {createPost.isPending ? "Posting..." : "Post"}
           </Button>
@@ -200,19 +157,17 @@ export const CommunityFeed = () => {
                 <ThumbsUp className="w-4 h-4 mr-2" />
                 {post.likes_count || 0}
               </Button>
-              <Button variant="ghost" size="sm" onClick={() => navigate(`/community/post/${post.id}`)}>
+              <Button variant="ghost" size="sm" onClick={() => toggleComments(post.id)}>
                 <MessageSquare className="w-4 h-4 mr-2" />
                 {post.comments_count || 0}
               </Button>
-              <Button variant="ghost" size="sm" onClick={() => handleShare(post.id)}>
-                <Share2 className="w-4 h-4 mr-2" />
-                Share
-              </Button>
-              <Button variant="ghost" size="sm" onClick={() => savePost.mutate(post.id)}>
-                <Bookmark className="w-4 h-4 mr-2" />
-                Save
-              </Button>
             </div>
+            
+            {expandedPost === post.id && (
+              <div className="mt-4 pt-4 border-t">
+                <CommentList postId={post.id} />
+              </div>
+            )}
           </div>
         ))
       )}
