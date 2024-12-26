@@ -19,7 +19,7 @@ const Inbox = () => {
             content,
             tags
           ),
-          requester:profiles(
+          requester:profiles!inner(
             username,
             avatar_url
           )
