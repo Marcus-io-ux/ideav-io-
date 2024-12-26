@@ -7,8 +7,19 @@ import { Card } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { formatDistanceToNow } from "date-fns";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { Textarea } from "@/components/ui/textarea";
+import { useState } from "react";
+import { useToast } from "@/hooks/use-toast";
+import { MessageSquare } from "lucide-react";
 
 const Inbox = () => {
+  const [isReplyDialogOpen, setIsReplyDialogOpen] = useState(false);
+  const [replyTo, setReplyTo] = useState<any>(null);
+  const [replyMessage, setReplyMessage] = useState("");
+  const { toast } = useToast();
+
   const { data: requests, isLoading: isLoadingRequests } = useQuery({
     queryKey: ['collaboration-requests'],
     queryFn: async () => {
@@ -74,6 +85,38 @@ const Inbox = () => {
       return messages;
     }
   });
+
+  const handleReply = async () => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error("Not authenticated");
+
+      const { error } = await supabase
+        .from('messages')
+        .insert({
+          sender_id: user.id,
+          recipient_id: replyTo.sender_id,
+          content: replyMessage,
+        });
+
+      if (error) throw error;
+
+      toast({
+        title: "Reply sent",
+        description: "Your reply has been sent successfully",
+      });
+
+      setReplyMessage("");
+      setIsReplyDialogOpen(false);
+    } catch (error) {
+      console.error('Error sending reply:', error);
+      toast({
+        title: "Error",
+        description: "Failed to send reply",
+        variant: "destructive",
+      });
+    }
+  };
 
   const pendingRequestsCount = requests?.filter(req => req.status === 'pending').length || 0;
   const unreadMessagesCount = messages?.filter(msg => !msg.is_read).length || 0;
@@ -144,6 +187,19 @@ const Inbox = () => {
                       </span>
                     </div>
                     <p className="mt-1">{message.content}</p>
+                    <div className="mt-2">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => {
+                          setReplyTo(message);
+                          setIsReplyDialogOpen(true);
+                        }}
+                      >
+                        <MessageSquare className="h-4 w-4 mr-2" />
+                        Reply
+                      </Button>
+                    </div>
                   </div>
                 </div>
               </Card>
@@ -151,6 +207,39 @@ const Inbox = () => {
           )}
         </TabsContent>
       </Tabs>
+
+      <Dialog open={isReplyDialogOpen} onOpenChange={setIsReplyDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Reply to {replyTo?.sender.username}</DialogTitle>
+          </DialogHeader>
+          <div className="py-4">
+            <Textarea
+              value={replyMessage}
+              onChange={(e) => setReplyMessage(e.target.value)}
+              placeholder="Type your reply here..."
+              className="min-h-[100px]"
+            />
+          </div>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => {
+                setIsReplyDialogOpen(false);
+                setReplyMessage("");
+              }}
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={handleReply}
+              disabled={!replyMessage.trim()}
+            >
+              Send Reply
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

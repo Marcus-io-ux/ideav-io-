@@ -8,7 +8,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useQueryClient } from "@tanstack/react-query";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
-import { MessageSquare } from "lucide-react";
+import { MessageSquare, Trash2 } from "lucide-react";
 
 interface CollaborationRequestCardProps {
   request: any;
@@ -49,6 +49,34 @@ export const CollaborationRequestCard = ({ request }: CollaborationRequestCardPr
     }
   };
 
+  const handleDelete = async () => {
+    try {
+      setIsLoading(true);
+      const { error } = await supabase
+        .from('collaboration_requests')
+        .delete()
+        .eq('id', request.id);
+
+      if (error) throw error;
+
+      await queryClient.invalidateQueries({ queryKey: ['collaboration-requests'] });
+
+      toast({
+        title: "Request deleted",
+        description: "The collaboration request has been deleted",
+      });
+    } catch (error) {
+      console.error('Error deleting request:', error);
+      toast({
+        title: "Error",
+        description: "Failed to delete request",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const handleSendMessage = async () => {
     try {
       const { data: { user } } = await supabase.auth.getUser();
@@ -71,6 +99,9 @@ export const CollaborationRequestCard = ({ request }: CollaborationRequestCardPr
 
       setMessage("");
       setIsMessageDialogOpen(false);
+      
+      // Invalidate messages query to refresh the messages list
+      await queryClient.invalidateQueries({ queryKey: ['messages'] });
     } catch (error) {
       console.error('Error sending message:', error);
       toast({
@@ -133,14 +164,24 @@ export const CollaborationRequestCard = ({ request }: CollaborationRequestCardPr
                 {request.status.charAt(0).toUpperCase() + request.status.slice(1)}
               </Badge>
               {request.status === 'accepted' && (
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setIsMessageDialogOpen(true)}
-                >
-                  <MessageSquare className="h-4 w-4 mr-2" />
-                  Message
-                </Button>
+                <>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setIsMessageDialogOpen(true)}
+                  >
+                    <MessageSquare className="h-4 w-4 mr-2" />
+                    Message
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={handleDelete}
+                    disabled={isLoading}
+                  >
+                    <Trash2 className="h-4 w-4 text-destructive" />
+                  </Button>
+                </>
               )}
             </div>
           )}
