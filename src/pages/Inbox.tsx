@@ -19,7 +19,7 @@ const Inbox = () => {
             content,
             tags
           ),
-          requester:profiles!collaboration_requests_requester_id_fkey(
+          requester:profiles(
             username,
             avatar_url
           )
