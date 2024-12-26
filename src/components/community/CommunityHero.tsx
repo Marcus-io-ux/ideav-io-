@@ -1,4 +1,9 @@
-export const CommunityHero = () => {
+interface CommunityHeroProps {
+  onPostClick?: () => void;
+  onExploreClick?: () => void;
+}
+
+export const CommunityHero = ({ onPostClick, onExploreClick }: CommunityHeroProps) => {
   return (
     <section className="text-center mb-12">
       <h1 className="text-4xl font-bold mb-4">Welcome to the IdeaVault Community!</h1>
