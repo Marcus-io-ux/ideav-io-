@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { MessageSquare, ThumbsUp, Database, Building, Cpu, Leaf, Palette, Smartphone, Trash2 } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
@@ -14,6 +14,15 @@ export const CommunityFeed = () => {
   const queryClient = useQueryClient();
   const [expandedPost, setExpandedPost] = useState<string | null>(null);
   const [selectedChannel, setSelectedChannel] = useState("general");
+  const [currentUserId, setCurrentUserId] = useState<string | null>(null);
+
+  useEffect(() => {
+    const getUser = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      setCurrentUserId(session?.user?.id || null);
+    };
+    getUser();
+  }, []);
 
   const channels = [
     { id: "general", icon: Database, label: "General Ideas" },
@@ -180,7 +189,7 @@ export const CommunityFeed = () => {
                   </p>
                 </div>
               </div>
-              {post.user_id === supabase.auth.getSession().then(({ data }) => data.session?.user?.id) && (
+              {post.user_id === currentUserId && (
                 <Button
                   variant="ghost"
                   size="icon"
