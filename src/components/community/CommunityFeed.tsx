@@ -8,6 +8,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { CommentList } from "./comments/CommentList";
 import { CreatePost } from "./CreatePost";
+import { PopulateChannelsButton } from "./PopulateChannelsButton";
 
 export const CommunityFeed = () => {
   const { toast } = useToast();
@@ -167,7 +168,10 @@ export const CommunityFeed = () => {
         })}
       </div>
 
-      <CreatePost selectedChannel={selectedChannel} />
+      <div className="flex items-center justify-between">
+        <CreatePost selectedChannel={selectedChannel} />
+        <PopulateChannelsButton />
+      </div>
 
       {isLoading ? (
         <div>Loading posts...</div>
