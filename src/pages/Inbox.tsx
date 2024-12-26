@@ -27,7 +27,11 @@ const Inbox = () => {
         .eq('owner_id', user.id)
         .order('created_at', { ascending: false });
 
-      if (error) throw error;
+      if (error) {
+        console.error('Error fetching collaboration requests:', error);
+        throw error;
+      }
+
       return data;
     }
   });
