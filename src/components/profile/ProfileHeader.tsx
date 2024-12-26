@@ -106,10 +106,10 @@ export const ProfileHeader = ({ profile, actionButton }: ProfileHeaderProps) => 
   };
 
   return (
-    <Card className="p-6">
-      <div className="flex items-center gap-6">
-        <div className="relative">
-          <Avatar className="h-24 w-24">
+    <Card className="p-4 md:p-6">
+      <div className="flex flex-col md:flex-row md:items-center gap-4 md:gap-6">
+        <div className="relative mx-auto md:mx-0">
+          <Avatar className="h-20 w-20 md:h-24 md:w-24">
             <AvatarImage src={profile.avatar_url} />
             <AvatarFallback>{profile.username?.[0]?.toUpperCase()}</AvatarFallback>
           </Avatar>
@@ -130,14 +130,16 @@ export const ProfileHeader = ({ profile, actionButton }: ProfileHeaderProps) => 
         </div>
 
         <div className="flex-1">
-          <div className="flex justify-between items-start">
-            <div>
-              <h1 className="text-2xl font-bold">{profile.username}</h1>
+          <div className="flex flex-col md:flex-row justify-between items-center md:items-start gap-4">
+            <div className="text-center md:text-left">
+              <h1 className="text-xl md:text-2xl font-bold">{profile.username}</h1>
               {profile.bio && (
                 <p className="text-muted-foreground mt-1">{profile.bio}</p>
               )}
             </div>
-            {actionButton}
+            <div className="w-full md:w-auto">
+              {actionButton}
+            </div>
           </div>
         </div>
       </div>

@@ -49,7 +49,7 @@ export const NavigationBar = () => {
           <div className="flex justify-between items-center">
             <Link 
               to="/" 
-              className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary to-primary-light hover:opacity-80 transition-opacity"
+              className="text-xl md:text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary to-primary-light hover:opacity-80 transition-opacity"
             >
               IdeaVault
             </Link>
@@ -76,7 +76,7 @@ export const NavigationBar = () => {
             {/* Mobile Navigation */}
             <Sheet>
               <SheetTrigger asChild className="md:hidden">
-                <Button variant="ghost" size="icon">
+                <Button variant="ghost" size="icon" className="mr-2">
                   <Menu className="h-5 w-5" />
                 </Button>
               </SheetTrigger>
@@ -92,7 +92,6 @@ export const NavigationBar = () => {
                           ? "bg-primary text-white"
                           : "text-muted-foreground hover:bg-accent"
                       )}
-                      onClick={() => setIsOpen(false)}
                     >
                       <item.icon className="h-4 w-4" />
                       <span>{item.label}</span>

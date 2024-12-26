@@ -148,18 +148,18 @@ export const CommunityFeed = () => {
 
   return (
     <div className="space-y-6">
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-2 mb-6">
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2 mb-6">
         {channels.map((channel) => {
           const Icon = channel.icon;
           return (
             <Button
               key={channel.id}
               variant={selectedChannel === channel.id ? "default" : "outline"}
-              className="w-full h-auto py-2 px-3"
+              className="w-full h-auto py-2 px-1 md:px-3 text-xs md:text-sm"
               onClick={() => setSelectedChannel(channel.id)}
             >
-              <Icon className="w-4 h-4 mr-2 flex-shrink-0" />
-              <span className="text-sm">
+              <Icon className="w-4 h-4 mr-1 md:mr-2 flex-shrink-0" />
+              <span className="truncate">
                 {channel.label}
               </span>
             </Button>
@@ -173,8 +173,8 @@ export const CommunityFeed = () => {
         <div>Loading posts...</div>
       ) : (
         posts?.map((post) => (
-          <div key={post.id} className="bg-card rounded-lg p-6 shadow-sm">
-            <div className="flex items-center justify-between mb-4">
+          <div key={post.id} className="bg-card rounded-lg p-4 md:p-6 shadow-sm">
+            <div className="flex flex-col md:flex-row md:items-center justify-between mb-4 gap-4">
               <div className="flex items-center gap-4">
                 <Avatar>
                   <AvatarImage src={post.profiles?.avatar_url} />
@@ -194,7 +194,7 @@ export const CommunityFeed = () => {
                   variant="ghost"
                   size="icon"
                   onClick={() => deletePost.mutate(post.id)}
-                  className="text-muted-foreground hover:text-destructive"
+                  className="text-muted-foreground hover:text-destructive self-start md:self-auto"
                 >
                   <Trash2 className="h-4 w-4" />
                 </Button>
@@ -207,7 +207,7 @@ export const CommunityFeed = () => {
                   <Badge 
                     key={index} 
                     variant="secondary"
-                    className="px-3 py-1 text-sm bg-primary/10 text-primary hover:bg-primary/20 transition-colors"
+                    className="px-2 md:px-3 py-1 text-xs md:text-sm bg-primary/10 text-primary hover:bg-primary/20 transition-colors"
                   >
                     #{tag}
                   </Badge>

@@ -180,7 +180,7 @@ export const IdeaCard = ({
       onClick={() => setIsEditing(true)}
     >
       <CardHeader>
-        <div className="flex items-center justify-between space-y-0 pb-2">
+        <div className="flex flex-col md:flex-row md:items-center justify-between space-y-2 md:space-y-0 pb-2">
           <div className="flex items-center gap-2 flex-1">
             <IdeaCardTitle
               title={title}
@@ -191,7 +191,7 @@ export const IdeaCard = ({
               isDraft={isDraft}
             />
           </div>
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2 md:gap-4">
             <IdeaCardMetadata createdAt={createdAt} />
             <IdeaCardSelection
               isSelected={isSelected}

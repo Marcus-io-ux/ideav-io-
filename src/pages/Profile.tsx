@@ -50,8 +50,8 @@ const Profile = () => {
   }
 
   return (
-    <div className="container max-w-4xl mx-auto px-4 py-8 space-y-8">
-      <h1 className="text-3xl font-bold">Profile</h1>
+    <div className="container max-w-4xl mx-auto px-4 py-4 md:py-8 space-y-4 md:space-y-8">
+      <h1 className="text-2xl md:text-3xl font-bold">Profile</h1>
       <ProfileHeader 
         profile={profileData} 
         actionButton={
