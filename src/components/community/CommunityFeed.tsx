@@ -155,7 +155,7 @@ export const CommunityFeed = () => {
             <Button
               key={channel.id}
               variant={selectedChannel === channel.id ? "default" : "outline"}
-              className="w-full h-auto py-3 px-4 text-sm flex items-center justify-start space-x-2"
+              className="w-full h-8 py-1 px-3 text-sm flex items-center justify-start space-x-2"
               onClick={() => setSelectedChannel(channel.id)}
             >
               <Icon className="w-4 h-4 flex-shrink-0" />
@@ -164,8 +164,6 @@ export const CommunityFeed = () => {
           );
         })}
       </div>
-
-      <CreatePost selectedChannel={selectedChannel} />
 
       {isLoading ? (
         <div>Loading posts...</div>
