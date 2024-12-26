@@ -8,6 +8,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, Di
 import { useState } from "react";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
+import { useNavigate } from "react-router-dom";
 
 interface PostCardProps {
   post: any;
@@ -30,6 +31,7 @@ export const PostCard = ({
   const [collabMessage, setCollabMessage] = useState("");
   const { sendCollaborationRequest, isLoading } = useCollaborationRequest();
   const { toast } = useToast();
+  const navigate = useNavigate();
 
   const handleCollabRequest = async () => {
     if (!currentUserId) {
@@ -50,9 +52,28 @@ export const PostCard = ({
       return;
     }
 
-    await sendCollaborationRequest(post.id, post.user_id, collabMessage);
-    setIsCollabDialogOpen(false);
-    setCollabMessage("");
+    try {
+      await sendCollaborationRequest(post.id, post.user_id, collabMessage);
+      setIsCollabDialogOpen(false);
+      setCollabMessage("");
+      
+      toast({
+        title: "Request sent successfully",
+        description: "Your collaboration request has been sent to the post owner",
+      });
+
+      // Ask user if they want to view their sent request in inbox
+      const viewInInbox = window.confirm("Would you like to view your sent request in your inbox?");
+      if (viewInInbox) {
+        navigate("/inbox");
+      }
+    } catch (error) {
+      toast({
+        title: "Error sending request",
+        description: "Failed to send collaboration request. Please try again.",
+        variant: "destructive",
+      });
+    }
   };
 
   return (
@@ -111,6 +132,7 @@ export const PostCard = ({
           size="sm" 
           onClick={() => setIsCollabDialogOpen(true)}
           className="text-primary hover:text-primary/80"
+          disabled={post.user_id === currentUserId}
         >
           <UserPlus className="w-4 h-4 mr-2" />
           Collaborate
@@ -142,7 +164,10 @@ export const PostCard = ({
           <DialogFooter>
             <Button
               variant="outline"
-              onClick={() => setIsCollabDialogOpen(false)}
+              onClick={() => {
+                setIsCollabDialogOpen(false);
+                setCollabMessage("");
+              }}
             >
               Cancel
             </Button>
