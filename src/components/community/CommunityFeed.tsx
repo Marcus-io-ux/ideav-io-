@@ -77,19 +77,49 @@ export const CommunityFeed = () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error("Not authenticated");
 
-      const { error } = await supabase
+      // First check if the user has already liked this post
+      const { data: existingLike } = await supabase
         .from('community_post_likes')
-        .insert([
-          { post_id: postId, user_id: user.id }
-        ]);
+        .select('id')
+        .eq('post_id', postId)
+        .eq('user_id', user.id)
+        .maybeSingle();
 
-      if (error) throw error;
+      if (existingLike) {
+        // If like exists, remove it (unlike)
+        const { error } = await supabase
+          .from('community_post_likes')
+          .delete()
+          .eq('post_id', postId)
+          .eq('user_id', user.id);
+
+        if (error) throw error;
+        return { action: 'unliked' };
+      } else {
+        // If no like exists, create one
+        const { error } = await supabase
+          .from('community_post_likes')
+          .insert([
+            { post_id: postId, user_id: user.id }
+          ]);
+
+        if (error) throw error;
+        return { action: 'liked' };
+      }
     },
-    onSuccess: () => {
+    onSuccess: (result) => {
       queryClient.invalidateQueries({ queryKey: ['community-posts'] });
       toast({
-        title: "Post liked",
-        description: "You've liked this post!",
+        title: result.action === 'liked' ? "Post liked" : "Post unliked",
+        description: result.action === 'liked' ? "You've liked this post!" : "You've unliked this post",
+      });
+    },
+    onError: (error) => {
+      console.error('Error toggling like:', error);
+      toast({
+        title: "Error",
+        description: "Failed to update like status. Please try again.",
+        variant: "destructive",
       });
     }
   });
