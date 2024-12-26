@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { MessageSquare, ThumbsUp, Database, Building, Cpu, Leaf, Palette, Smartphone } from "lucide-react";
+import { MessageSquare, ThumbsUp, Database, Building, Cpu, Leaf, Palette, Smartphone, Trash2 } from "lucide-react";
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
@@ -103,6 +103,37 @@ export const CommunityFeed = () => {
     }
   });
 
+  // Add delete post mutation
+  const deletePost = useMutation({
+    mutationFn: async (postId: string) => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error("Not authenticated");
+
+      const { error } = await supabase
+        .from('community_posts')
+        .delete()
+        .eq('id', postId)
+        .eq('user_id', user.id);
+
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['community-posts'] });
+      toast({
+        title: "Post deleted",
+        description: "Your post has been successfully deleted",
+      });
+    },
+    onError: (error) => {
+      console.error('Error deleting post:', error);
+      toast({
+        title: "Error",
+        description: "Failed to delete post. Please try again.",
+        variant: "destructive",
+      });
+    }
+  });
+
   const toggleComments = (postId: string) => {
     setExpandedPost(expandedPost === postId ? null : postId);
   };
@@ -135,26 +166,46 @@ export const CommunityFeed = () => {
       ) : (
         posts?.map((post) => (
           <div key={post.id} className="bg-card rounded-lg p-6 shadow-sm">
-            <div className="flex items-center gap-4 mb-4">
-              <Avatar>
-                <AvatarImage src={post.profiles?.avatar_url} />
-                <AvatarFallback>
-                  {post.profiles?.username?.[0]?.toUpperCase() || 'U'}
-                </AvatarFallback>
-              </Avatar>
-              <div>
-                <h3 className="font-semibold">{post.profiles?.username || 'Anonymous'}</h3>
-                <p className="text-sm text-muted-foreground">
-                  Posted {new Date(post.created_at).toLocaleDateString()}
-                </p>
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-4">
+                <Avatar>
+                  <AvatarImage src={post.profiles?.avatar_url} />
+                  <AvatarFallback>
+                    {post.profiles?.username?.[0]?.toUpperCase() || 'U'}
+                  </AvatarFallback>
+                </Avatar>
+                <div>
+                  <h3 className="font-semibold">{post.profiles?.username || 'Anonymous'}</h3>
+                  <p className="text-sm text-muted-foreground">
+                    Posted {new Date(post.created_at).toLocaleDateString()}
+                  </p>
+                </div>
               </div>
+              {post.user_id === (supabase.auth.getUser() as any)._data?.user?.id && (
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => deletePost.mutate(post.id)}
+                  className="text-muted-foreground hover:text-destructive"
+                >
+                  <Trash2 className="h-4 w-4" />
+                </Button>
+              )}
             </div>
             <p className="mb-4">{post.content}</p>
-            <div className="flex gap-2 mb-4">
-              {post.tags?.map((tag, index) => (
-                <Badge key={index} variant="secondary">#{tag}</Badge>
-              ))}
-            </div>
+            {post.tags && post.tags.length > 0 && (
+              <div className="flex flex-wrap gap-2 mb-4">
+                {post.tags.map((tag, index) => (
+                  <Badge 
+                    key={index} 
+                    variant="secondary"
+                    className="px-3 py-1 text-sm bg-primary/10 text-primary hover:bg-primary/20 transition-colors"
+                  >
+                    #{tag}
+                  </Badge>
+                ))}
+              </div>
+            )}
             <div className="flex gap-4">
               <Button variant="ghost" size="sm" onClick={() => likePost.mutate(post.id)}>
                 <ThumbsUp className="w-4 h-4 mr-2" />
