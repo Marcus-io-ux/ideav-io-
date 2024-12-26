@@ -13,9 +13,10 @@ interface ProfileHeaderProps {
     is_public?: boolean;
     user_id: string;
   };
+  actionButton?: React.ReactNode;
 }
 
-export const ProfileHeader = ({ profile }: ProfileHeaderProps) => {
+export const ProfileHeader = ({ profile, actionButton }: ProfileHeaderProps) => {
   const [followersCount, setFollowersCount] = useState(0);
   const [followingCount, setFollowingCount] = useState(0);
   const { toast } = useToast();
@@ -136,6 +137,7 @@ export const ProfileHeader = ({ profile }: ProfileHeaderProps) => {
                 <p className="text-muted-foreground mt-1">{profile.bio}</p>
               )}
             </div>
+            {actionButton}
           </div>
         </div>
       </div>

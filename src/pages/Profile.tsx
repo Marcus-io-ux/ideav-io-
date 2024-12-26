@@ -51,19 +51,21 @@ const Profile = () => {
 
   return (
     <div className="container max-w-4xl mx-auto px-4 py-8 space-y-8">
-      <div className="flex justify-between items-start">
-        <h1 className="text-3xl font-bold">Profile</h1>
-        <AddIdeaDialog 
-          buttonText="+ Add Idea"
-          onIdeaSubmit={() => {
-            toast({
-              title: "Success",
-              description: "Your idea has been created successfully!",
-            });
-          }}
-        />
-      </div>
-      <ProfileHeader profile={profileData} />
+      <h1 className="text-3xl font-bold">Profile</h1>
+      <ProfileHeader 
+        profile={profileData} 
+        actionButton={
+          <AddIdeaDialog 
+            buttonText="Add Idea"
+            onIdeaSubmit={() => {
+              toast({
+                title: "Success",
+                description: "Your idea has been created successfully!",
+              });
+            }}
+          />
+        }
+      />
       <StatsSection userId={profileData?.user_id} />
       <RecentIdeas userId={profileData?.user_id} />
     </div>
