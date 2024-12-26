@@ -6,9 +6,8 @@ import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useQueryClient } from "@tanstack/react-query";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
-import { Textarea } from "@/components/ui/textarea";
 import { MessageSquare, Trash2 } from "lucide-react";
+import { MessageDialog } from "./MessageDialog";
 
 interface CollaborationRequestCardProps {
   request: any;
@@ -17,7 +16,6 @@ interface CollaborationRequestCardProps {
 export const CollaborationRequestCard = ({ request }: CollaborationRequestCardProps) => {
   const [isLoading, setIsLoading] = useState(false);
   const [isMessageDialogOpen, setIsMessageDialogOpen] = useState(false);
-  const [message, setMessage] = useState("");
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -74,41 +72,6 @@ export const CollaborationRequestCard = ({ request }: CollaborationRequestCardPr
       });
     } finally {
       setIsLoading(false);
-    }
-  };
-
-  const handleSendMessage = async () => {
-    try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error("Not authenticated");
-
-      const { error } = await supabase
-        .from('messages')
-        .insert({
-          sender_id: user.id,
-          recipient_id: request.requester_id,
-          content: message,
-        });
-
-      if (error) throw error;
-
-      toast({
-        title: "Message sent",
-        description: "Your message has been sent successfully",
-      });
-
-      setMessage("");
-      setIsMessageDialogOpen(false);
-      
-      // Invalidate messages query to refresh the messages list
-      await queryClient.invalidateQueries({ queryKey: ['messages'] });
-    } catch (error) {
-      console.error('Error sending message:', error);
-      toast({
-        title: "Error",
-        description: "Failed to send message",
-        variant: "destructive",
-      });
     }
   };
 
@@ -188,38 +151,12 @@ export const CollaborationRequestCard = ({ request }: CollaborationRequestCardPr
         </div>
       </div>
 
-      <Dialog open={isMessageDialogOpen} onOpenChange={setIsMessageDialogOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Send Message to {request.requester?.username}</DialogTitle>
-          </DialogHeader>
-          <div className="py-4">
-            <Textarea
-              value={message}
-              onChange={(e) => setMessage(e.target.value)}
-              placeholder="Type your message here..."
-              className="min-h-[100px]"
-            />
-          </div>
-          <DialogFooter>
-            <Button
-              variant="outline"
-              onClick={() => {
-                setIsMessageDialogOpen(false);
-                setMessage("");
-              }}
-            >
-              Cancel
-            </Button>
-            <Button
-              onClick={handleSendMessage}
-              disabled={!message.trim()}
-            >
-              Send Message
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      <MessageDialog
+        open={isMessageDialogOpen}
+        onOpenChange={setIsMessageDialogOpen}
+        recipientId={request.requester_id}
+        recipientUsername={request.requester?.username}
+      />
     </Card>
   );
 };

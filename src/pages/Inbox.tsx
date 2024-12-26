@@ -1,23 +1,18 @@
+import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { PageHeader } from "@/components/ui/page-header";
-import { CollaborationRequestCard } from "@/components/inbox/CollaborationRequestCard";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Card } from "@/components/ui/card";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { formatDistanceToNow } from "date-fns";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
-import { Textarea } from "@/components/ui/textarea";
-import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
-import { MessageSquare } from "lucide-react";
+import { MessageHeader } from "@/components/inbox/MessageHeader";
+import { MessageThreadList } from "@/components/inbox/MessageThreadList";
+import { NewMessageDialog } from "@/components/inbox/NewMessageDialog";
+import { CollaborationRequestCard } from "@/components/inbox/CollaborationRequestCard";
+import { PlusCircle, Bell } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
 
 const Inbox = () => {
-  const [isReplyDialogOpen, setIsReplyDialogOpen] = useState(false);
-  const [replyTo, setReplyTo] = useState<any>(null);
-  const [replyMessage, setReplyMessage] = useState("");
+  const [isNewMessageOpen, setIsNewMessageOpen] = useState(false);
   const { toast } = useToast();
 
   const { data: requests, isLoading: isLoadingRequests } = useQuery({
@@ -26,7 +21,6 @@ const Inbox = () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error("Not authenticated");
 
-      // First get the collaboration requests with post data
       const { data: collaborationRequests, error } = await supabase
         .from('collaboration_requests')
         .select(`
@@ -35,33 +29,17 @@ const Inbox = () => {
             title,
             content,
             tags
+          ),
+          requester:profiles!collaboration_requests_requester_id_fkey(
+            username,
+            avatar_url
           )
         `)
         .eq('owner_id', user.id)
         .order('created_at', { ascending: false });
 
-      if (error) {
-        console.error('Error fetching collaboration requests:', error);
-        throw error;
-      }
-
-      // Then fetch the requester profiles separately
-      const requestsWithProfiles = await Promise.all(
-        (collaborationRequests || []).map(async (request) => {
-          const { data: requesterProfile } = await supabase
-            .from('profiles')
-            .select('username, avatar_url')
-            .eq('user_id', request.requester_id)
-            .maybeSingle();
-
-          return {
-            ...request,
-            requester: requesterProfile
-          };
-        })
-      );
-
-      return requestsWithProfiles;
+      if (error) throw error;
+      return collaborationRequests;
     }
   });
 
@@ -71,7 +49,7 @@ const Inbox = () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error("Not authenticated");
 
-      const { data: messages, error } = await supabase
+      const { data, error } = await supabase
         .from('messages')
         .select(`
           *,
@@ -82,37 +60,68 @@ const Inbox = () => {
         .order('created_at', { ascending: false });
 
       if (error) throw error;
-      return messages;
+      return data;
     }
   });
 
-  const handleReply = async () => {
+  const handleSendMessage = async (recipientUsername: string, content: string) => {
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error("Not authenticated");
+
+      // First get the recipient's profile
+      const { data: recipientProfile } = await supabase
+        .from('profiles')
+        .select('user_id')
+        .eq('username', recipientUsername)
+        .single();
+
+      if (!recipientProfile) {
+        throw new Error("Recipient not found");
+      }
 
       const { error } = await supabase
         .from('messages')
         .insert({
           sender_id: user.id,
-          recipient_id: replyTo.sender_id,
-          content: replyMessage,
+          recipient_id: recipientProfile.user_id,
+          content,
         });
 
       if (error) throw error;
 
       toast({
-        title: "Reply sent",
-        description: "Your reply has been sent successfully",
+        title: "Message sent",
+        description: "Your message has been sent successfully",
       });
-
-      setReplyMessage("");
-      setIsReplyDialogOpen(false);
     } catch (error) {
-      console.error('Error sending reply:', error);
+      console.error('Error sending message:', error);
       toast({
         title: "Error",
-        description: "Failed to send reply",
+        description: "Failed to send message",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleDeleteMessage = async (messageId: string) => {
+    try {
+      const { error } = await supabase
+        .from('messages')
+        .delete()
+        .eq('id', messageId);
+
+      if (error) throw error;
+
+      toast({
+        title: "Message deleted",
+        description: "The message has been deleted successfully",
+      });
+    } catch (error) {
+      console.error('Error deleting message:', error);
+      toast({
+        title: "Error",
+        description: "Failed to delete message",
         variant: "destructive",
       });
     }
@@ -123,30 +132,67 @@ const Inbox = () => {
 
   return (
     <div className="container max-w-4xl mx-auto p-6">
-      <PageHeader
-        title="Inbox"
-        description="Manage your collaboration requests and messages"
-      />
-
-      <Tabs defaultValue="requests" className="mt-8">
-        <TabsList className="grid w-full grid-cols-2">
-          <TabsTrigger value="requests" className="flex items-center gap-2">
-            Collaboration Requests
-            {pendingRequestsCount > 0 && (
-              <Badge variant="secondary" className="ml-2">
-                {pendingRequestsCount}
+      <div className="flex items-center justify-between mb-8">
+        <MessageHeader />
+        <div className="flex items-center gap-4">
+          <Button
+            onClick={() => setIsNewMessageOpen(true)}
+            className="gap-2"
+          >
+            <PlusCircle className="h-4 w-4" />
+            New Message
+          </Button>
+          <Button variant="ghost" className="relative">
+            <Bell className="h-4 w-4" />
+            {unreadMessagesCount > 0 && (
+              <Badge 
+                variant="secondary"
+                className="absolute -top-2 -right-2 min-w-[20px] h-5"
+              >
+                {unreadMessagesCount}
               </Badge>
             )}
-          </TabsTrigger>
+          </Button>
+        </div>
+      </div>
+
+      <Tabs defaultValue="messages" className="mt-8">
+        <TabsList className="grid w-full grid-cols-2">
           <TabsTrigger value="messages" className="flex items-center gap-2">
             Messages
             {unreadMessagesCount > 0 && (
-              <Badge variant="secondary" className="ml-2">
+              <Badge variant="secondary">
                 {unreadMessagesCount}
               </Badge>
             )}
           </TabsTrigger>
+          <TabsTrigger value="requests" className="flex items-center gap-2">
+            Collaboration Requests
+            {pendingRequestsCount > 0 && (
+              <Badge variant="secondary">
+                {pendingRequestsCount}
+              </Badge>
+            )}
+          </TabsTrigger>
         </TabsList>
+
+        <TabsContent value="messages" className="mt-4">
+          {isLoadingMessages ? (
+            <div>Loading messages...</div>
+          ) : messages?.length === 0 ? (
+            <div className="text-center text-muted-foreground">
+              No messages yet
+            </div>
+          ) : (
+            <MessageThreadList
+              messages={messages}
+              onReply={(message) => {
+                setIsNewMessageOpen(true);
+              }}
+              onDelete={handleDeleteMessage}
+            />
+          )}
+        </TabsContent>
 
         <TabsContent value="requests" className="mt-4 space-y-4">
           {isLoadingRequests ? (
@@ -161,85 +207,17 @@ const Inbox = () => {
             ))
           )}
         </TabsContent>
-
-        <TabsContent value="messages" className="mt-4 space-y-4">
-          {isLoadingMessages ? (
-            <div>Loading messages...</div>
-          ) : messages?.length === 0 ? (
-            <div className="text-center text-muted-foreground">
-              No messages yet
-            </div>
-          ) : (
-            messages?.map((message) => (
-              <Card key={message.id} className="p-4">
-                <div className="flex items-start space-x-4">
-                  <Avatar>
-                    <AvatarImage src={message.sender.avatar_url} />
-                    <AvatarFallback>
-                      {message.sender.username?.[0]?.toUpperCase() || 'U'}
-                    </AvatarFallback>
-                  </Avatar>
-                  <div className="flex-1">
-                    <div className="flex items-center justify-between">
-                      <p className="font-semibold">{message.sender.username}</p>
-                      <span className="text-sm text-muted-foreground">
-                        {formatDistanceToNow(new Date(message.created_at), { addSuffix: true })}
-                      </span>
-                    </div>
-                    <p className="mt-1">{message.content}</p>
-                    <div className="mt-2">
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => {
-                          setReplyTo(message);
-                          setIsReplyDialogOpen(true);
-                        }}
-                      >
-                        <MessageSquare className="h-4 w-4 mr-2" />
-                        Reply
-                      </Button>
-                    </div>
-                  </div>
-                </div>
-              </Card>
-            ))
-          )}
-        </TabsContent>
       </Tabs>
 
-      <Dialog open={isReplyDialogOpen} onOpenChange={setIsReplyDialogOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Reply to {replyTo?.sender.username}</DialogTitle>
-          </DialogHeader>
-          <div className="py-4">
-            <Textarea
-              value={replyMessage}
-              onChange={(e) => setReplyMessage(e.target.value)}
-              placeholder="Type your reply here..."
-              className="min-h-[100px]"
-            />
-          </div>
-          <DialogFooter>
-            <Button
-              variant="outline"
-              onClick={() => {
-                setIsReplyDialogOpen(false);
-                setReplyMessage("");
-              }}
-            >
-              Cancel
-            </Button>
-            <Button
-              onClick={handleReply}
-              disabled={!replyMessage.trim()}
-            >
-              Send Reply
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      <NewMessageDialog
+        open={isNewMessageOpen}
+        onOpenChange={setIsNewMessageOpen}
+        onSend={handleSendMessage}
+      />
+
+      <div className="mt-8 text-center text-muted-foreground">
+        <p>Got feedback or a question? Reach out to collaborators directly and keep the momentum going!</p>
+      </div>
     </div>
   );
 };
