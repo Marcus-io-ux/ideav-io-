@@ -14,7 +14,6 @@ export const CommunityFeed = () => {
     setShowOnlyMyPosts,
     setSelectedChannel,
     setExpandedPost,
-    likePost,
     deletePost,
   } = useCommunityFeed();
 
@@ -43,7 +42,6 @@ export const CommunityFeed = () => {
           currentUserId={currentUserId}
           expandedPost={expandedPost}
           onToggleComments={toggleComments}
-          onLike={(postId) => likePost.mutate(postId)}
           onDelete={(postId) => deletePost.mutate(postId)}
         />
       )}

@@ -113,6 +113,13 @@ export const PostCard = ({
     setEditedTags(newTags);
   };
 
+  const handleCommentAdded = () => {
+    // Always expand comments when a new comment is added
+    if (!isExpanded) {
+      onToggleComments(post.id);
+    }
+  };
+
   return (
     <div className="bg-card rounded-lg p-4 md:p-6 shadow-sm">
       <PostCardHeader
@@ -138,16 +145,16 @@ export const PostCard = ({
       <div className="mt-4">
         <PostCardCommentInput 
           postId={post.id}
-          onCommentAdded={() => onToggleComments(post.id)}
+          onCommentAdded={handleCommentAdded}
         />
       </div>
       
-      {isExpanded && (
+      {(isExpanded || post.comments?.length > 0) && (
         <div className="mt-4 pt-4 border-t">
           <PostComments
             postId={post.id}
             comments={post.comments || []}
-            onCommentAdded={() => onToggleComments(post.id)}
+            onCommentAdded={handleCommentAdded}
           />
         </div>
       )}
