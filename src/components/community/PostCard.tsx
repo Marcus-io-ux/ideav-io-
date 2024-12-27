@@ -1,14 +1,16 @@
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { MessageSquare, ThumbsUp, Trash2, UserPlus } from "lucide-react";
+import { MessageSquare, ThumbsUp, Trash2, UserPlus, Edit2 } from "lucide-react";
 import { CommentList } from "./comments/CommentList";
 import { useCollaborationRequest } from "@/hooks/use-collaboration-request";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { useState } from "react";
 import { Textarea } from "@/components/ui/textarea";
+import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
 
 interface PostCardProps {
   post: any;
@@ -29,6 +31,10 @@ export const PostCard = ({
 }: PostCardProps) => {
   const [isCollabDialogOpen, setIsCollabDialogOpen] = useState(false);
   const [collabMessage, setCollabMessage] = useState("");
+  const [isEditing, setIsEditing] = useState(false);
+  const [editedTitle, setEditedTitle] = useState(post.title);
+  const [editedContent, setEditedContent] = useState(post.content);
+  const [editedTags, setEditedTags] = useState(post.tags || []);
   const { sendCollaborationRequest, isLoading } = useCollaborationRequest();
   const { toast } = useToast();
   const navigate = useNavigate();
@@ -75,6 +81,60 @@ export const PostCard = ({
     }
   };
 
+  const handleSaveEdit = async () => {
+    try {
+      const { error: postError } = await supabase
+        .from('community_posts')
+        .update({
+          title: editedTitle,
+          content: editedContent,
+          tags: editedTags,
+        })
+        .eq('id', post.id);
+
+      if (postError) throw postError;
+
+      // Also update the corresponding idea if it exists
+      const { error: ideaError } = await supabase
+        .from('ideas')
+        .update({
+          title: editedTitle,
+          content: editedContent,
+          tags: editedTags,
+        })
+        .match({
+          title: post.title,
+          content: post.content,
+          user_id: currentUserId
+        });
+
+      if (ideaError) {
+        console.error('Error updating idea:', ideaError);
+      }
+
+      setIsEditing(false);
+      toast({
+        title: "Success",
+        description: "Your post has been updated",
+      });
+
+      // Refresh the posts list
+      window.location.reload();
+    } catch (error) {
+      console.error('Error updating post:', error);
+      toast({
+        title: "Error",
+        description: "Failed to update post. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleTagsChange = (value: string) => {
+    const newTags = value.split(',').map(tag => tag.trim()).filter(Boolean);
+    setEditedTags(newTags);
+  };
+
   return (
     <div className="bg-card rounded-lg p-4 md:p-6 shadow-sm">
       <div className="flex flex-col md:flex-row md:items-center justify-between mb-4 gap-4">
@@ -92,34 +152,90 @@ export const PostCard = ({
             </p>
           </div>
         </div>
-        {post.user_id === currentUserId && (
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => onDelete(post.id)}
-            className="text-muted-foreground hover:text-destructive self-start md:self-auto"
-          >
-            <Trash2 className="h-4 w-4" />
-          </Button>
-        )}
+        <div className="flex gap-2">
+          {post.user_id === currentUserId && (
+            <>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => setIsEditing(true)}
+                className="text-muted-foreground hover:text-primary"
+              >
+                <Edit2 className="h-4 w-4" />
+              </Button>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => onDelete(post.id)}
+                className="text-muted-foreground hover:text-destructive"
+              >
+                <Trash2 className="h-4 w-4" />
+              </Button>
+            </>
+          )}
+        </div>
       </div>
 
-      <h2 className="text-xl font-semibold mb-3">{post.title}</h2>
-      <p className="mb-4">{post.content}</p>
-
-      {post.tags && post.tags.length > 0 && (
-        <div className="flex flex-wrap gap-2 mb-4">
-          {post.tags.map((tag: string, index: number) => (
-            <Badge 
-              key={index} 
-              variant="secondary"
-              className="px-2 md:px-3 py-1 text-xs md:text-sm bg-primary/10 text-primary hover:bg-primary/20 transition-colors"
+      {isEditing ? (
+        <div className="space-y-4">
+          <div>
+            <Input
+              value={editedTitle}
+              onChange={(e) => setEditedTitle(e.target.value)}
+              className="mb-2"
+              placeholder="Title"
+            />
+            <Textarea
+              value={editedContent}
+              onChange={(e) => setEditedContent(e.target.value)}
+              className="min-h-[100px]"
+              placeholder="Content"
+            />
+          </div>
+          <div>
+            <Input
+              value={editedTags.join(', ')}
+              onChange={(e) => handleTagsChange(e.target.value)}
+              placeholder="Tags (comma-separated)"
+              className="mb-2"
+            />
+          </div>
+          <div className="flex gap-2">
+            <Button onClick={handleSaveEdit}>Save</Button>
+            <Button 
+              variant="outline" 
+              onClick={() => {
+                setIsEditing(false);
+                setEditedTitle(post.title);
+                setEditedContent(post.content);
+                setEditedTags(post.tags || []);
+              }}
             >
-              #{tag}
-            </Badge>
-          ))}
+              Cancel
+            </Button>
+          </div>
         </div>
+      ) : (
+        <>
+          <h2 className="text-xl font-semibold mb-3">{post.title}</h2>
+          <p className="mb-4">{post.content}</p>
+
+          {post.tags && post.tags.length > 0 && (
+            <div className="flex flex-wrap gap-2 mb-4">
+              {post.tags.map((tag: string, index: number) => (
+                <Badge 
+                  key={index} 
+                  variant="secondary"
+                  className="px-2 md:px-3 py-1 text-xs md:text-sm bg-primary/10 text-primary hover:bg-primary/20 transition-colors"
+                >
+                  #{tag}
+                </Badge>
+              ))}
+            </div>
+          )}
+        </>
       )}
+
       <div className="flex gap-4">
         <Button variant="ghost" size="sm" onClick={() => onLike(post.id)}>
           <ThumbsUp className="w-4 h-4 mr-2" />
