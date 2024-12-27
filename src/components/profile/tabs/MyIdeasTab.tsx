@@ -124,7 +124,7 @@ export const MyIdeasTab = () => {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col items-center justify-between gap-4 sm:flex-row">
         <SearchBar onSearch={setSearchQuery} />
         <div className="flex items-center gap-4">
           <AddIdeaDialog buttonText="Add New Idea" onIdeaSubmit={async () => {
