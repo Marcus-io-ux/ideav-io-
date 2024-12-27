@@ -133,18 +133,23 @@ const Dashboard = () => {
           "{dailyQuote}"
         </div>
         
-        <DashboardActionsBar
-          totalIdeas={ideasData.length}
-          searchQuery={searchQuery}
-          setSearchQuery={setSearchQuery}
-          viewMode={viewMode}
-          setViewMode={setViewMode}
-          showFavorites={showFavorites}
-          setShowFavorites={setShowFavorites}
-          showDrafts={showDrafts}
-          setShowDrafts={setShowDrafts}
-          handleIdeaSubmit={handleIdeaSubmit}
-        />
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div className="flex items-center gap-4 w-full sm:w-auto">
+            <FeedbackButton onClick={() => setIsFeedbackModalOpen(true)} />
+            <DashboardActionsBar
+              totalIdeas={filteredIdeas.length}
+              searchQuery={searchQuery}
+              setSearchQuery={setSearchQuery}
+              viewMode={viewMode}
+              setViewMode={setViewMode}
+              showFavorites={showFavorites}
+              setShowFavorites={setShowFavorites}
+              showDrafts={showDrafts}
+              setShowDrafts={setShowDrafts}
+              handleIdeaSubmit={handleIdeaSubmit}
+            />
+          </div>
+        </div>
 
         <IdeasGrid
           ideas={filteredIdeas}
@@ -155,7 +160,6 @@ const Dashboard = () => {
         />
       </div>
 
-      <FeedbackButton onClick={() => setIsFeedbackModalOpen(true)} />
       <FeedbackModal 
         isOpen={isFeedbackModalOpen}
         onClose={() => setIsFeedbackModalOpen(false)}
