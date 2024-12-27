@@ -13,19 +13,19 @@ interface CreatePostChannelSelectProps {
 
 export const CreatePostChannelSelect = ({ value, onChange }: CreatePostChannelSelectProps) => {
   const channels = [
-    { id: "general", label: "General Ideas" },
-    { id: "business", label: "Startups & Business" },
-    { id: "tech", label: "Tech & Innovation" },
-    { id: "lifestyle", label: "Lifestyle & Wellness" },
-    { id: "design", label: "Design & Creativity" },
-    { id: "apps", label: "Apps & Tech Tools" },
+    { id: "feedback", label: "Share Feedback" },
+    { id: "business", label: "Business Ideas" },
+    { id: "tech", label: "Tech Projects" },
+    { id: "lifestyle", label: "Lifestyle" },
+    { id: "design", label: "Design Ideas" },
+    { id: "apps", label: "App Concepts" },
   ];
 
   return (
     <div className="w-full">
       <Select value={value} onValueChange={onChange}>
         <SelectTrigger className="w-full">
-          <SelectValue placeholder="Select a channel" />
+          <SelectValue placeholder="Select a channel for your idea" />
         </SelectTrigger>
         <SelectContent>
           {channels.map((ch) => (
