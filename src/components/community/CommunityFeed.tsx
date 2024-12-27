@@ -19,7 +19,51 @@ export const CommunityFeed = () => {
       setCurrentUserId(session?.user?.id || null);
     };
     getUser();
-  }, []);
+
+    // Subscribe to real-time updates for posts, comments, and likes
+    const channel = supabase.channel('community-updates')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'community_posts'
+        },
+        () => {
+          console.log('Post updated, refreshing feed...');
+          queryClient.invalidateQueries({ queryKey: ['community-posts'] });
+        }
+      )
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'community_comments'
+        },
+        () => {
+          console.log('Comment added/removed, refreshing feed...');
+          queryClient.invalidateQueries({ queryKey: ['community-posts'] });
+        }
+      )
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'community_post_likes'
+        },
+        () => {
+          console.log('Like added/removed, refreshing feed...');
+          queryClient.invalidateQueries({ queryKey: ['community-posts'] });
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [queryClient]);
 
   // Fetch posts with channel filter
   const { data: posts, isLoading } = useQuery({

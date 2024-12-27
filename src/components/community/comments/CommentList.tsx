@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -24,6 +24,29 @@ export const CommentList = ({ postId }: CommentListProps) => {
   const [newComment, setNewComment] = useState("");
   const { toast } = useToast();
   const queryClient = useQueryClient();
+
+  useEffect(() => {
+    // Subscribe to real-time updates for comments on this post
+    const channel = supabase.channel(`comments-${postId}`)
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'community_comments',
+          filter: `post_id=eq.${postId}`
+        },
+        () => {
+          console.log('Comment updated, refreshing comments...');
+          queryClient.invalidateQueries({ queryKey: ["comments", postId] });
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [postId, queryClient]);
 
   const { data: comments, isLoading } = useQuery({
     queryKey: ["comments", postId],
