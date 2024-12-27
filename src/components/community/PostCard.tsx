@@ -149,7 +149,8 @@ export const PostCard = ({
         />
       </div>
       
-      {(isExpanded || post.comments?.length > 0) && (
+      {/* Always show comments if they exist */}
+      {post.comments?.length > 0 && (
         <div className="mt-4 pt-4 border-t">
           <PostComments
             postId={post.id}
