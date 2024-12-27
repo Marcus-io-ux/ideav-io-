@@ -18,6 +18,7 @@ export const useCommunityFeed = () => {
     };
     getUser();
 
+    // Subscribe to all relevant changes
     const channel = supabase.channel('community-updates')
       .on(
         'postgres_changes',
