@@ -80,33 +80,36 @@ export const IdeaCard = ({
       isDraft={isDraft}
       onClick={() => setIsEditing(true)}
       sharedToCommunity={sharedToCommunity}
+      className="w-full"
     >
       <CardHeader>
-        <div className="flex flex-col md:flex-row md:items-center justify-between space-y-2 md:space-y-0 pb-2">
-          <div className="flex items-center gap-2 flex-1">
-            <IdeaCardTitle
-              title={title}
-              isEditing={isEditing}
-              editedTitle={editedTitle}
-              onTitleChange={setEditedTitle}
-              onKeyDown={handleKeyDown}
-              isDraft={isDraft}
-            />
+        <div className="flex flex-col space-y-2">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+            <div className="flex items-center gap-2 flex-1">
+              <IdeaCardTitle
+                title={title}
+                isEditing={isEditing}
+                editedTitle={editedTitle}
+                onTitleChange={setEditedTitle}
+                onKeyDown={handleKeyDown}
+                isDraft={isDraft}
+              />
+            </div>
+            <div className="flex items-center gap-2">
+              <IdeaCardMetadata createdAt={createdAt} />
+              <IdeaCardSelection
+                isSelected={isSelected}
+                onSelect={onSelect}
+                id={id}
+              />
+            </div>
           </div>
-          <div className="flex items-center gap-2 md:gap-4">
-            <IdeaCardMetadata createdAt={createdAt} />
-            <IdeaCardSelection
-              isSelected={isSelected}
-              onSelect={onSelect}
-              id={id}
-            />
-          </div>
+          <IdeaCardTags 
+            tags={isEditing ? editedTags : tags}
+            isEditing={isEditing}
+            onTagsChange={handleTagsChange}
+          />
         </div>
-        <IdeaCardTags 
-          tags={isEditing ? editedTags : tags}
-          isEditing={isEditing}
-          onTagsChange={handleTagsChange}
-        />
       </CardHeader>
       <CardContent className="relative pb-16">
         <IdeaCardContent

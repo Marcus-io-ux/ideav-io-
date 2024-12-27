@@ -122,12 +122,14 @@ const Dashboard = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <div className="container max-w-7xl mx-auto p-6 space-y-8">
+      <div className="container px-4 sm:px-6 py-4 sm:py-6 mx-auto space-y-6 sm:space-y-8">
         <PageHeader
           title={`Welcome back, ${userName}!`}
           description="Your personal vault of saved and developing ideas."
+          className="text-center sm:text-left"
         />
-        <div className="text-center text-muted-foreground italic mb-8">
+        
+        <div className="text-center text-muted-foreground italic mb-4 sm:mb-8 px-4">
           "{dailyQuote}"
         </div>
         

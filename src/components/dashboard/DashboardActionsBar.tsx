@@ -35,11 +35,11 @@ export const DashboardActionsBar = ({
   handleIdeaSubmit,
 }: DashboardActionsBarProps) => {
   return (
-    <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
+    <div className="flex flex-col sm:flex-row justify-between items-center gap-4 p-4">
       <div className="text-muted-foreground text-center sm:text-left w-full sm:w-auto">
         You have {totalIdeas} idea{totalIdeas !== 1 ? 's' : ''} stored
       </div>
-      <div className="flex items-center gap-2">
+      <div className="flex flex-wrap items-center justify-center sm:justify-end gap-2">
         <Button
           variant="outline"
           size="icon"
@@ -48,13 +48,14 @@ export const DashboardActionsBar = ({
         >
           {viewMode === "grid" ? <List className="h-4 w-4" /> : <Grid className="h-4 w-4" />}
         </Button>
+        
         <Popover>
           <PopoverTrigger asChild>
             <Button variant="outline" size="icon" className="h-10 w-10">
               <Search className="h-4 w-4" />
             </Button>
           </PopoverTrigger>
-          <PopoverContent className="w-80">
+          <PopoverContent className="w-[280px] sm:w-80">
             <Input
               placeholder="Search ideas..."
               value={searchQuery}
@@ -63,6 +64,7 @@ export const DashboardActionsBar = ({
             />
           </PopoverContent>
         </Popover>
+
         <Button
           variant={showDrafts ? "default" : "outline"}
           size="icon"
@@ -71,6 +73,7 @@ export const DashboardActionsBar = ({
         >
           <Save className="h-4 w-4" />
         </Button>
+
         <Button
           variant={showFavorites ? "default" : "outline"}
           size="icon"
@@ -79,6 +82,7 @@ export const DashboardActionsBar = ({
         >
           <Star className={cn("h-4 w-4", showFavorites && "fill-current")} />
         </Button>
+
         <AddIdeaDialog onIdeaSubmit={handleIdeaSubmit} />
       </div>
     </div>

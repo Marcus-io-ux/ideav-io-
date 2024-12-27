@@ -18,7 +18,11 @@ interface IdeasGridProps {
 export const IdeasGrid = ({ ideas, isLoading, viewMode, onDelete, onIdeaSubmit }: IdeasGridProps) => {
   if (isLoading) {
     return (
-      <div className={`grid gap-6 ${viewMode === "grid" ? "grid-cols-1 md:grid-cols-2 lg:grid-cols-3" : ""}`}>
+      <div className={`grid gap-4 sm:gap-6 ${
+        viewMode === "grid" 
+          ? "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3" 
+          : "grid-cols-1"
+      }`}>
         {[...Array(6)].map((_, i) => (
           <Skeleton key={i} className="h-[200px] w-full" />
         ))}
@@ -31,7 +35,11 @@ export const IdeasGrid = ({ ideas, isLoading, viewMode, onDelete, onIdeaSubmit }
   }
 
   return (
-    <div className={`grid gap-6 ${viewMode === "grid" ? "grid-cols-1 md:grid-cols-2 lg:grid-cols-3" : ""}`}>
+    <div className={`grid gap-4 sm:gap-6 ${
+      viewMode === "grid" 
+        ? "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3" 
+        : "grid-cols-1"
+    }`}>
       {ideas.map((idea) => (
         <IdeaCard
           key={idea.id}

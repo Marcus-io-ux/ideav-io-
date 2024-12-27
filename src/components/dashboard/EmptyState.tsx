@@ -13,7 +13,7 @@ export const EmptyState = ({ onIdeaSubmit }: EmptyStateProps) => {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center py-12 text-center space-y-4">
+    <div className="flex flex-col items-center justify-center py-8 sm:py-12 text-center space-y-4 px-4">
       <div className="rounded-full bg-primary/10 p-4">
         <div className="h-12 w-12 text-primary" />
       </div>
