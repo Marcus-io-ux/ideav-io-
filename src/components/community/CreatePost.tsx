@@ -61,7 +61,6 @@ export const CreatePost = ({ selectedChannel, showOnlyMyPosts, onToggleMyPosts }
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error("Not authenticated");
 
-      // Create only the community post
       const { error: postError } = await supabase
         .from('community_posts')
         .insert([
@@ -76,7 +75,6 @@ export const CreatePost = ({ selectedChannel, showOnlyMyPosts, onToggleMyPosts }
 
       if (postError) throw postError;
 
-      // Invalidate only community posts query
       await queryClient.invalidateQueries({ queryKey: ['community-posts'] });
 
       setPostTitle("");
@@ -99,7 +97,7 @@ export const CreatePost = ({ selectedChannel, showOnlyMyPosts, onToggleMyPosts }
   };
 
   return (
-    <div className="bg-card rounded-lg p-6 shadow-sm space-y-4">
+    <div className="bg-card rounded-lg p-4 md:p-6 shadow-sm space-y-4 mx-2 md:mx-0">
       <CreatePostHeader 
         onPost={handlePost} 
         showOnlyMyPosts={showOnlyMyPosts}

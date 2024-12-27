@@ -45,18 +45,18 @@ export const NavigationBar = () => {
 
   return (
     <nav className="sticky top-0 z-50 w-full border-b bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/60">
-      <div className="flex h-16 items-center px-4">
+      <div className="flex h-14 md:h-16 items-center px-4">
         <div className="mx-auto w-full max-w-6xl">
           <div className="flex justify-between items-center">
             <Link 
               to="/" 
-              className="text-xl md:text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary to-primary-light hover:opacity-80 transition-opacity"
+              className="text-lg md:text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary to-primary-light hover:opacity-80 transition-opacity"
             >
               IdeaVault
             </Link>
 
             {/* Desktop Navigation */}
-            <div className="hidden md:flex space-x-6">
+            <div className="hidden md:flex space-x-4 lg:space-x-6">
               {navItems.map((item) => (
                 <Link
                   key={item.label}
@@ -75,42 +75,61 @@ export const NavigationBar = () => {
             </div>
 
             {/* Mobile Navigation */}
-            <Sheet>
+            <Sheet open={isOpen} onOpenChange={setIsOpen}>
               <SheetTrigger asChild className="md:hidden">
                 <Button variant="ghost" size="icon" className="mr-2">
                   <Menu className="h-5 w-5" />
                 </Button>
               </SheetTrigger>
-              <SheetContent side="left" className="w-[240px] sm:w-[280px]">
-                <div className="flex flex-col space-y-4 py-4">
-                  {navItems.map((item) => (
-                    <Link
-                      key={item.label}
-                      to={item.path}
-                      className={cn(
-                        "flex items-center space-x-2 px-2 py-1.5 text-sm font-medium rounded-md",
-                        location.pathname === item.path
-                          ? "bg-primary text-white"
-                          : "text-muted-foreground hover:bg-accent"
-                      )}
+              <SheetContent side="left" className="w-[240px] sm:w-[280px] p-0">
+                <div className="flex flex-col h-full">
+                  <div className="p-4 border-b">
+                    <Link 
+                      to="/" 
+                      className="text-xl font-bold text-primary"
+                      onClick={() => setIsOpen(false)}
                     >
-                      <item.icon className="h-4 w-4" />
-                      <span>{item.label}</span>
+                      IdeaVault
                     </Link>
-                  ))}
-                  <Button
-                    variant="ghost"
-                    className="w-full justify-start px-2 py-1.5"
-                    onClick={handleLogout}
-                  >
-                    <LogOut className="h-4 w-4 mr-2" />
-                    <span>Logout</span>
-                  </Button>
+                  </div>
+                  <nav className="flex-1 overflow-y-auto">
+                    <div className="flex flex-col p-4 space-y-2">
+                      {navItems.map((item) => (
+                        <Link
+                          key={item.label}
+                          to={item.path}
+                          onClick={() => setIsOpen(false)}
+                          className={cn(
+                            "flex items-center space-x-2 px-2 py-2 text-sm font-medium rounded-md",
+                            location.pathname === item.path
+                              ? "bg-primary text-white"
+                              : "text-muted-foreground hover:bg-accent"
+                          )}
+                        >
+                          <item.icon className="h-4 w-4" />
+                          <span>{item.label}</span>
+                        </Link>
+                      ))}
+                    </div>
+                  </nav>
+                  <div className="p-4 border-t mt-auto">
+                    <Button
+                      variant="ghost"
+                      className="w-full justify-start"
+                      onClick={() => {
+                        handleLogout();
+                        setIsOpen(false);
+                      }}
+                    >
+                      <LogOut className="h-4 w-4 mr-2" />
+                      <span>Logout</span>
+                    </Button>
+                  </div>
                 </div>
               </SheetContent>
             </Sheet>
 
-            {/* Logout Button */}
+            {/* Desktop Logout Button */}
             <Button
               variant="ghost"
               className="hidden md:flex items-center space-x-2 text-sm font-medium text-muted-foreground hover:text-primary"

@@ -23,7 +23,7 @@ export const CommunityFeed = () => {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 md:space-y-6 max-w-3xl mx-auto pb-6">
       <FeedFilters
         selectedChannel={selectedChannel}
         onChannelSelect={setSelectedChannel}
@@ -36,7 +36,7 @@ export const CommunityFeed = () => {
       />
 
       {isLoading ? (
-        <div>Loading posts...</div>
+        <div className="text-center py-8">Loading posts...</div>
       ) : (
         <FeedContent
           posts={posts || []}

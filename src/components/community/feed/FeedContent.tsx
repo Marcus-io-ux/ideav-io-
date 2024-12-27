@@ -18,7 +18,7 @@ export const FeedContent = ({
   onDelete,
 }: FeedContentProps) => {
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 md:space-y-6 px-2 md:px-0">
       {posts?.map((post) => (
         <PostCard
           key={post.id}
@@ -31,7 +31,7 @@ export const FeedContent = ({
         />
       ))}
       {posts?.length === 0 && (
-        <div className="text-center py-12">
+        <div className="text-center py-8 md:py-12">
           <p className="text-muted-foreground">No posts found</p>
         </div>
       )}
