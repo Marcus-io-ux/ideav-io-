@@ -8,6 +8,9 @@ import { Settings, Users, Lightbulb } from "lucide-react";
 import { format } from "date-fns";
 import { Link } from "react-router-dom";
 import { AnnouncementDialog } from "@/components/announcements/AnnouncementDialog";
+import { AnnouncementCard } from "@/components/announcements/AnnouncementCard";
+import { AnnouncementFilters } from "@/components/announcements/AnnouncementFilters";
+import { AnnouncementHeader } from "@/components/announcements/AnnouncementHeader";
 
 type Announcement = {
   id: string;
@@ -19,18 +22,6 @@ type Announcement = {
 };
 
 type CategoryFilter = "all" | "platform_update" | "community_news" | "featured_idea";
-
-const categoryIcons = {
-  platform_update: <Settings className="h-4 w-4" />,
-  community_news: <Users className="h-4 w-4" />,
-  featured_idea: <Lightbulb className="h-4 w-4" />,
-};
-
-const categoryLabels = {
-  platform_update: "Platform Update",
-  community_news: "Community News",
-  featured_idea: "Featured Idea",
-};
 
 export default function Announcements() {
   const [selectedCategory, setSelectedCategory] = useState<CategoryFilter>("all");
@@ -63,86 +54,30 @@ export default function Announcements() {
 
   return (
     <div className="container max-w-4xl py-8 space-y-8 animate-fade-in">
-      {/* Header Section */}
-      <div className="text-center space-y-4">
-        <h1 className="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary to-primary-light">
-          Stay Updated with Idea Vault
-        </h1>
-        <p className="text-muted-foreground text-lg">
-          All the latest platform updates, featured ideas, and community highlights in one place.
-        </p>
-      </div>
-
+      <AnnouncementHeader />
+      
       {/* Featured Announcements */}
       {featuredAnnouncements.length > 0 && (
         <div className="space-y-4">
           <h2 className="text-2xl font-semibold">Featured Updates</h2>
           <div className="grid gap-4 md:grid-cols-2">
             {featuredAnnouncements.map((announcement) => (
-              <Card key={announcement.id} className="border-2 border-primary/20 bg-accent">
-                <CardHeader>
-                  <div className="flex items-center justify-between">
-                    <Badge variant="secondary" className="flex items-center gap-1">
-                      {categoryIcons[announcement.category]}
-                      {categoryLabels[announcement.category]}
-                    </Badge>
-                    <span className="text-sm text-muted-foreground">
-                      {format(new Date(announcement.created_at), "MMM d, yyyy")}
-                    </span>
-                  </div>
-                  <h3 className="text-xl font-semibold mt-2">{announcement.title}</h3>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-muted-foreground line-clamp-3">{announcement.content}</p>
-                </CardContent>
-                <CardFooter>
-                  <Button 
-                    variant="ghost" 
-                    className="ml-auto"
-                    onClick={() => handleReadMore(announcement)}
-                  >
-                    Read More
-                  </Button>
-                </CardFooter>
-              </Card>
+              <AnnouncementCard
+                key={announcement.id}
+                announcement={announcement}
+                onReadMore={handleReadMore}
+                featured
+              />
             ))}
           </div>
         </div>
       )}
 
       {/* Category Filters */}
-      <div className="flex flex-wrap gap-2">
-        <Button
-          variant={selectedCategory === "all" ? "default" : "outline"}
-          onClick={() => setSelectedCategory("all")}
-        >
-          All Updates
-        </Button>
-        <Button
-          variant={selectedCategory === "platform_update" ? "default" : "outline"}
-          onClick={() => setSelectedCategory("platform_update")}
-          className="flex items-center gap-2"
-        >
-          <Settings className="h-4 w-4" />
-          Platform Updates
-        </Button>
-        <Button
-          variant={selectedCategory === "community_news" ? "default" : "outline"}
-          onClick={() => setSelectedCategory("community_news")}
-          className="flex items-center gap-2"
-        >
-          <Users className="h-4 w-4" />
-          Community News
-        </Button>
-        <Button
-          variant={selectedCategory === "featured_idea" ? "default" : "outline"}
-          onClick={() => setSelectedCategory("featured_idea")}
-          className="flex items-center gap-2"
-        >
-          <Lightbulb className="h-4 w-4" />
-          Featured Ideas
-        </Button>
-      </div>
+      <AnnouncementFilters
+        selectedCategory={selectedCategory}
+        onCategoryChange={setSelectedCategory}
+      />
 
       {/* Announcements Feed */}
       <div className="space-y-4">
@@ -154,32 +89,11 @@ export default function Announcements() {
           </div>
         ) : (
           filteredAnnouncements.map((announcement) => (
-            <Card key={announcement.id}>
-              <CardHeader>
-                <div className="flex items-center justify-between">
-                  <Badge variant="secondary" className="flex items-center gap-1">
-                    {categoryIcons[announcement.category]}
-                    {categoryLabels[announcement.category]}
-                  </Badge>
-                  <span className="text-sm text-muted-foreground">
-                    {format(new Date(announcement.created_at), "MMM d, yyyy")}
-                  </span>
-                </div>
-                <h3 className="text-xl font-semibold mt-2">{announcement.title}</h3>
-              </CardHeader>
-              <CardContent>
-                <p className="text-muted-foreground line-clamp-3">{announcement.content}</p>
-              </CardContent>
-              <CardFooter>
-                <Button 
-                  variant="ghost" 
-                  className="ml-auto"
-                  onClick={() => handleReadMore(announcement)}
-                >
-                  Read More
-                </Button>
-              </CardFooter>
-            </Card>
+            <AnnouncementCard
+              key={announcement.id}
+              announcement={announcement}
+              onReadMore={handleReadMore}
+            />
           ))
         )}
       </div>
