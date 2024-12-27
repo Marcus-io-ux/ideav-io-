@@ -307,6 +307,13 @@ export type Database = {
             referencedRelation: "ideas"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "idea_comments_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["user_id"]
+          },
         ]
       }
       idea_likes: {
@@ -756,6 +763,19 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      get_idea_comments: {
+        Args: {
+          p_idea_id: string
+        }
+        Returns: {
+          id: string
+          content: string
+          created_at: string
+          user_id: string
+          username: string
+          avatar_url: string
+        }[]
+      }
       update_collaboration_status: {
         Args: {
           request_id: string
