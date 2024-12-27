@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -22,6 +22,13 @@ export const MessageThread = ({ open, onOpenChange, selectedMessage }: MessageTh
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [threadMessages, setThreadMessages] = useState<Message[]>([]);
+
+  useEffect(() => {
+    if (open && selectedMessage) {
+      fetchThreadMessages();
+      markMessageAsRead();
+    }
+  }, [open, selectedMessage]);
 
   if (!selectedMessage) return null;
 
@@ -53,6 +60,21 @@ export const MessageThread = ({ open, onOpenChange, selectedMessage }: MessageTh
     setThreadMessages(data || []);
   };
 
+  const markMessageAsRead = async () => {
+    if (!selectedMessage.is_read) {
+      const { error } = await supabase
+        .from('messages')
+        .update({ is_read: true })
+        .eq('id', selectedMessage.id);
+
+      if (error) {
+        console.error('Error marking message as read:', error);
+      } else {
+        await queryClient.invalidateQueries({ queryKey: ['messages'] });
+      }
+    }
+  };
+
   const handleSendReply = async () => {
     try {
       const { data: { user } } = await supabase.auth.getUser();
@@ -67,16 +89,11 @@ export const MessageThread = ({ open, onOpenChange, selectedMessage }: MessageTh
           recipient_id: selectedMessage.sender.user_id,
           content: reply,
           parent_id: selectedMessage.id,
-          thread_id: threadId
+          thread_id: threadId,
+          is_read: false
         });
 
       if (error) throw error;
-
-      // Mark the original message as read
-      await supabase
-        .from('messages')
-        .update({ is_read: true })
-        .eq('id', selectedMessage.id);
 
       toast({
         title: "Reply sent",
@@ -85,7 +102,7 @@ export const MessageThread = ({ open, onOpenChange, selectedMessage }: MessageTh
 
       setReply("");
       await queryClient.invalidateQueries({ queryKey: ['messages'] });
-      await fetchThreadMessages(); // Refresh thread messages
+      await fetchThreadMessages();
     } catch (error) {
       console.error('Error sending reply:', error);
       toast({
