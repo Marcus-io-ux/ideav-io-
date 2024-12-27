@@ -82,6 +82,49 @@ const Inbox = () => {
   const pendingRequestsCount = requests?.filter(req => req.status === 'pending').length || 0;
   const unreadMessagesCount = messages?.filter(msg => !msg.is_read).length || 0;
 
+  // Filter messages based on current folder, search query, and active filters
+  const filteredMessages = messages?.filter(msg => {
+    // First apply folder filter
+    switch (currentFolder) {
+      case 'inbox':
+        return !msg.is_read;
+      case 'starred':
+        // Implement starred functionality when available
+        return false;
+      case 'sent':
+        return msg.sender_id === currentUser?.id;
+      case 'archived':
+        // Implement archived functionality when available
+        return false;
+      case 'trash':
+        // Implement trash functionality when available
+        return false;
+      default:
+        return true;
+    }
+  })?.filter(msg => {
+    // Then apply search filter
+    if (searchQuery) {
+      const searchLower = searchQuery.toLowerCase();
+      return (
+        msg.content.toLowerCase().includes(searchLower) ||
+        msg.sender.username?.toLowerCase().includes(searchLower) ||
+        msg.recipient.username?.toLowerCase().includes(searchLower)
+      );
+    }
+    return true;
+  })?.filter(msg => {
+    // Finally apply active filters
+    if (activeFilters.includes('unread')) {
+      return !msg.is_read;
+    }
+    if (activeFilters.includes('has_attachments')) {
+      // Implement attachment filtering when available
+      return false;
+    }
+    return true;
+  });
+
   const folderCounts = {
     inbox: unreadMessagesCount,
     starred: 0,
@@ -133,13 +176,13 @@ const Inbox = () => {
             <TabsContent value="messages" className="mt-4">
               {isLoadingMessages ? (
                 <div>Loading messages...</div>
-              ) : messages?.length === 0 ? (
+              ) : filteredMessages?.length === 0 ? (
                 <div className="text-center text-muted-foreground">
-                  No messages yet
+                  No messages found
                 </div>
               ) : (
                 <MessageThreadList
-                  messages={messages}
+                  messages={filteredMessages}
                   onReply={(message) => {
                     setIsNewMessageOpen(true);
                   }}
