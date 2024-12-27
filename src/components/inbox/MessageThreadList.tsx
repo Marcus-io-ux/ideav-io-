@@ -1,7 +1,6 @@
 import { MessageSquare, Trash2 } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { formatDistanceToNow } from "date-fns";
 import { Message } from "@/types/inbox";
@@ -10,16 +9,18 @@ import { useToast } from "@/hooks/use-toast";
 import { useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
+import { MessageThread } from "./MessageThread";
 
 interface MessageThreadListProps {
   messages: Message[];
   onReply: (message: Message) => void;
 }
 
-export const MessageThreadList = ({ messages, onReply }: MessageThreadListProps) => {
+export const MessageThreadList = ({ messages }: MessageThreadListProps) => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [deletingMessageId, setDeletingMessageId] = useState<string | null>(null);
+  const [selectedMessage, setSelectedMessage] = useState<Message | null>(null);
 
   const handleDelete = async (messageId: string) => {
     try {
@@ -66,7 +67,7 @@ export const MessageThreadList = ({ messages, onReply }: MessageThreadListProps)
               "p-6 border-b last:border-b-0 hover:bg-muted/50 transition-colors cursor-pointer relative",
               !message.is_read && "bg-blue-50/50 dark:bg-blue-950/20"
             )}
-            onClick={() => onReply(message)}
+            onClick={() => setSelectedMessage(message)}
           >
             <div className="flex items-start space-x-4">
               <Avatar className="h-10 w-10">
@@ -92,7 +93,7 @@ export const MessageThreadList = ({ messages, onReply }: MessageThreadListProps)
                     <Button
                       variant="ghost"
                       size="sm"
-                      onClick={() => onReply(message)}
+                      onClick={() => setSelectedMessage(message)}
                       className="text-muted-foreground hover:text-foreground"
                     >
                       <MessageSquare className="h-4 w-4 mr-2" />
@@ -120,6 +121,12 @@ export const MessageThreadList = ({ messages, onReply }: MessageThreadListProps)
           </div>
         ))}
       </div>
+
+      <MessageThread
+        open={!!selectedMessage}
+        onOpenChange={(open) => !open && setSelectedMessage(null)}
+        selectedMessage={selectedMessage}
+      />
     </div>
   );
 };
