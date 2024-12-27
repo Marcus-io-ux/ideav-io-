@@ -349,26 +349,39 @@ export type Database = {
           created_at: string | null
           id: string
           is_read: boolean | null
+          parent_id: string | null
           recipient_id: string | null
           sender_id: string | null
+          thread_id: string | null
         }
         Insert: {
           content: string
           created_at?: string | null
           id?: string
           is_read?: boolean | null
+          parent_id?: string | null
           recipient_id?: string | null
           sender_id?: string | null
+          thread_id?: string | null
         }
         Update: {
           content?: string
           created_at?: string | null
           id?: string
           is_read?: boolean | null
+          parent_id?: string | null
           recipient_id?: string | null
           sender_id?: string | null
+          thread_id?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "messages_parent_id_fkey"
+            columns: ["parent_id"]
+            isOneToOne: false
+            referencedRelation: "messages"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "messages_recipient_id_fkey"
             columns: ["recipient_id"]

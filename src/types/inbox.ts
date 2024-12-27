@@ -10,6 +10,8 @@ export interface Message {
   content: string;
   created_at: string;
   is_read: boolean;
+  parent_id?: string;
+  thread_id?: string;
   sender: {
     username: string;
     avatar_url?: string;

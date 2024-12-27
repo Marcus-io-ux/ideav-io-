@@ -7,7 +7,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useQueryClient } from "@tanstack/react-query";
 import { Message } from "@/types/inbox";
 import { formatDistanceToNow, format } from "date-fns";
-import { PaperclipIcon, Undo2 } from "lucide-react";
+import { PaperclipIcon } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
@@ -21,13 +21,44 @@ export const MessageThread = ({ open, onOpenChange, selectedMessage }: MessageTh
   const [reply, setReply] = useState("");
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const [threadMessages, setThreadMessages] = useState<Message[]>([]);
 
   if (!selectedMessage) return null;
+
+  const fetchThreadMessages = async () => {
+    const threadId = selectedMessage.thread_id || selectedMessage.id;
+    const { data, error } = await supabase
+      .from('messages')
+      .select(`
+        *,
+        sender:profiles!messages_sender_id_fkey (
+          username,
+          avatar_url,
+          user_id
+        ),
+        recipient:profiles!messages_recipient_id_fkey (
+          username,
+          avatar_url,
+          user_id
+        )
+      `)
+      .eq('thread_id', threadId)
+      .order('created_at', { ascending: true });
+
+    if (error) {
+      console.error('Error fetching thread messages:', error);
+      return;
+    }
+
+    setThreadMessages(data || []);
+  };
 
   const handleSendReply = async () => {
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error("Not authenticated");
+
+      const threadId = selectedMessage.thread_id || selectedMessage.id;
 
       const { error } = await supabase
         .from('messages')
@@ -35,6 +66,8 @@ export const MessageThread = ({ open, onOpenChange, selectedMessage }: MessageTh
           sender_id: user.id,
           recipient_id: selectedMessage.sender.user_id,
           content: reply,
+          parent_id: selectedMessage.id,
+          thread_id: threadId
         });
 
       if (error) throw error;
@@ -52,6 +85,7 @@ export const MessageThread = ({ open, onOpenChange, selectedMessage }: MessageTh
 
       setReply("");
       await queryClient.invalidateQueries({ queryKey: ['messages'] });
+      await fetchThreadMessages(); // Refresh thread messages
     } catch (error) {
       console.error('Error sending reply:', error);
       toast({
@@ -76,35 +110,37 @@ export const MessageThread = ({ open, onOpenChange, selectedMessage }: MessageTh
             Conversation with {selectedMessage.sender.username}
           </DialogTitle>
           <div className="text-sm text-muted-foreground">
-            Last message: {formatDistanceToNow(new Date(selectedMessage.created_at), { addSuffix: true })}
+            Started {formatDistanceToNow(new Date(selectedMessage.created_at), { addSuffix: true })}
           </div>
         </DialogHeader>
 
         <ScrollArea className="flex-1 pr-4">
           <div className="space-y-6">
-            <div className="bg-muted/30 rounded-lg p-4">
-              <div className="flex items-start space-x-4">
-                <Avatar className="h-10 w-10">
-                  <AvatarImage src={selectedMessage.sender.avatar_url} />
-                  <AvatarFallback>
-                    {selectedMessage.sender.username?.[0]?.toUpperCase() || 'U'}
-                  </AvatarFallback>
-                </Avatar>
-                <div className="flex-1">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="font-semibold">{selectedMessage.sender.username}</p>
-                      <p className="text-sm text-muted-foreground">
-                        {format(new Date(selectedMessage.created_at), "MMM d, yyyy 'at' h:mm a")}
-                      </p>
+            {threadMessages.map((message) => (
+              <div key={message.id} className="bg-muted/30 rounded-lg p-4">
+                <div className="flex items-start space-x-4">
+                  <Avatar className="h-10 w-10">
+                    <AvatarImage src={message.sender.avatar_url} />
+                    <AvatarFallback>
+                      {message.sender.username?.[0]?.toUpperCase() || 'U'}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div className="flex-1">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="font-semibold">{message.sender.username}</p>
+                        <p className="text-sm text-muted-foreground">
+                          {format(new Date(message.created_at), "MMM d, yyyy 'at' h:mm a")}
+                        </p>
+                      </div>
                     </div>
-                  </div>
-                  <div className="mt-2 text-sm">
-                    {selectedMessage.content}
+                    <div className="mt-2 text-sm">
+                      {message.content}
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
+            ))}
           </div>
         </ScrollArea>
 
