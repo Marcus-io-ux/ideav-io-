@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useQueryClient } from "@tanstack/react-query";
+import { useNavigate } from "react-router-dom";
 
 interface MessageDialogProps {
   open: boolean;
@@ -19,6 +20,7 @@ export const MessageDialog = ({ open, onOpenChange, recipientId, recipientUserna
   const [message, setMessage] = useState("");
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const navigate = useNavigate();
 
   const handleSendMessage = async () => {
     try {
@@ -45,7 +47,11 @@ export const MessageDialog = ({ open, onOpenChange, recipientId, recipientUserna
       setTitle("");
       onOpenChange(false);
       
+      // Invalidate messages query to refresh the list
       await queryClient.invalidateQueries({ queryKey: ['messages'] });
+      
+      // Navigate to sent folder
+      navigate("/inbox?folder=sent");
     } catch (error) {
       console.error('Error sending message:', error);
       toast({
