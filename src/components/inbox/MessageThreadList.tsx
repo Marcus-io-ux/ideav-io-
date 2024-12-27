@@ -97,7 +97,7 @@ export const MessageThreadList = ({ messages }: MessageThreadListProps) => {
             key={message.id} 
             className={cn(
               "p-6 border-b last:border-b-0 hover:bg-muted/50 transition-colors cursor-pointer relative",
-              !message.is_read && currentFolder !== "sent" && "bg-blue-50/50 dark:bg-blue-950/20"
+              !message.is_read && currentFolder !== "sent" && "bg-blue-50/80 dark:bg-blue-950/40"
             )}
             onClick={() => setSelectedMessage(message)}
           >
@@ -118,7 +118,12 @@ export const MessageThreadList = ({ messages }: MessageThreadListProps) => {
                       {currentFolder === "sent" ? message.recipient.username : message.sender.username}
                     </p>
                     {!message.is_read && currentFolder !== "sent" && (
-                      <Badge variant="secondary" className="h-2 w-2 rounded-full bg-blue-500 p-0" />
+                      <Badge 
+                        variant="default" 
+                        className="bg-blue-500 hover:bg-blue-600 text-white text-xs px-2"
+                      >
+                        New
+                      </Badge>
                     )}
                   </div>
                   <div 
@@ -149,7 +154,10 @@ export const MessageThreadList = ({ messages }: MessageThreadListProps) => {
                   {formatDistanceToNow(new Date(message.created_at), { addSuffix: true })}
                 </p>
                 {message.title && (
-                  <h3 className="mt-2 font-medium text-sm">
+                  <h3 className={cn(
+                    "mt-2 font-medium text-sm",
+                    !message.is_read && currentFolder !== "sent" && "font-semibold text-blue-600 dark:text-blue-400"
+                  )}>
                     {message.title}
                   </h3>
                 )}
