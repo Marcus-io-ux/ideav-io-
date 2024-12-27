@@ -5,7 +5,6 @@ interface FeedContentProps {
   currentUserId: string | null;
   expandedPost: string | null;
   onToggleComments: (postId: string) => void;
-  onLike: (postId: string) => void;
   onDelete: (postId: string) => void;
 }
 
@@ -14,7 +13,6 @@ export const FeedContent = ({
   currentUserId,
   expandedPost,
   onToggleComments,
-  onLike,
   onDelete,
 }: FeedContentProps) => {
   return (
@@ -26,7 +24,6 @@ export const FeedContent = ({
           currentUserId={currentUserId}
           isExpanded={expandedPost === post.id}
           onToggleComments={onToggleComments}
-          onLike={onLike}
           onDelete={onDelete}
         />
       ))}
