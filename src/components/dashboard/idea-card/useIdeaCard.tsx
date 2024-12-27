@@ -119,24 +119,38 @@ export const useIdeaCard = ({
 
       // If the idea is shared to community, update the community post
       if (sharedToCommunity) {
-        const { error: communityError } = await supabase
+        // First find the matching community post
+        const { data: communityPost, error: findError } = await supabase
           .from('community_posts')
-          .update({
-            title: editedTitle,
-            content: editedContent,
-            tags: editedTags,
-          })
+          .select('id')
           .eq('user_id', user.id)
           .eq('title', title)
-          .eq('content', content);
+          .eq('content', content)
+          .single();
 
-        if (communityError) {
-          console.error('Error updating community post:', communityError);
-          toast({
-            title: "Warning",
-            description: "Your idea was updated but there was an error updating the community post.",
-            variant: "destructive",
-          });
+        if (findError) {
+          console.error('Error finding community post:', findError);
+          throw findError;
+        }
+
+        if (communityPost) {
+          const { error: communityError } = await supabase
+            .from('community_posts')
+            .update({
+              title: editedTitle,
+              content: editedContent,
+              tags: editedTags,
+            })
+            .eq('id', communityPost.id);
+
+          if (communityError) {
+            console.error('Error updating community post:', communityError);
+            toast({
+              title: "Warning",
+              description: "Your idea was updated but there was an error updating the community post.",
+              variant: "destructive",
+            });
+          }
         }
       }
 
