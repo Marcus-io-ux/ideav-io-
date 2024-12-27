@@ -28,16 +28,16 @@ export const InboxSidebar = ({ counts, className }: InboxSidebarProps) => {
       count: counts.inbox 
     },
     { 
-      label: "Starred", 
-      icon: Star, 
-      value: "starred",
-      count: counts.starred 
-    },
-    { 
       label: "Sent", 
       icon: Send, 
       value: "sent",
       count: counts.sent 
+    },
+    { 
+      label: "Starred", 
+      icon: Star, 
+      value: "starred",
+      count: counts.starred 
     },
     { 
       label: "Archived", 

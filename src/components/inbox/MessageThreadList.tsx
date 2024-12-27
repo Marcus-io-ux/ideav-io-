@@ -10,6 +10,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
 import { MessageThread } from "./MessageThread";
+import { useLocation } from "react-router-dom";
 
 interface MessageThreadListProps {
   messages: Message[];
@@ -21,6 +22,8 @@ export const MessageThreadList = ({ messages }: MessageThreadListProps) => {
   const queryClient = useQueryClient();
   const [deletingMessageId, setDeletingMessageId] = useState<string | null>(null);
   const [selectedMessage, setSelectedMessage] = useState<Message | null>(null);
+  const location = useLocation();
+  const currentFolder = new URLSearchParams(location.search).get("folder") || "inbox";
 
   const handleDelete = async (messageId: string) => {
     try {
@@ -77,9 +80,14 @@ export const MessageThreadList = ({ messages }: MessageThreadListProps) => {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h2 className="text-lg font-semibold">Latest Messages</h2>
+        <h2 className="text-lg font-semibold">
+          {currentFolder === "sent" ? "Sent Messages" : "Latest Messages"}
+        </h2>
         <Badge variant="secondary">
-          {messages.filter(m => !m.is_read).length} unread
+          {currentFolder === "sent" ? 
+            `${messages.length} sent` : 
+            `${messages.filter(m => !m.is_read).length} unread`
+          }
         </Badge>
       </div>
       
@@ -89,24 +97,27 @@ export const MessageThreadList = ({ messages }: MessageThreadListProps) => {
             key={message.id} 
             className={cn(
               "p-6 border-b last:border-b-0 hover:bg-muted/50 transition-colors cursor-pointer relative",
-              !message.is_read && "bg-blue-50/50 dark:bg-blue-950/20"
+              !message.is_read && currentFolder !== "sent" && "bg-blue-50/50 dark:bg-blue-950/20"
             )}
             onClick={() => setSelectedMessage(message)}
           >
             <div className="flex items-start space-x-4">
               <Avatar className="h-10 w-10">
-                <AvatarImage src={message.sender.avatar_url} />
+                <AvatarImage src={currentFolder === "sent" ? message.recipient.avatar_url : message.sender.avatar_url} />
                 <AvatarFallback>
-                  {message.sender.username?.[0]?.toUpperCase() || 'U'}
+                  {currentFolder === "sent" 
+                    ? message.recipient.username?.[0]?.toUpperCase() || 'U'
+                    : message.sender.username?.[0]?.toUpperCase() || 'U'
+                  }
                 </AvatarFallback>
               </Avatar>
               <div className="flex-1 min-w-0">
                 <div className="flex items-start justify-between gap-x-2">
                   <div className="flex items-center gap-2">
                     <p className="font-semibold text-foreground">
-                      {message.sender.username}
+                      {currentFolder === "sent" ? message.recipient.username : message.sender.username}
                     </p>
-                    {!message.is_read && (
+                    {!message.is_read && currentFolder !== "sent" && (
                       <Badge variant="secondary" className="h-2 w-2 rounded-full bg-blue-500 p-0" />
                     )}
                   </div>
