@@ -1,7 +1,8 @@
 import { SearchBar } from "@/components/SearchBar";
 import { AddIdeaDialog } from "@/components/dashboard/AddIdeaDialog";
 import { Button } from "@/components/ui/button";
-import { Grid, List } from "lucide-react";
+import { Grid, List, Star, FileText } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 interface DashboardActionsBarProps {
   totalIdeas: number;
@@ -61,24 +62,29 @@ export const DashboardActionsBar = ({
           </div>
         </div>
       </div>
-      <div className="flex flex-wrap gap-2 justify-start">
+      <div className="flex flex-wrap gap-2 justify-start items-center">
         <Button
           variant={showFavorites ? "default" : "outline"}
-          size="sm"
+          size="icon"
           onClick={() => setShowFavorites(!showFavorites)}
-          className="text-sm"
+          className={cn(
+            "h-9 w-9",
+            showFavorites && "text-primary"
+          )}
+          title={showFavorites ? "Show All Ideas" : "Show Favorites"}
         >
-          {showFavorites ? "All Ideas" : "Show Favorites"}
+          <Star className={cn("h-4 w-4", showFavorites && "fill-current")} />
         </Button>
         <Button
           variant={showDrafts ? "default" : "outline"}
-          size="sm"
+          size="icon"
           onClick={() => setShowDrafts(!showDrafts)}
-          className="text-sm"
+          className="h-9 w-9"
+          title={showDrafts ? "Show Published" : "Show Drafts"}
         >
-          {showDrafts ? "Published" : "Show Drafts"}
+          <FileText className="h-4 w-4" />
         </Button>
-        <span className="text-sm text-muted-foreground ml-auto mt-2 sm:mt-0">
+        <span className="text-sm text-muted-foreground ml-auto">
           {totalIdeas} {totalIdeas === 1 ? 'idea' : 'ideas'}
         </span>
       </div>
