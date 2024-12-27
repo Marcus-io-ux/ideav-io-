@@ -1,13 +1,17 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Card } from "@/components/ui/card";
 import { IdeaCard } from "@/components/IdeaCard";
 import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
 
 interface RecentIdeasProps {
   userId: string;
 }
 
 export const RecentIdeas = ({ userId }: RecentIdeasProps) => {
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
+
   const { data: ideas = [] } = useQuery({
     queryKey: ["recent-ideas", userId],
     queryFn: async () => {
@@ -28,6 +32,31 @@ export const RecentIdeas = ({ userId }: RecentIdeasProps) => {
     enabled: !!userId,
   });
 
+  const handleDelete = async (id: string) => {
+    try {
+      const { error } = await supabase
+        .from("ideas")
+        .update({ deleted: true, deleted_at: new Date().toISOString() })
+        .eq("id", id);
+
+      if (error) throw error;
+
+      await queryClient.invalidateQueries({ queryKey: ["recent-ideas", userId] });
+      
+      toast({
+        title: "Success",
+        description: "Idea moved to trash",
+      });
+    } catch (error) {
+      console.error("Error deleting idea:", error);
+      toast({
+        title: "Error",
+        description: "Failed to delete idea",
+        variant: "destructive",
+      });
+    }
+  };
+
   if (!ideas.length) {
     return null;
   }
@@ -40,6 +69,7 @@ export const RecentIdeas = ({ userId }: RecentIdeasProps) => {
           <IdeaCard
             key={idea.id}
             {...idea}
+            onDelete={handleDelete}
           />
         ))}
       </div>
