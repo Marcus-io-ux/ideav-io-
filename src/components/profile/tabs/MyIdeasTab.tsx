@@ -125,7 +125,10 @@ export const MyIdeasTab = () => {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <SearchBar onSearch={setSearchQuery} />
+        <SearchBar 
+          value={searchQuery}
+          onSearch={setSearchQuery}
+        />
         <div className="flex items-center gap-4">
           <AddIdeaDialog buttonText="Add New Idea" onIdeaSubmit={async () => {
             await queryClient.invalidateQueries({ queryKey: ["my-ideas"] });

@@ -34,7 +34,7 @@ export const DashboardActionsBar = ({
         <div className="w-full sm:w-auto flex-1">
           <SearchBar 
             value={searchQuery}
-            onChange={setSearchQuery}
+            onSearch={setSearchQuery}
             placeholder="Search ideas..."
             className="w-full"
           />
