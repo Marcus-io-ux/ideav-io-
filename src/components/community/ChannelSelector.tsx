@@ -8,7 +8,7 @@ interface ChannelSelectorProps {
 
 export const ChannelSelector = ({ selectedChannel, onChannelSelect }: ChannelSelectorProps) => {
   const channels = [
-    { id: "feedback", icon: Database, label: "Share Feedback" },
+    { id: "feedback", icon: Database, label: "General Ideas" },
     { id: "business", icon: Building, label: "Business Ideas" },
     { id: "tech", icon: Cpu, label: "Tech Projects" },
     { id: "lifestyle", icon: Leaf, label: "Lifestyle" },

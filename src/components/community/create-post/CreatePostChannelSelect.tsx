@@ -13,7 +13,7 @@ interface CreatePostChannelSelectProps {
 
 export const CreatePostChannelSelect = ({ value, onChange }: CreatePostChannelSelectProps) => {
   const channels = [
-    { id: "feedback", label: "Share Feedback" },
+    { id: "feedback", label: "General Ideas" },
     { id: "business", label: "Business Ideas" },
     { id: "tech", label: "Tech Projects" },
     { id: "lifestyle", label: "Lifestyle" },
