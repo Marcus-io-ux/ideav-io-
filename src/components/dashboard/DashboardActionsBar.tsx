@@ -59,31 +59,31 @@ export const DashboardActionsBar = ({
             >
               <List className="h-4 w-4" />
             </Button>
+            <Button
+              variant={showFavorites ? "default" : "outline"}
+              size="icon"
+              onClick={() => setShowFavorites(!showFavorites)}
+              className={cn(
+                "h-9 w-9",
+                showFavorites && "text-primary"
+              )}
+              title={showFavorites ? "Show All Ideas" : "Show Favorites"}
+            >
+              <Star className={cn("h-4 w-4", showFavorites && "fill-current")} />
+            </Button>
+            <Button
+              variant={showDrafts ? "default" : "outline"}
+              size="icon"
+              onClick={() => setShowDrafts(!showDrafts)}
+              className="h-9 w-9"
+              title={showDrafts ? "Show Published" : "Show Drafts"}
+            >
+              <FileText className="h-4 w-4" />
+            </Button>
           </div>
         </div>
       </div>
-      <div className="flex flex-wrap gap-2 justify-start items-center">
-        <Button
-          variant={showFavorites ? "default" : "outline"}
-          size="icon"
-          onClick={() => setShowFavorites(!showFavorites)}
-          className={cn(
-            "h-9 w-9",
-            showFavorites && "text-primary"
-          )}
-          title={showFavorites ? "Show All Ideas" : "Show Favorites"}
-        >
-          <Star className={cn("h-4 w-4", showFavorites && "fill-current")} />
-        </Button>
-        <Button
-          variant={showDrafts ? "default" : "outline"}
-          size="icon"
-          onClick={() => setShowDrafts(!showDrafts)}
-          className="h-9 w-9"
-          title={showDrafts ? "Show Published" : "Show Drafts"}
-        >
-          <FileText className="h-4 w-4" />
-        </Button>
+      <div className="flex items-center">
         <span className="text-sm text-muted-foreground ml-auto">
           {totalIdeas} {totalIdeas === 1 ? 'idea' : 'ideas'}
         </span>
