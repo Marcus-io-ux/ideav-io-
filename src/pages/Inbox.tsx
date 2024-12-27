@@ -9,10 +9,16 @@ import { NewMessageDialog } from "@/components/inbox/NewMessageDialog";
 import { CollaborationRequestCard } from "@/components/inbox/CollaborationRequestCard";
 import { useMessages } from "@/hooks/use-messages";
 import { Badge } from "@/components/ui/badge";
+import { InboxSidebar } from "@/components/inbox/InboxSidebar";
+import { useLocation } from "react-router-dom";
 
 const Inbox = () => {
   const [isNewMessageOpen, setIsNewMessageOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [activeFilters, setActiveFilters] = useState<string[]>([]);
   const { sendMessage } = useMessages();
+  const location = useLocation();
+  const currentFolder = new URLSearchParams(location.search).get("folder") || "inbox";
 
   const { data: requests, isLoading: isLoadingRequests } = useQuery({
     queryKey: ['collaboration-requests'],
@@ -66,78 +72,96 @@ const Inbox = () => {
   const pendingRequestsCount = requests?.filter(req => req.status === 'pending').length || 0;
   const unreadMessagesCount = messages?.filter(msg => !msg.is_read).length || 0;
 
+  const folderCounts = {
+    inbox: unreadMessagesCount,
+    starred: 0,
+    sent: messages?.filter(msg => msg.sender_id === supabase.auth.user()?.id).length || 0,
+    archived: 0,
+    trash: 0,
+  };
+
   return (
-    <div className="container max-w-4xl mx-auto p-6">
-      <div className="flex items-center justify-between mb-8">
-        <MessageHeader />
-        <Button
-          onClick={() => setIsNewMessageOpen(true)}
-          className="gap-2"
-        >
-          New Message
-        </Button>
-      </div>
-
-      <Tabs defaultValue="messages" className="mt-8">
-        <TabsList className="grid w-full grid-cols-2">
-          <TabsTrigger value="messages" className="flex items-center gap-2">
-            Messages
-            {unreadMessagesCount > 0 && (
-              <Badge variant="secondary">
-                {unreadMessagesCount}
-              </Badge>
-            )}
-          </TabsTrigger>
-          <TabsTrigger value="requests" className="flex items-center gap-2">
-            Collaboration Requests
-            {pendingRequestsCount > 0 && (
-              <Badge variant="secondary">
-                {pendingRequestsCount}
-              </Badge>
-            )}
-          </TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="messages" className="mt-4">
-          {isLoadingMessages ? (
-            <div>Loading messages...</div>
-          ) : messages?.length === 0 ? (
-            <div className="text-center text-muted-foreground">
-              No messages yet
-            </div>
-          ) : (
-            <MessageThreadList
-              messages={messages}
-              onReply={(message) => {
-                setIsNewMessageOpen(true);
-              }}
+    <div className="flex h-[calc(100vh-4rem)]">
+      <InboxSidebar counts={folderCounts} />
+      
+      <div className="flex-1 overflow-auto p-6">
+        <div className="max-w-4xl mx-auto">
+          <div className="flex items-center justify-between mb-8">
+            <MessageHeader 
+              onSearch={setSearchQuery}
+              onFilterChange={setActiveFilters}
+              activeFilters={activeFilters}
             />
-          )}
-        </TabsContent>
+            <Button
+              onClick={() => setIsNewMessageOpen(true)}
+              className="gap-2"
+            >
+              New Message
+            </Button>
+          </div>
 
-        <TabsContent value="requests" className="mt-4 space-y-4">
-          {isLoadingRequests ? (
-            <div>Loading requests...</div>
-          ) : requests?.length === 0 ? (
-            <div className="text-center text-muted-foreground">
-              No collaboration requests yet
-            </div>
-          ) : (
-            requests?.map((request) => (
-              <CollaborationRequestCard key={request.id} request={request} />
-            ))
-          )}
-        </TabsContent>
-      </Tabs>
+          <Tabs defaultValue="messages" className="mt-8">
+            <TabsList className="grid w-full grid-cols-2">
+              <TabsTrigger value="messages" className="flex items-center gap-2">
+                Messages
+                {unreadMessagesCount > 0 && (
+                  <Badge variant="secondary">
+                    {unreadMessagesCount}
+                  </Badge>
+                )}
+              </TabsTrigger>
+              <TabsTrigger value="requests" className="flex items-center gap-2">
+                Collaboration Requests
+                {pendingRequestsCount > 0 && (
+                  <Badge variant="secondary">
+                    {pendingRequestsCount}
+                  </Badge>
+                )}
+              </TabsTrigger>
+            </TabsList>
 
-      <NewMessageDialog
-        open={isNewMessageOpen}
-        onOpenChange={setIsNewMessageOpen}
-        onSend={sendMessage}
-      />
+            <TabsContent value="messages" className="mt-4">
+              {isLoadingMessages ? (
+                <div>Loading messages...</div>
+              ) : messages?.length === 0 ? (
+                <div className="text-center text-muted-foreground">
+                  No messages yet
+                </div>
+              ) : (
+                <MessageThreadList
+                  messages={messages}
+                  onReply={(message) => {
+                    setIsNewMessageOpen(true);
+                  }}
+                />
+              )}
+            </TabsContent>
 
-      <div className="mt-8 text-center text-muted-foreground">
-        <p>Got feedback or a question? Reach out to collaborators directly and keep the momentum going!</p>
+            <TabsContent value="requests" className="mt-4 space-y-4">
+              {isLoadingRequests ? (
+                <div>Loading requests...</div>
+              ) : requests?.length === 0 ? (
+                <div className="text-center text-muted-foreground">
+                  No collaboration requests yet
+                </div>
+              ) : (
+                requests?.map((request) => (
+                  <CollaborationRequestCard key={request.id} request={request} />
+                ))
+              )}
+            </TabsContent>
+          </Tabs>
+
+          <NewMessageDialog
+            open={isNewMessageOpen}
+            onOpenChange={setIsNewMessageOpen}
+            onSend={sendMessage}
+          />
+
+          <div className="mt-8 text-center text-muted-foreground">
+            <p>Need help? Visit our support page for tips on using your inbox!</p>
+          </div>
+        </div>
       </div>
     </div>
   );
