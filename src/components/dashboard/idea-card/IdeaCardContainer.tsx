@@ -7,7 +7,6 @@ interface IdeaCardContainerProps {
   onClick: () => void;
   children: React.ReactNode;
   sharedToCommunity?: boolean;
-  className?: string; // Added className prop
 }
 
 export const IdeaCardContainer = ({
@@ -16,7 +15,6 @@ export const IdeaCardContainer = ({
   onClick,
   children,
   sharedToCommunity = false,
-  className,
 }: IdeaCardContainerProps) => {
   return (
     <Card 
@@ -25,8 +23,7 @@ export const IdeaCardContainer = ({
         "hover:shadow-lg dark:hover:shadow-primary/5",
         isSelected && "border-primary dark:border-primary",
         isDraft && "border-dashed",
-        sharedToCommunity && "bg-primary/5 hover:bg-primary/10",
-        className // Added className to cn function
+        sharedToCommunity && "bg-primary/5 hover:bg-primary/10"
       )}
       onClick={onClick}
     >
