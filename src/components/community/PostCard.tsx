@@ -9,14 +9,13 @@ import { useCollaborationRequest } from "@/hooks/use-collaboration-request";
 import { PostComments } from "./comments/PostComments";
 import { PostCardHeader } from "./post-card/PostCardHeader";
 import { PostCardContent } from "./post-card/PostCardContent";
-import { PostCardFooter } from "./post-card/PostCardFooter";
+import { PostCardCommentInput } from "./post-card/PostCardCommentInput";
 
 interface PostCardProps {
   post: any;
   currentUserId: string | null;
   isExpanded: boolean;
   onToggleComments: (postId: string) => void;
-  onLike: (postId: string) => void;
   onDelete: (postId: string) => void;
 }
 
@@ -25,7 +24,6 @@ export const PostCard = ({
   currentUserId,
   isExpanded,
   onToggleComments,
-  onLike,
   onDelete,
 }: PostCardProps) => {
   const [isCollabDialogOpen, setIsCollabDialogOpen] = useState(false);
@@ -93,23 +91,6 @@ export const PostCard = ({
 
       if (postError) throw postError;
 
-      const { error: ideaError } = await supabase
-        .from('ideas')
-        .update({
-          title: editedTitle,
-          content: editedContent,
-          tags: editedTags,
-        })
-        .match({
-          title: post.title,
-          content: post.content,
-          user_id: currentUserId
-        });
-
-      if (ideaError) {
-        console.error('Error updating idea:', ideaError);
-      }
-
       setIsEditing(false);
       toast({
         title: "Success",
@@ -154,17 +135,12 @@ export const PostCard = ({
         setIsEditing={setIsEditing}
       />
       
-      <PostCardFooter
-        currentUserId={currentUserId}
-        post={post}
-        setIsCollabDialogOpen={setIsCollabDialogOpen}
-        isCommentsExpanded={isExpanded}
-        onToggleComments={() => onToggleComments(post.id)}
-        isLiked={post.is_liked}
-        likesCount={post.likes_count}
-        commentsCount={post.comments_count}
-        onLike={() => onLike(post.id)}
-      />
+      <div className="mt-4">
+        <PostCardCommentInput 
+          postId={post.id}
+          onCommentAdded={() => onToggleComments(post.id)}
+        />
+      </div>
       
       {isExpanded && (
         <div className="mt-4 pt-4 border-t">
