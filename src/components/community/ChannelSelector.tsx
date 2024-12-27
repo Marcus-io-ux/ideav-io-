@@ -24,11 +24,11 @@ export const ChannelSelector = ({ selectedChannel, onChannelSelect }: ChannelSel
           <Button
             key={channel.id}
             variant={selectedChannel === channel.id ? "default" : "outline"}
-            className="w-full h-8 px-2 text-xs sm:text-sm flex items-center gap-1.5"
+            className="w-full h-8 px-2 text-xs sm:text-sm flex items-center gap-1.5 whitespace-normal lg:whitespace-nowrap"
             onClick={() => onChannelSelect(channel.id)}
           >
             <Icon className="w-4 h-4 flex-shrink-0" />
-            <span className="truncate">{channel.label}</span>
+            <span>{channel.label}</span>
           </Button>
         );
       })}
