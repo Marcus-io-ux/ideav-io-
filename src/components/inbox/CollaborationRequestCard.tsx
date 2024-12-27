@@ -47,34 +47,6 @@ export const CollaborationRequestCard = ({ request }: CollaborationRequestCardPr
     }
   };
 
-  const handleDelete = async () => {
-    try {
-      setIsLoading(true);
-      const { error } = await supabase
-        .from('collaboration_requests')
-        .delete()
-        .eq('id', request.id);
-
-      if (error) throw error;
-
-      await queryClient.invalidateQueries({ queryKey: ['collaboration-requests'] });
-
-      toast({
-        title: "Request removed",
-        description: "The collaboration request has been removed",
-      });
-    } catch (error: any) {
-      console.error('Error deleting request:', error);
-      toast({
-        title: "Error",
-        description: "Failed to remove request",
-        variant: "destructive",
-      });
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
   return (
     <Card className="p-6">
       <div className="flex items-start justify-between">
@@ -127,24 +99,14 @@ export const CollaborationRequestCard = ({ request }: CollaborationRequestCardPr
                 {request.status.charAt(0).toUpperCase() + request.status.slice(1)}
               </Badge>
               {request.status === 'accepted' && (
-                <>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => setIsMessageDialogOpen(true)}
-                  >
-                    <MessageSquare className="h-4 w-4 mr-2" />
-                    Message
-                  </Button>
-                  <Button
-                    variant="destructive"
-                    size="sm"
-                    onClick={handleDelete}
-                    disabled={isLoading}
-                  >
-                    Remove
-                  </Button>
-                </>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setIsMessageDialogOpen(true)}
+                >
+                  <MessageSquare className="h-4 w-4 mr-2" />
+                  Message
+                </Button>
               )}
             </div>
           )}
