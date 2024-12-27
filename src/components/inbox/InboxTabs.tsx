@@ -35,11 +35,13 @@ export const InboxTabs = ({
       navigate("/inbox?folder=inbox");
     } else if (value === "sent") {
       navigate("/inbox?folder=sent");
+    } else {
+      navigate("/inbox?folder=requests");
     }
   };
 
   const currentTab = currentFolder === "sent" ? "sent" : 
-                     currentFolder === "inbox" ? "messages" : "requests";
+                     currentFolder === "requests" ? "requests" : "messages";
 
   return (
     <Tabs value={currentTab} onValueChange={handleTabChange} className="mt-6">
