@@ -1,16 +1,12 @@
 import { useState, useEffect } from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useQueryClient } from "@tanstack/react-query";
 import { Message } from "@/types/inbox";
-import { formatDistanceToNow } from "date-fns";
-import { PaperclipIcon } from "lucide-react";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { MessageItem } from "./MessageItem";
-import { QuickReplies } from "./QuickReplies";
+import { ThreadHeader } from "./thread/ThreadHeader";
+import { ThreadMessages } from "./thread/ThreadMessages";
+import { ThreadReplyForm } from "./thread/ThreadReplyForm";
 
 interface MessageThreadProps {
   open: boolean;
@@ -19,8 +15,6 @@ interface MessageThreadProps {
 }
 
 export const MessageThread = ({ open, onOpenChange, selectedMessage }: MessageThreadProps) => {
-  const [reply, setReply] = useState("");
-  const [attachedFile, setAttachedFile] = useState<File | null>(null);
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [threadMessages, setThreadMessages] = useState<Message[]>([]);
@@ -93,28 +87,7 @@ export const MessageThread = ({ open, onOpenChange, selectedMessage }: MessageTh
     }
   };
 
-  const handleFileAttachment = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (file) {
-      if (file.size > 5 * 1024 * 1024) { // 5MB limit
-        toast({
-          title: "File too large",
-          description: "Please select a file smaller than 5MB",
-          variant: "destructive",
-        });
-        return;
-      }
-      setAttachedFile(file);
-      toast({
-        title: "File attached",
-        description: file.name,
-      });
-    }
-  };
-
-  const handleSendReply = async () => {
-    if (!reply.trim() && !attachedFile) return;
-
+  const handleSendReply = async (reply: string, attachedFile: File | null) => {
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error("Not authenticated");
@@ -159,8 +132,6 @@ export const MessageThread = ({ open, onOpenChange, selectedMessage }: MessageTh
         description: "Your reply has been sent successfully",
       });
 
-      setReply("");
-      setAttachedFile(null);
       await queryClient.invalidateQueries({ queryKey: ['messages'] });
       await fetchThreadMessages();
     } catch (error) {
@@ -176,73 +147,9 @@ export const MessageThread = ({ open, onOpenChange, selectedMessage }: MessageTh
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[700px] h-[80vh] flex flex-col">
-        <DialogHeader>
-          <DialogTitle className="text-xl">
-            Conversation with {selectedMessage.sender.username}
-          </DialogTitle>
-          <div className="text-sm text-muted-foreground">
-            Started {formatDistanceToNow(new Date(selectedMessage.created_at), { addSuffix: true })}
-          </div>
-        </DialogHeader>
-
-        <ScrollArea className="flex-1 pr-4">
-          {isLoading ? (
-            <div className="flex items-center justify-center h-full">
-              <p className="text-muted-foreground">Loading messages...</p>
-            </div>
-          ) : (
-            <div className="space-y-6">
-              {threadMessages.map((message) => (
-                <MessageItem key={message.id} message={message} />
-              ))}
-            </div>
-          )}
-        </ScrollArea>
-
-        <div className="mt-4 space-y-4">
-          <QuickReplies onSelect={setReply} />
-
-          <div className="space-y-2">
-            <div className="space-y-2">
-              <label htmlFor="reply" className="text-sm font-medium text-foreground">
-                Message
-              </label>
-              <Textarea
-                id="reply"
-                value={reply}
-                onChange={(e) => setReply(e.target.value)}
-                placeholder="Write your reply here..."
-                className="min-h-[100px]"
-              />
-            </div>
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <input
-                  type="file"
-                  id="file-upload"
-                  className="hidden"
-                  onChange={handleFileAttachment}
-                  accept="image/*,.pdf,.doc,.docx,.txt"
-                />
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="text-muted-foreground"
-                  onClick={() => document.getElementById('file-upload')?.click()}
-                >
-                  <PaperclipIcon className="h-4 w-4 mr-2" />
-                  {attachedFile ? attachedFile.name : 'Attach files'}
-                </Button>
-              </div>
-              <Button
-                onClick={handleSendReply}
-                disabled={(!reply.trim() && !attachedFile) || isLoading}
-              >
-                Send Reply
-              </Button>
-            </div>
-          </div>
-        </div>
+        <ThreadHeader message={selectedMessage} />
+        <ThreadMessages messages={threadMessages} isLoading={isLoading} />
+        <ThreadReplyForm onSendReply={handleSendReply} isLoading={isLoading} />
       </DialogContent>
     </Dialog>
   );
