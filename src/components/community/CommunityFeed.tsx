@@ -1,5 +1,5 @@
 import { CreatePost } from "./CreatePost";
-import { ChannelSelector } from "./ChannelSelector";
+import { FeedFilters } from "./feed/FeedFilters";
 import { FeedContent } from "./feed/FeedContent";
 import { useCommunityFeed } from "./feed/useCommunityFeed";
 
@@ -24,16 +24,14 @@ export const CommunityFeed = () => {
 
   return (
     <div className="space-y-6">
-      <ChannelSelector 
-        selectedChannel={selectedChannel}
-        onChannelSelect={setSelectedChannel}
-      />
-
-      <CreatePost 
+      <FeedFilters
         selectedChannel={selectedChannel}
         showOnlyMyPosts={showOnlyMyPosts}
+        onChannelSelect={setSelectedChannel}
         onToggleMyPosts={setShowOnlyMyPosts}
       />
+
+      <CreatePost selectedChannel={selectedChannel} />
 
       {isLoading ? (
         <div>Loading posts...</div>
