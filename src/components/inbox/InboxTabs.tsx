@@ -70,13 +70,13 @@ export const InboxTabs = ({
       <TabsContent value="messages" className="mt-6">
         {isLoadingMessages ? (
           <div className="text-center text-muted-foreground">Loading messages...</div>
-        ) : filteredMessages?.length === 0 ? (
+        ) : filteredMessages?.filter(msg => msg.recipient_id === msg.sender.user_id).length === 0 ? (
           <div className="text-center text-muted-foreground py-8">
             No messages found
           </div>
         ) : (
           <MessageThreadList
-            messages={filteredMessages?.filter(msg => msg.recipient_id === msg.sender_id)}
+            messages={filteredMessages?.filter(msg => msg.recipient_id === msg.sender.user_id)}
             onReply={() => setIsNewMessageOpen(true)}
           />
         )}
@@ -85,13 +85,13 @@ export const InboxTabs = ({
       <TabsContent value="sent" className="mt-6">
         {isLoadingMessages ? (
           <div className="text-center text-muted-foreground">Loading sent messages...</div>
-        ) : messages?.filter(msg => msg.sender_id === msg.recipient_id).length === 0 ? (
+        ) : messages?.filter(msg => msg.sender_id === msg.recipient.user_id).length === 0 ? (
           <div className="text-center text-muted-foreground py-8">
             No sent messages found
           </div>
         ) : (
           <MessageThreadList
-            messages={messages?.filter(msg => msg.sender_id === msg.recipient_id)}
+            messages={messages?.filter(msg => msg.sender_id === msg.recipient.user_id)}
             onReply={() => setIsNewMessageOpen(true)}
           />
         )}
