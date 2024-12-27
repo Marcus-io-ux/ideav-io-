@@ -20,6 +20,14 @@ const Inbox = () => {
   const location = useLocation();
   const currentFolder = new URLSearchParams(location.search).get("folder") || "inbox";
 
+  const { data: currentUser } = useQuery({
+    queryKey: ['currentUser'],
+    queryFn: async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      return user;
+    },
+  });
+
   const { data: requests, isLoading: isLoadingRequests } = useQuery({
     queryKey: ['collaboration-requests'],
     queryFn: async () => {
@@ -75,10 +83,7 @@ const Inbox = () => {
   const folderCounts = {
     inbox: unreadMessagesCount,
     starred: 0,
-    sent: messages?.filter(msg => {
-      const { data: { user } } = await supabase.auth.getUser();
-      return msg.sender_id === user?.id;
-    }).length || 0,
+    sent: messages?.filter(msg => msg.sender_id === currentUser?.id).length || 0,
     archived: 0,
     trash: 0,
   };
