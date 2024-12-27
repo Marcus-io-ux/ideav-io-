@@ -26,6 +26,8 @@ interface IdeaCardProps {
   onEdit?: (id: string) => void;
   onDelete?: (id: string) => void;
   onToggleFavorite?: (id: string) => void;
+  userId?: string;
+  sharedToCommunity?: boolean;
 }
 
 export const IdeaCard = ({ 
@@ -39,7 +41,9 @@ export const IdeaCard = ({
   tags = [],
   onSelect,
   onDelete,
-  onToggleFavorite 
+  onToggleFavorite,
+  userId,
+  sharedToCommunity = false
 }: IdeaCardProps) => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -219,6 +223,8 @@ export const IdeaCard = ({
           isCurrentlyFavorite={isCurrentlyFavorite}
           onToggleFavorite={handleToggleFavorite}
           onDelete={onDelete ? handleDelete : undefined}
+          userId={userId}
+          sharedToCommunity={sharedToCommunity}
         />
         
         {isEditing && (
