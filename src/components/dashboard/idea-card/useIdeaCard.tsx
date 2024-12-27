@@ -101,6 +101,9 @@ export const useIdeaCard = ({
 
   const handleSaveEdit = async () => {
     try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error("Not authenticated");
+
       // First update the idea
       const { error: ideaError } = await supabase
         .from('ideas')
@@ -123,11 +126,9 @@ export const useIdeaCard = ({
             content: editedContent,
             tags: editedTags,
           })
-          .match({
-            title: title,
-            content: content,
-            user_id: (await supabase.auth.getUser()).data.user?.id
-          });
+          .eq('user_id', user.id)
+          .eq('title', title)
+          .eq('content', content);
 
         if (communityError) {
           console.error('Error updating community post:', communityError);
