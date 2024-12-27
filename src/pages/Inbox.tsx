@@ -11,6 +11,7 @@ import { useMessages } from "@/hooks/use-messages";
 import { Badge } from "@/components/ui/badge";
 import { InboxSidebar } from "@/components/inbox/InboxSidebar";
 import { useLocation } from "react-router-dom";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 const Inbox = () => {
   const [isNewMessageOpen, setIsNewMessageOpen] = useState(false);
@@ -19,6 +20,7 @@ const Inbox = () => {
   const { sendMessage } = useMessages();
   const location = useLocation();
   const currentFolder = new URLSearchParams(location.search).get("folder") || "inbox";
+  const isMobile = useIsMobile();
 
   const { data: currentUser } = useQuery({
     queryKey: ['currentUser'],
@@ -89,12 +91,12 @@ const Inbox = () => {
   };
 
   return (
-    <div className="flex h-[calc(100vh-4rem)]">
-      <InboxSidebar counts={folderCounts} />
+    <div className="flex flex-col md:flex-row h-[calc(100vh-4rem)] w-full overflow-hidden">
+      {!isMobile && <InboxSidebar counts={folderCounts} className="w-64 min-w-64 border-r" />}
       
-      <div className="flex-1 overflow-auto p-6">
+      <div className="flex-1 overflow-auto p-4 md:p-6 w-full">
         <div className="max-w-4xl mx-auto">
-          <div className="flex items-center justify-between mb-8">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
             <MessageHeader 
               onSearch={setSearchQuery}
               onFilterChange={setActiveFilters}
@@ -102,7 +104,7 @@ const Inbox = () => {
             />
             <Button
               onClick={() => setIsNewMessageOpen(true)}
-              className="gap-2"
+              className="w-full md:w-auto"
             >
               New Message
             </Button>
@@ -119,7 +121,7 @@ const Inbox = () => {
                 )}
               </TabsTrigger>
               <TabsTrigger value="requests" className="flex items-center gap-2">
-                Collaboration Requests
+                {isMobile ? "Requests" : "Collaboration Requests"}
                 {pendingRequestsCount > 0 && (
                   <Badge variant="secondary">
                     {pendingRequestsCount}
@@ -167,7 +169,7 @@ const Inbox = () => {
           />
 
           <div className="mt-8 text-center text-muted-foreground">
-            <p>Need help? Visit our support page for tips on using your inbox!</p>
+            <p className="text-sm">Need help? Visit our support page for tips on using your inbox!</p>
           </div>
         </div>
       </div>
