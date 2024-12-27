@@ -110,7 +110,7 @@ export const MessageThread = ({ open, onOpenChange, selectedMessage }: MessageTh
           parent_id: selectedMessage.id,
           thread_id: threadId,
           is_read: false,
-          title: selectedMessage.title ? `Re: ${selectedMessage.title}` : undefined
+          title: selectedMessage.title // Keep the original title without modification
         });
 
       if (error) throw error;
