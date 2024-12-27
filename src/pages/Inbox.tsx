@@ -5,12 +5,15 @@ import { useMessages } from "@/hooks/use-messages";
 import { InboxPageHeader } from "@/components/inbox/InboxPageHeader";
 import { InboxTabs } from "@/components/inbox/InboxTabs";
 import { NewMessageDialog } from "@/components/inbox/NewMessageDialog";
+import { useLocation } from "react-router-dom";
 
 const Inbox = () => {
   const [isNewMessageOpen, setIsNewMessageOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [activeFilters, setActiveFilters] = useState<string[]>([]);
   const { sendMessage } = useMessages();
+  const location = useLocation();
+  const currentFolder = new URLSearchParams(location.search).get("folder") || "inbox";
 
   const { data: currentUser } = useQuery({
     queryKey: ['currentUser'],
@@ -69,9 +72,17 @@ const Inbox = () => {
     }
   });
 
-  // Filter messages based on search query and active filters
+  // Filter messages based on search query, active filters, and current folder
   const filteredMessages = messages?.filter(msg => {
-    // Apply search filter
+    // First apply folder filter
+    if (currentFolder === "sent" && msg.sender_id !== currentUser?.id) {
+      return false;
+    }
+    if (currentFolder === "inbox" && msg.recipient_id !== currentUser?.id) {
+      return false;
+    }
+
+    // Then apply search filter
     if (searchQuery) {
       const searchLower = searchQuery.toLowerCase();
       return (
@@ -88,7 +99,9 @@ const Inbox = () => {
   });
 
   const pendingRequestsCount = requests?.filter(req => req.status === 'pending').length || 0;
-  const unreadMessagesCount = messages?.filter(msg => !msg.is_read).length || 0;
+  const unreadMessagesCount = messages?.filter(msg => 
+    !msg.is_read && msg.recipient_id === currentUser?.id
+  ).length || 0;
 
   return (
     <div className="min-h-[calc(100vh-4rem)] bg-background">

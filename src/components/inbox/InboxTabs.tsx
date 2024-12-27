@@ -3,6 +3,7 @@ import { Badge } from "@/components/ui/badge";
 import { MessageThreadList } from "./MessageThreadList";
 import { CollaborationRequestCard } from "./CollaborationRequestCard";
 import { Message } from "@/types/inbox";
+import { useLocation, useNavigate } from "react-router-dom";
 
 interface InboxTabsProps {
   messages: Message[] | null;
@@ -25,9 +26,24 @@ export const InboxTabs = ({
   pendingRequestsCount,
   setIsNewMessageOpen,
 }: InboxTabsProps) => {
+  const location = useLocation();
+  const navigate = useNavigate();
+  const currentFolder = new URLSearchParams(location.search).get("folder") || "inbox";
+
+  const handleTabChange = (value: string) => {
+    if (value === "messages") {
+      navigate("/inbox?folder=inbox");
+    } else if (value === "sent") {
+      navigate("/inbox?folder=sent");
+    }
+  };
+
+  const currentTab = currentFolder === "sent" ? "sent" : 
+                     currentFolder === "inbox" ? "messages" : "requests";
+
   return (
-    <Tabs defaultValue="messages" className="mt-6">
-      <TabsList className="grid w-full grid-cols-2">
+    <Tabs value={currentTab} onValueChange={handleTabChange} className="mt-6">
+      <TabsList className="grid w-full grid-cols-3">
         <TabsTrigger value="messages" className="flex items-center gap-2">
           Messages
           {unreadMessagesCount > 0 && (
@@ -35,6 +51,9 @@ export const InboxTabs = ({
               {unreadMessagesCount}
             </Badge>
           )}
+        </TabsTrigger>
+        <TabsTrigger value="sent">
+          Sent
         </TabsTrigger>
         <TabsTrigger value="requests" className="flex items-center gap-2">
           Requests
@@ -55,7 +74,22 @@ export const InboxTabs = ({
           </div>
         ) : (
           <MessageThreadList
-            messages={filteredMessages}
+            messages={filteredMessages?.filter(msg => msg.recipient_id === msg.sender_id)}
+            onReply={() => setIsNewMessageOpen(true)}
+          />
+        )}
+      </TabsContent>
+
+      <TabsContent value="sent" className="mt-6">
+        {isLoadingMessages ? (
+          <div className="text-center text-muted-foreground">Loading sent messages...</div>
+        ) : messages?.filter(msg => msg.sender_id === msg.recipient_id).length === 0 ? (
+          <div className="text-center text-muted-foreground py-8">
+            No sent messages found
+          </div>
+        ) : (
+          <MessageThreadList
+            messages={messages?.filter(msg => msg.sender_id === msg.recipient_id)}
             onReply={() => setIsNewMessageOpen(true)}
           />
         )}
