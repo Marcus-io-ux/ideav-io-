@@ -32,6 +32,14 @@ export const InboxTabs = ({
   const location = useLocation();
   const currentFolder = new URLSearchParams(location.search).get("folder") || "inbox";
 
+  // Filter messages based on the current folder
+  const displayMessages = filteredMessages?.filter(msg => {
+    if (currentFolder === "sent") {
+      return msg.sender.user_id === (messages?.[0]?.sender.user_id || msg.sender.user_id);
+    }
+    return msg.recipient.user_id === (messages?.[0]?.recipient.user_id || msg.recipient.user_id);
+  });
+
   return (
     <Tabs defaultValue="messages" className="mt-6">
       <TabsList className="grid w-full grid-cols-3">
@@ -64,13 +72,13 @@ export const InboxTabs = ({
       <TabsContent value="messages" className="mt-6">
         {isLoadingMessages ? (
           <div className="text-center text-muted-foreground">Loading messages...</div>
-        ) : filteredMessages?.length === 0 ? (
+        ) : displayMessages?.length === 0 ? (
           <div className="text-center text-muted-foreground py-8">
             No messages found
           </div>
         ) : (
           <MessageThreadList
-            messages={filteredMessages}
+            messages={displayMessages}
             onReply={() => setIsNewMessageOpen(true)}
           />
         )}
