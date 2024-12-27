@@ -94,7 +94,6 @@ export const PostCard = ({
 
       if (postError) throw postError;
 
-      // Also update the corresponding idea if it exists
       const { error: ideaError } = await supabase
         .from('ideas')
         .update({
@@ -118,7 +117,6 @@ export const PostCard = ({
         description: "Your post has been updated",
       });
 
-      // Refresh the posts list
       window.location.reload();
     } catch (error) {
       console.error('Error updating post:', error);
@@ -133,6 +131,30 @@ export const PostCard = ({
   const handleTagsChange = (value: string) => {
     const newTags = value.split(',').map(tag => tag.trim()).filter(Boolean);
     setEditedTags(newTags);
+  };
+
+  const handleLike = async () => {
+    if (!currentUserId) {
+      toast({
+        title: "Authentication required",
+        description: "Please sign in to like posts",
+        variant: "destructive",
+      });
+      return;
+    }
+    onLike(post.id);
+  };
+
+  const handleComment = () => {
+    if (!currentUserId) {
+      toast({
+        title: "Authentication required",
+        description: "Please sign in to comment on posts",
+        variant: "destructive",
+      });
+      return;
+    }
+    onToggleComments(post.id);
   };
 
   return (
@@ -237,13 +259,23 @@ export const PostCard = ({
       )}
 
       <div className="flex gap-4">
-        <Button variant="ghost" size="sm" onClick={() => onLike(post.id)}>
-          <ThumbsUp className="w-4 h-4 mr-2" />
-          {post.likes_count || 0}
+        <Button 
+          variant="ghost" 
+          size="sm" 
+          onClick={handleLike}
+          className="flex items-center gap-2"
+        >
+          <ThumbsUp className="w-4 h-4" />
+          <span>{post.likes_count || 0}</span>
         </Button>
-        <Button variant="ghost" size="sm" onClick={() => onToggleComments(post.id)}>
-          <MessageSquare className="w-4 h-4 mr-2" />
-          {post.comments_count || 0}
+        <Button 
+          variant="ghost" 
+          size="sm" 
+          onClick={handleComment}
+          className="flex items-center gap-2"
+        >
+          <MessageSquare className="w-4 h-4" />
+          <span>{post.comments_count || 0}</span>
         </Button>
         <Button 
           variant="ghost" 
