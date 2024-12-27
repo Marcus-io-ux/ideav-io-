@@ -4,6 +4,8 @@ import { MessageThreadList } from "./MessageThreadList";
 import { CollaborationRequestCard } from "./CollaborationRequestCard";
 import { Message } from "@/types/inbox";
 import { useLocation, useNavigate } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 
 interface InboxTabsProps {
   messages: Message[] | null;
@@ -29,6 +31,14 @@ export const InboxTabs = ({
   const location = useLocation();
   const navigate = useNavigate();
   const currentFolder = new URLSearchParams(location.search).get("folder") || "inbox";
+
+  const { data: currentUser } = useQuery({
+    queryKey: ['currentUser'],
+    queryFn: async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      return user;
+    },
+  });
 
   const handleTabChange = (value: string) => {
     if (value === "messages") {
@@ -70,13 +80,13 @@ export const InboxTabs = ({
       <TabsContent value="messages" className="mt-6">
         {isLoadingMessages ? (
           <div className="text-center text-muted-foreground">Loading messages...</div>
-        ) : filteredMessages?.filter(msg => msg.recipient_id === msg.sender.user_id).length === 0 ? (
+        ) : filteredMessages?.filter(msg => msg.recipient_id === currentUser?.id).length === 0 ? (
           <div className="text-center text-muted-foreground py-8">
             No messages found
           </div>
         ) : (
           <MessageThreadList
-            messages={filteredMessages?.filter(msg => msg.recipient_id === msg.sender.user_id)}
+            messages={filteredMessages?.filter(msg => msg.recipient_id === currentUser?.id)}
             onReply={() => setIsNewMessageOpen(true)}
           />
         )}
@@ -85,13 +95,13 @@ export const InboxTabs = ({
       <TabsContent value="sent" className="mt-6">
         {isLoadingMessages ? (
           <div className="text-center text-muted-foreground">Loading sent messages...</div>
-        ) : messages?.filter(msg => msg.sender_id === msg.recipient.user_id).length === 0 ? (
+        ) : messages?.filter(msg => msg.sender_id === currentUser?.id).length === 0 ? (
           <div className="text-center text-muted-foreground py-8">
             No sent messages found
           </div>
         ) : (
           <MessageThreadList
-            messages={messages?.filter(msg => msg.sender_id === msg.recipient.user_id)}
+            messages={messages?.filter(msg => msg.sender_id === currentUser?.id)}
             onReply={() => setIsNewMessageOpen(true)}
           />
         )}
