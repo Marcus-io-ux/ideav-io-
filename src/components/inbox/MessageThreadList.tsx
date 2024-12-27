@@ -25,6 +25,19 @@ export const MessageThreadList = ({ messages }: MessageThreadListProps) => {
   const handleDelete = async (messageId: string) => {
     try {
       setDeletingMessageId(messageId);
+      
+      // First, delete all child messages that reference this message as parent
+      const { error: childrenError } = await supabase
+        .from('messages')
+        .delete()
+        .eq('parent_id', messageId);
+
+      if (childrenError) {
+        console.error('Error deleting child messages:', childrenError);
+        throw childrenError;
+      }
+
+      // Then delete the message itself
       const { error } = await supabase
         .from('messages')
         .delete()
@@ -36,7 +49,7 @@ export const MessageThreadList = ({ messages }: MessageThreadListProps) => {
 
       toast({
         title: "Message deleted",
-        description: "The message has been deleted successfully",
+        description: "The message and its replies have been deleted successfully",
       });
     } catch (error) {
       console.error('Error deleting message:', error);
