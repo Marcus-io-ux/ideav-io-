@@ -126,25 +126,28 @@ const Dashboard = () => {
         <PageHeader
           title={`Welcome back, ${userName}!`}
           description="Your personal vault of saved and developing ideas."
-          className="text-center sm:text-left"
+          className="text-center"
         />
         
         <div className="text-center text-muted-foreground italic mb-4 sm:mb-8 px-4">
           "{dailyQuote}"
         </div>
         
-        <DashboardActionsBar
-          totalIdeas={ideasData.length}
-          searchQuery={searchQuery}
-          setSearchQuery={setSearchQuery}
-          viewMode={viewMode}
-          setViewMode={setViewMode}
-          showFavorites={showFavorites}
-          setShowFavorites={setShowFavorites}
-          showDrafts={showDrafts}
-          setShowDrafts={setShowDrafts}
-          handleIdeaSubmit={handleIdeaSubmit}
-        />
+        <div className="flex items-center gap-4 mb-6">
+          <FeedbackButton onClick={() => setIsFeedbackModalOpen(true)} />
+          <DashboardActionsBar
+            totalIdeas={ideasData.length}
+            searchQuery={searchQuery}
+            setSearchQuery={setSearchQuery}
+            viewMode={viewMode}
+            setViewMode={setViewMode}
+            showFavorites={showFavorites}
+            setShowFavorites={setShowFavorites}
+            showDrafts={showDrafts}
+            setShowDrafts={setShowDrafts}
+            handleIdeaSubmit={handleIdeaSubmit}
+          />
+        </div>
 
         <IdeasGrid
           ideas={filteredIdeas}
@@ -155,7 +158,6 @@ const Dashboard = () => {
         />
       </div>
 
-      <FeedbackButton onClick={() => setIsFeedbackModalOpen(true)} />
       <FeedbackModal 
         isOpen={isFeedbackModalOpen}
         onClose={() => setIsFeedbackModalOpen(false)}
