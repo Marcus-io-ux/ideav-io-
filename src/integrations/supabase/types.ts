@@ -274,8 +274,73 @@ export type Database = {
         }
         Relationships: []
       }
+      idea_comments: {
+        Row: {
+          content: string
+          created_at: string | null
+          id: string
+          idea_id: string | null
+          updated_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          content: string
+          created_at?: string | null
+          id?: string
+          idea_id?: string | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          content?: string
+          created_at?: string | null
+          id?: string
+          idea_id?: string | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "idea_comments_idea_id_fkey"
+            columns: ["idea_id"]
+            isOneToOne: false
+            referencedRelation: "ideas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      idea_likes: {
+        Row: {
+          created_at: string | null
+          id: string
+          idea_id: string | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          idea_id?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          idea_id?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "idea_likes_idea_id_fkey"
+            columns: ["idea_id"]
+            isOneToOne: false
+            referencedRelation: "ideas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       ideas: {
         Row: {
+          comments_count: number | null
           content: string
           created_at: string | null
           deleted: boolean | null
@@ -283,12 +348,14 @@ export type Database = {
           id: string
           images: string[] | null
           is_draft: boolean | null
+          likes_count: number | null
           shared_to_community: boolean | null
           tags: string[] | null
           title: string
           user_id: string | null
         }
         Insert: {
+          comments_count?: number | null
           content: string
           created_at?: string | null
           deleted?: boolean | null
@@ -296,12 +363,14 @@ export type Database = {
           id?: string
           images?: string[] | null
           is_draft?: boolean | null
+          likes_count?: number | null
           shared_to_community?: boolean | null
           tags?: string[] | null
           title: string
           user_id?: string | null
         }
         Update: {
+          comments_count?: number | null
           content?: string
           created_at?: string | null
           deleted?: boolean | null
@@ -309,6 +378,7 @@ export type Database = {
           id?: string
           images?: string[] | null
           is_draft?: boolean | null
+          likes_count?: number | null
           shared_to_community?: boolean | null
           tags?: string[] | null
           title?: string

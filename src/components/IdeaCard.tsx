@@ -8,7 +8,9 @@ import { IdeaCardTitle } from "@/components/dashboard/idea-card/IdeaCardTitle";
 import { IdeaCardSelection } from "@/components/dashboard/idea-card/IdeaCardSelection";
 import { IdeaCardFooter } from "@/components/dashboard/idea-card/IdeaCardFooter";
 import { IdeaCardTags } from "@/components/dashboard/idea-card/IdeaCardTags";
+import { IdeaCardComments } from "@/components/dashboard/idea-card/IdeaCardComments";
 import { useIdeaCard } from "@/components/dashboard/idea-card/useIdeaCard";
+import { useIdeaInteractions } from "@/components/dashboard/idea-card/useIdeaInteractions";
 
 interface IdeaCardProps {
   id: string;
@@ -64,6 +66,17 @@ export const IdeaCard = ({
     isDraft,
     onToggleFavorite,
   });
+
+  const {
+    isLiked,
+    likesCount,
+    commentsCount,
+    comments,
+    isCommentsExpanded,
+    handleLike,
+    toggleComments,
+    fetchComments,
+  } = useIdeaInteractions(id, userId);
 
   const handleDelete = () => {
     onDelete?.(id);
@@ -126,7 +139,21 @@ export const IdeaCard = ({
           onDelete={onDelete ? handleDelete : undefined}
           userId={userId}
           sharedToCommunity={sharedToCommunity}
+          isLiked={isLiked}
+          likesCount={likesCount}
+          onLike={handleLike}
+          commentsCount={commentsCount}
+          isCommentsExpanded={isCommentsExpanded}
+          onToggleComments={toggleComments}
         />
+        
+        {isCommentsExpanded && (
+          <IdeaCardComments
+            ideaId={id}
+            comments={comments}
+            onCommentAdded={fetchComments}
+          />
+        )}
         
         {isEditing && (
           <IdeaCardActions
