@@ -1,15 +1,11 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Button } from "@/components/ui/button";
-import { MessageHeader } from "@/components/inbox/MessageHeader";
-import { MessageThreadList } from "@/components/inbox/MessageThreadList";
-import { NewMessageDialog } from "@/components/inbox/NewMessageDialog";
-import { CollaborationRequestCard } from "@/components/inbox/CollaborationRequestCard";
 import { useMessages } from "@/hooks/use-messages";
-import { Badge } from "@/components/ui/badge";
 import { InboxSidebar } from "@/components/inbox/InboxSidebar";
+import { InboxPageHeader } from "@/components/inbox/InboxPageHeader";
+import { InboxTabs } from "@/components/inbox/InboxTabs";
+import { NewMessageDialog } from "@/components/inbox/NewMessageDialog";
 import { useLocation } from "react-router-dom";
 import { useIsMobile } from "@/hooks/use-mobile";
 
@@ -89,21 +85,17 @@ const Inbox = () => {
       case 'inbox':
         return !msg.is_read;
       case 'starred':
-        // Implement starred functionality when available
         return false;
       case 'sent':
         return msg.sender_id === currentUser?.id;
       case 'archived':
-        // Implement archived functionality when available
         return false;
       case 'trash':
-        // Implement trash functionality when available
         return false;
       default:
         return true;
     }
   })?.filter(msg => {
-    // Then apply search filter
     if (searchQuery) {
       const searchLower = searchQuery.toLowerCase();
       return (
@@ -114,12 +106,10 @@ const Inbox = () => {
     }
     return true;
   })?.filter(msg => {
-    // Finally apply active filters
     if (activeFilters.includes('unread')) {
       return !msg.is_read;
     }
     if (activeFilters.includes('has_attachments')) {
-      // Implement attachment filtering when available
       return false;
     }
     return true;
@@ -134,76 +124,28 @@ const Inbox = () => {
   };
 
   return (
-    <div className="flex flex-col md:flex-row h-[calc(100vh-4rem)] w-full overflow-hidden">
-      {!isMobile && <InboxSidebar counts={folderCounts} className="w-64 min-w-64 border-r" />}
+    <div className="flex h-[calc(100vh-4rem)]">
+      {!isMobile && <InboxSidebar counts={folderCounts} />}
       
-      <div className="flex-1 overflow-auto p-4 md:p-6 w-full">
+      <div className="flex-1 overflow-auto p-4 md:p-6">
         <div className="max-w-4xl mx-auto">
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
-            <MessageHeader 
-              onSearch={setSearchQuery}
-              onFilterChange={setActiveFilters}
-              activeFilters={activeFilters}
-            />
-            <Button
-              onClick={() => setIsNewMessageOpen(true)}
-              className="w-full md:w-auto"
-            >
-              New Message
-            </Button>
-          </div>
+          <InboxPageHeader
+            onSearch={setSearchQuery}
+            onFilterChange={setActiveFilters}
+            activeFilters={activeFilters}
+            onNewMessage={() => setIsNewMessageOpen(true)}
+          />
 
-          <Tabs defaultValue="messages" className="mt-8">
-            <TabsList className="grid w-full grid-cols-2">
-              <TabsTrigger value="messages" className="flex items-center gap-2">
-                Messages
-                {unreadMessagesCount > 0 && (
-                  <Badge variant="secondary">
-                    {unreadMessagesCount}
-                  </Badge>
-                )}
-              </TabsTrigger>
-              <TabsTrigger value="requests" className="flex items-center gap-2">
-                {isMobile ? "Requests" : "Collaboration Requests"}
-                {pendingRequestsCount > 0 && (
-                  <Badge variant="secondary">
-                    {pendingRequestsCount}
-                  </Badge>
-                )}
-              </TabsTrigger>
-            </TabsList>
-
-            <TabsContent value="messages" className="mt-4">
-              {isLoadingMessages ? (
-                <div>Loading messages...</div>
-              ) : filteredMessages?.length === 0 ? (
-                <div className="text-center text-muted-foreground">
-                  No messages found
-                </div>
-              ) : (
-                <MessageThreadList
-                  messages={filteredMessages}
-                  onReply={(message) => {
-                    setIsNewMessageOpen(true);
-                  }}
-                />
-              )}
-            </TabsContent>
-
-            <TabsContent value="requests" className="mt-4 space-y-4">
-              {isLoadingRequests ? (
-                <div>Loading requests...</div>
-              ) : requests?.length === 0 ? (
-                <div className="text-center text-muted-foreground">
-                  No collaboration requests yet
-                </div>
-              ) : (
-                requests?.map((request) => (
-                  <CollaborationRequestCard key={request.id} request={request} />
-                ))
-              )}
-            </TabsContent>
-          </Tabs>
+          <InboxTabs
+            messages={messages}
+            filteredMessages={filteredMessages}
+            requests={requests}
+            isLoadingMessages={isLoadingMessages}
+            isLoadingRequests={isLoadingRequests}
+            unreadMessagesCount={unreadMessagesCount}
+            pendingRequestsCount={pendingRequestsCount}
+            setIsNewMessageOpen={setIsNewMessageOpen}
+          />
 
           <NewMessageDialog
             open={isNewMessageOpen}
@@ -212,7 +154,7 @@ const Inbox = () => {
           />
 
           <div className="mt-8 text-center text-muted-foreground">
-            <p className="text-sm">Need help? Visit our support page for tips on using your inbox!</p>
+            <p>Need help? Visit our support page for tips on using your inbox!</p>
           </div>
         </div>
       </div>
