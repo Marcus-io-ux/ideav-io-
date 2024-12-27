@@ -12,7 +12,7 @@ export const MessageItem = ({ message }: MessageItemProps) => {
   return (
     <div className={cn(
       "bg-muted/30 rounded-lg p-4",
-      !message.is_read && "bg-blue-50/80 dark:bg-blue-950/40"
+      !message.is_read && "bg-blue-50/30 dark:bg-blue-950/20"
     )}>
       <div className="flex items-start space-x-4">
         <Avatar className="h-10 w-10">

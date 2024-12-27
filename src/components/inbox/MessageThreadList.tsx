@@ -1,6 +1,7 @@
+import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 import { MessageSquare, Trash2 } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { formatDistanceToNow } from "date-fns";
 import { Message } from "@/types/inbox";
@@ -8,7 +9,6 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
-import { cn } from "@/lib/utils";
 import { MessageThread } from "./MessageThread";
 import { useLocation } from "react-router-dom";
 
@@ -97,7 +97,7 @@ export const MessageThreadList = ({ messages }: MessageThreadListProps) => {
             key={message.id} 
             className={cn(
               "p-6 border-b last:border-b-0 hover:bg-muted/50 transition-colors cursor-pointer relative",
-              !message.is_read && currentFolder !== "sent" && "bg-blue-50/80 dark:bg-blue-950/40"
+              !message.is_read && currentFolder !== "sent" && "bg-blue-50/30 dark:bg-blue-950/20"
             )}
             onClick={() => setSelectedMessage(message)}
           >
