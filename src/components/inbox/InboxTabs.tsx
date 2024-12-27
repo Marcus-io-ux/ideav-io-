@@ -3,6 +3,9 @@ import { Badge } from "@/components/ui/badge";
 import { MessageThreadList } from "./MessageThreadList";
 import { CollaborationRequestCard } from "./CollaborationRequestCard";
 import { Message } from "@/types/inbox";
+import { Send } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { useNavigate, useLocation } from "react-router-dom";
 
 interface InboxTabsProps {
   messages: Message[] | null;
@@ -25,9 +28,13 @@ export const InboxTabs = ({
   pendingRequestsCount,
   setIsNewMessageOpen,
 }: InboxTabsProps) => {
+  const navigate = useNavigate();
+  const location = useLocation();
+  const currentFolder = new URLSearchParams(location.search).get("folder") || "inbox";
+
   return (
     <Tabs defaultValue="messages" className="mt-6">
-      <TabsList className="grid w-full grid-cols-2">
+      <TabsList className="grid w-full grid-cols-3">
         <TabsTrigger value="messages" className="flex items-center gap-2">
           Messages
           {unreadMessagesCount > 0 && (
@@ -36,6 +43,14 @@ export const InboxTabs = ({
             </Badge>
           )}
         </TabsTrigger>
+        <Button 
+          variant="ghost" 
+          className="flex items-center gap-2"
+          onClick={() => navigate("/inbox?folder=sent")}
+        >
+          <Send className="h-4 w-4" />
+          Sent
+        </Button>
         <TabsTrigger value="requests" className="flex items-center gap-2">
           Requests
           {pendingRequestsCount > 0 && (
