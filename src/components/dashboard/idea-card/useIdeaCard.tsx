@@ -10,6 +10,7 @@ interface UseIdeaCardProps {
   tags: string[];
   isFavorite: boolean;
   isDraft: boolean;
+  sharedToCommunity?: boolean;
   onToggleFavorite?: (id: string) => void;
 }
 
@@ -20,6 +21,7 @@ export const useIdeaCard = ({
   tags,
   isFavorite,
   isDraft,
+  sharedToCommunity = false,
   onToggleFavorite,
 }: UseIdeaCardProps) => {
   const { toast } = useToast();
@@ -99,7 +101,8 @@ export const useIdeaCard = ({
 
   const handleSaveEdit = async () => {
     try {
-      const { error } = await supabase
+      // First update the idea
+      const { error: ideaError } = await supabase
         .from('ideas')
         .update({
           title: editedTitle,
@@ -109,10 +112,38 @@ export const useIdeaCard = ({
         })
         .eq('id', id);
 
-      if (error) throw error;
+      if (ideaError) throw ideaError;
+
+      // If the idea is shared to community, update the community post
+      if (sharedToCommunity) {
+        const { error: communityError } = await supabase
+          .from('community_posts')
+          .update({
+            title: editedTitle,
+            content: editedContent,
+            tags: editedTags,
+          })
+          .match({
+            title: title,
+            content: content,
+            user_id: (await supabase.auth.getUser()).data.user?.id
+          });
+
+        if (communityError) {
+          console.error('Error updating community post:', communityError);
+          toast({
+            title: "Warning",
+            description: "Your idea was updated but there was an error updating the community post.",
+            variant: "destructive",
+          });
+        }
+      }
 
       setIsEditing(false);
-      await queryClient.invalidateQueries({ queryKey: ["my-ideas"] });
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ["my-ideas"] }),
+        queryClient.invalidateQueries({ queryKey: ["community-posts"] })
+      ]);
       
       toast({
         title: "Success",
