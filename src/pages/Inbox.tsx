@@ -52,8 +52,8 @@ const Inbox = () => {
         .from('messages')
         .select(`
           *,
-          sender:profiles!messages_sender_id_fkey(username, avatar_url),
-          recipient:profiles!messages_recipient_id_fkey(username, avatar_url)
+          sender:profiles!messages_sender_id_fkey(username, avatar_url, user_id),
+          recipient:profiles!messages_recipient_id_fkey(username, avatar_url, user_id)
         `)
         .or(`sender_id.eq.${user.id},recipient_id.eq.${user.id}`)
         .order('created_at', { ascending: false });

@@ -15,11 +15,13 @@ export function useRealTimeMessages(userId: string | null) {
           *,
           sender:profiles!messages_sender_id_fkey (
             username,
-            avatar_url
+            avatar_url,
+            user_id
           ),
           recipient:profiles!messages_recipient_id_fkey (
             username,
-            avatar_url
+            avatar_url,
+            user_id
           )
         `)
         .or(`sender_id.eq.${userId},recipient_id.eq.${userId}`)
@@ -37,13 +39,17 @@ export function useRealTimeMessages(userId: string | null) {
         content: msg.content,
         created_at: msg.created_at,
         is_read: msg.is_read,
+        parent_id: msg.parent_id,
+        thread_id: msg.thread_id,
         sender: {
           username: msg.sender?.username || "Unknown",
-          avatar_url: msg.sender?.avatar_url
+          avatar_url: msg.sender?.avatar_url,
+          user_id: msg.sender?.user_id
         },
         recipient: {
           username: msg.recipient?.username || "Unknown",
-          avatar_url: msg.recipient?.avatar_url
+          avatar_url: msg.recipient?.avatar_url,
+          user_id: msg.recipient?.user_id
         }
       }));
 
