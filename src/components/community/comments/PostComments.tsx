@@ -49,6 +49,7 @@ export const PostComments = ({
         .insert([
           {
             post_id: postId,
+            user_id: session.user.id,  // Add this line to set the user_id
             content: newComment.trim(),
           },
         ]);
