@@ -12,6 +12,7 @@ export interface Message {
   is_read: boolean;
   parent_id?: string;
   thread_id?: string;
+  title?: string;
   sender: {
     username: string;
     avatar_url?: string;
