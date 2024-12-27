@@ -137,7 +137,12 @@ export const MessageThreadList = ({ messages }: MessageThreadListProps) => {
                 <p className="text-sm text-muted-foreground">
                   {formatDistanceToNow(new Date(message.created_at), { addSuffix: true })}
                 </p>
-                <div className="mt-2 text-sm leading-6 text-foreground">
+                {message.title && (
+                  <h3 className="mt-2 font-medium text-sm">
+                    {message.title}
+                  </h3>
+                )}
+                <div className="mt-2 text-sm leading-6 text-foreground line-clamp-2">
                   {message.content}
                 </div>
               </div>
