@@ -7,6 +7,7 @@ import { Card, CardHeader, CardContent, CardFooter } from "@/components/ui/card"
 import { Settings, Users, Lightbulb } from "lucide-react";
 import { format } from "date-fns";
 import { Link } from "react-router-dom";
+import { AnnouncementDialog } from "@/components/announcements/AnnouncementDialog";
 
 type Announcement = {
   id: string;
@@ -33,6 +34,8 @@ const categoryLabels = {
 
 export default function Announcements() {
   const [selectedCategory, setSelectedCategory] = useState<CategoryFilter>("all");
+  const [selectedAnnouncement, setSelectedAnnouncement] = useState<Announcement | null>(null);
+  const [dialogOpen, setDialogOpen] = useState(false);
 
   const { data: announcements = [], isLoading } = useQuery({
     queryKey: ["announcements"],
@@ -52,6 +55,11 @@ export default function Announcements() {
   );
 
   const featuredAnnouncements = announcements.filter((a) => a.is_featured);
+
+  const handleReadMore = (announcement: Announcement) => {
+    setSelectedAnnouncement(announcement);
+    setDialogOpen(true);
+  };
 
   return (
     <div className="container max-w-4xl py-8 space-y-8 animate-fade-in">
@@ -85,8 +93,17 @@ export default function Announcements() {
                   <h3 className="text-xl font-semibold mt-2">{announcement.title}</h3>
                 </CardHeader>
                 <CardContent>
-                  <p className="text-muted-foreground">{announcement.content}</p>
+                  <p className="text-muted-foreground line-clamp-3">{announcement.content}</p>
                 </CardContent>
+                <CardFooter>
+                  <Button 
+                    variant="ghost" 
+                    className="ml-auto"
+                    onClick={() => handleReadMore(announcement)}
+                  >
+                    Read More
+                  </Button>
+                </CardFooter>
               </Card>
             ))}
           </div>
@@ -151,10 +168,14 @@ export default function Announcements() {
                 <h3 className="text-xl font-semibold mt-2">{announcement.title}</h3>
               </CardHeader>
               <CardContent>
-                <p className="text-muted-foreground">{announcement.content}</p>
+                <p className="text-muted-foreground line-clamp-3">{announcement.content}</p>
               </CardContent>
               <CardFooter>
-                <Button variant="ghost" className="ml-auto">
+                <Button 
+                  variant="ghost" 
+                  className="ml-auto"
+                  onClick={() => handleReadMore(announcement)}
+                >
                   Read More
                 </Button>
               </CardFooter>
@@ -170,6 +191,13 @@ export default function Announcements() {
           <Link to="/community">Go to Community Page</Link>
         </Button>
       </div>
+
+      {/* Announcement Dialog */}
+      <AnnouncementDialog
+        open={dialogOpen}
+        onOpenChange={setDialogOpen}
+        announcement={selectedAnnouncement}
+      />
     </div>
   );
 }
