@@ -32,13 +32,18 @@ export const DashboardActionsBar = ({
   return (
     <div className="w-full space-y-4">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-        <div className="w-full sm:w-auto flex-1">
-          <SearchBar 
-            value={searchQuery}
-            onSearch={setSearchQuery}
-            placeholder="Search ideas..."
-            className="w-full"
-          />
+        <div className="flex items-center gap-4 w-full sm:w-auto">
+          <span className="text-sm text-muted-foreground whitespace-nowrap">
+            {totalIdeas} {totalIdeas === 1 ? 'idea' : 'ideas'}
+          </span>
+          <div className="w-full">
+            <SearchBar 
+              value={searchQuery}
+              onSearch={setSearchQuery}
+              placeholder="Search ideas..."
+              className="w-full"
+            />
+          </div>
         </div>
         <div className="flex items-center gap-2 w-full sm:w-auto justify-between sm:justify-end">
           <AddIdeaDialog onIdeaSubmit={handleIdeaSubmit} />
@@ -82,11 +87,6 @@ export const DashboardActionsBar = ({
             </Button>
           </div>
         </div>
-      </div>
-      <div className="flex items-center">
-        <span className="text-sm text-muted-foreground ml-auto">
-          {totalIdeas} {totalIdeas === 1 ? 'idea' : 'ideas'}
-        </span>
       </div>
     </div>
   );
