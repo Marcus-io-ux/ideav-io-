@@ -35,11 +35,11 @@ export const DashboardActionsBar = ({
   handleIdeaSubmit,
 }: DashboardActionsBarProps) => {
   return (
-    <div className="flex flex-col sm:flex-row justify-between items-center gap-4 p-4">
-      <div className="text-muted-foreground text-center sm:text-left w-full sm:w-auto">
+    <div className="flex flex-col sm:flex-row justify-between items-center gap-4 p-4 w-full">
+      <div className="text-muted-foreground text-center sm:text-left">
         You have {totalIdeas} idea{totalIdeas !== 1 ? 's' : ''} stored
       </div>
-      <div className="flex flex-wrap items-center justify-center sm:justify-end gap-2">
+      <div className="flex flex-wrap items-center justify-end gap-2 ml-auto">
         <Button
           variant="outline"
           size="icon"
