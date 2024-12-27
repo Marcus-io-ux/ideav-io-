@@ -1,8 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Star, Trash2, ThumbsUp, MessageSquare } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { IdeaCardLikeButton } from "./IdeaCardLikeButton";
-import { IdeaCardCommentButton } from "./IdeaCardCommentButton";
 
 interface IdeaCardFooterProps {
   isCurrentlyFavorite: boolean;
@@ -16,6 +14,7 @@ interface IdeaCardFooterProps {
   commentsCount: number;
   isCommentsExpanded: boolean;
   onToggleComments: () => void;
+  hideInteractions?: boolean;
 }
 
 export const IdeaCardFooter = ({
@@ -30,45 +29,48 @@ export const IdeaCardFooter = ({
   commentsCount,
   isCommentsExpanded,
   onToggleComments,
+  hideInteractions = false,
 }: IdeaCardFooterProps) => {
   return (
     <div className="absolute bottom-4 left-4 right-4 flex items-center justify-between">
-      <div className="flex items-center gap-2">
-        <Button
-          variant="ghost"
-          size="sm"
-          className={cn(
-            "gap-2 text-muted-foreground hover:text-primary",
-            isLiked && "text-primary"
-          )}
-          onClick={(e) => {
-            e.stopPropagation();
-            onLike();
-          }}
-          disabled={!userId}
-        >
-          <ThumbsUp className={cn("h-4 w-4", isLiked && "fill-current")} />
-          <span className="text-sm">{likesCount}</span>
-        </Button>
+      {!hideInteractions && (
+        <div className="flex items-center gap-2">
+          <Button
+            variant="ghost"
+            size="sm"
+            className={cn(
+              "gap-2 text-muted-foreground hover:text-primary",
+              isLiked && "text-primary"
+            )}
+            onClick={(e) => {
+              e.stopPropagation();
+              onLike();
+            }}
+            disabled={!userId}
+          >
+            <ThumbsUp className={cn("h-4 w-4", isLiked && "fill-current")} />
+            <span className="text-sm">{likesCount}</span>
+          </Button>
 
-        <Button
-          variant="ghost"
-          size="sm"
-          className={cn(
-            "gap-2 text-muted-foreground hover:text-primary",
-            isCommentsExpanded && "text-primary"
-          )}
-          onClick={(e) => {
-            e.stopPropagation();
-            onToggleComments();
-          }}
-        >
-          <MessageSquare className="h-4 w-4" />
-          <span className="text-sm">{commentsCount}</span>
-        </Button>
-      </div>
+          <Button
+            variant="ghost"
+            size="sm"
+            className={cn(
+              "gap-2 text-muted-foreground hover:text-primary",
+              isCommentsExpanded && "text-primary"
+            )}
+            onClick={(e) => {
+              e.stopPropagation();
+              onToggleComments();
+            }}
+          >
+            <MessageSquare className="h-4 w-4" />
+            <span className="text-sm">{commentsCount}</span>
+          </Button>
+        </div>
+      )}
       
-      <div className="flex items-center gap-2">
+      <div className={cn("flex items-center gap-2", hideInteractions && "ml-auto")}>
         <Button
           variant="ghost"
           size="icon"

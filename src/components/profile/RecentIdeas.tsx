@@ -70,6 +70,7 @@ export const RecentIdeas = ({ userId }: RecentIdeasProps) => {
             key={idea.id}
             {...idea}
             onDelete={handleDelete}
+            hideInteractions={true}
           />
         ))}
       </div>

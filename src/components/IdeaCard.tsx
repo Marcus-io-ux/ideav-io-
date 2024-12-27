@@ -27,6 +27,7 @@ interface IdeaCardProps {
   onToggleFavorite?: (id: string) => void;
   userId?: string;
   sharedToCommunity?: boolean;
+  hideInteractions?: boolean;
 }
 
 export const IdeaCard = ({ 
@@ -42,7 +43,8 @@ export const IdeaCard = ({
   onDelete,
   onToggleFavorite,
   userId,
-  sharedToCommunity = false
+  sharedToCommunity = false,
+  hideInteractions = false
 }: IdeaCardProps) => {
   const {
     isCurrentlyFavorite,
@@ -145,9 +147,10 @@ export const IdeaCard = ({
           commentsCount={commentsCount}
           isCommentsExpanded={isCommentsExpanded}
           onToggleComments={toggleComments}
+          hideInteractions={hideInteractions}
         />
         
-        {isCommentsExpanded && (
+        {isCommentsExpanded && !hideInteractions && (
           <IdeaCardComments
             ideaId={id}
             comments={comments}
