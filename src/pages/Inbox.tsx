@@ -108,9 +108,6 @@ const Inbox = () => {
       <div className="container mx-auto p-4 md:p-6">
         <InboxPageHeader
           onSearch={setSearchQuery}
-          onFilterChange={setActiveFilters}
-          activeFilters={activeFilters}
-          onNewMessage={() => setIsNewMessageOpen(true)}
         />
 
         <InboxTabs
