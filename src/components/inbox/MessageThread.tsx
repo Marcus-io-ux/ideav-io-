@@ -2,7 +2,6 @@ import { useState, useEffect } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useQueryClient } from "@tanstack/react-query";
@@ -21,7 +20,6 @@ interface MessageThreadProps {
 
 export const MessageThread = ({ open, onOpenChange, selectedMessage }: MessageThreadProps) => {
   const [reply, setReply] = useState("");
-  const [title, setTitle] = useState("");
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [threadMessages, setThreadMessages] = useState<Message[]>([]);
@@ -31,8 +29,6 @@ export const MessageThread = ({ open, onOpenChange, selectedMessage }: MessageTh
     if (open && selectedMessage) {
       fetchThreadMessages();
       markMessageAsRead();
-      // Set default reply title
-      setTitle(`Re: ${selectedMessage.title || 'No title'}`);
     }
   }, [open, selectedMessage]);
 
@@ -97,7 +93,7 @@ export const MessageThread = ({ open, onOpenChange, selectedMessage }: MessageTh
   };
 
   const handleSendReply = async () => {
-    if (!reply.trim() || !title.trim()) return;
+    if (!reply.trim()) return;
 
     try {
       const { data: { user } } = await supabase.auth.getUser();
@@ -111,10 +107,10 @@ export const MessageThread = ({ open, onOpenChange, selectedMessage }: MessageTh
           sender_id: user.id,
           recipient_id: selectedMessage.sender.user_id,
           content: reply,
-          title: title,
           parent_id: selectedMessage.id,
           thread_id: threadId,
-          is_read: false
+          is_read: false,
+          title: selectedMessage.title ? `Re: ${selectedMessage.title}` : undefined
         });
 
       if (error) throw error;
@@ -125,7 +121,6 @@ export const MessageThread = ({ open, onOpenChange, selectedMessage }: MessageTh
       });
 
       setReply("");
-      setTitle(`Re: ${selectedMessage.title || 'No title'}`);
       await queryClient.invalidateQueries({ queryKey: ['messages'] });
       await fetchThreadMessages();
     } catch (error) {
@@ -169,18 +164,6 @@ export const MessageThread = ({ open, onOpenChange, selectedMessage }: MessageTh
 
           <div className="space-y-2">
             <div className="space-y-2">
-              <label htmlFor="title" className="text-sm font-medium text-foreground">
-                Title
-              </label>
-              <Input
-                id="title"
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
-                placeholder="Enter message title..."
-                className="w-full"
-              />
-            </div>
-            <div className="space-y-2">
               <label htmlFor="reply" className="text-sm font-medium text-foreground">
                 Message
               </label>
@@ -199,7 +182,7 @@ export const MessageThread = ({ open, onOpenChange, selectedMessage }: MessageTh
               </Button>
               <Button
                 onClick={handleSendReply}
-                disabled={!reply.trim() || !title.trim() || isLoading}
+                disabled={!reply.trim() || isLoading}
               >
                 Send Reply
               </Button>
