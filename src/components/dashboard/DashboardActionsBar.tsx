@@ -1,13 +1,7 @@
-import { Button } from "@/components/ui/button";
-import { Filter, Grid, List, Search, Star, Save } from "lucide-react";
+import { SearchBar } from "@/components/SearchBar";
 import { AddIdeaDialog } from "@/components/dashboard/AddIdeaDialog";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-import { Input } from "@/components/ui/input";
-import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
+import { Grid, List } from "lucide-react";
 
 interface DashboardActionsBarProps {
   totalIdeas: number;
@@ -19,7 +13,7 @@ interface DashboardActionsBarProps {
   setShowFavorites: (show: boolean) => void;
   showDrafts: boolean;
   setShowDrafts: (show: boolean) => void;
-  handleIdeaSubmit: () => Promise<void>;
+  handleIdeaSubmit: () => void;
 }
 
 export const DashboardActionsBar = ({
@@ -35,55 +29,58 @@ export const DashboardActionsBar = ({
   handleIdeaSubmit,
 }: DashboardActionsBarProps) => {
   return (
-    <div className="flex flex-col sm:flex-row justify-between items-center gap-4 p-4 w-full">
-      <div className="text-muted-foreground text-center sm:text-left">
-        You have {totalIdeas} idea{totalIdeas !== 1 ? 's' : ''} stored
-      </div>
-      <div className="flex flex-wrap items-center justify-end gap-2 ml-auto">
-        <Button
-          variant="outline"
-          size="icon"
-          onClick={() => setViewMode(viewMode === "grid" ? "list" : "grid")}
-          className="hidden md:flex h-10 w-10"
-        >
-          {viewMode === "grid" ? <List className="h-4 w-4" /> : <Grid className="h-4 w-4" />}
-        </Button>
-        
-        <Popover>
-          <PopoverTrigger asChild>
-            <Button variant="outline" size="icon" className="h-10 w-10">
-              <Search className="h-4 w-4" />
+    <div className="w-full space-y-4">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div className="w-full sm:w-auto flex-1">
+          <SearchBar 
+            value={searchQuery}
+            onChange={setSearchQuery}
+            placeholder="Search ideas..."
+            className="w-full"
+          />
+        </div>
+        <div className="flex items-center gap-2 w-full sm:w-auto justify-between sm:justify-end">
+          <AddIdeaDialog onIdeaSubmit={handleIdeaSubmit} />
+          <div className="flex items-center gap-2">
+            <Button
+              variant={viewMode === "grid" ? "default" : "outline"}
+              size="icon"
+              onClick={() => setViewMode("grid")}
+              className="h-9 w-9"
+            >
+              <Grid className="h-4 w-4" />
             </Button>
-          </PopoverTrigger>
-          <PopoverContent className="w-[280px] sm:w-80">
-            <Input
-              placeholder="Search ideas..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full"
-            />
-          </PopoverContent>
-        </Popover>
-
-        <Button
-          variant={showDrafts ? "default" : "outline"}
-          size="icon"
-          className="h-10 w-10"
-          onClick={() => setShowDrafts(!showDrafts)}
-        >
-          <Save className="h-4 w-4" />
-        </Button>
-
+            <Button
+              variant={viewMode === "list" ? "default" : "outline"}
+              size="icon"
+              onClick={() => setViewMode("list")}
+              className="h-9 w-9"
+            >
+              <List className="h-4 w-4" />
+            </Button>
+          </div>
+        </div>
+      </div>
+      <div className="flex flex-wrap gap-2 justify-start">
         <Button
           variant={showFavorites ? "default" : "outline"}
-          size="icon"
-          className="h-10 w-10"
+          size="sm"
           onClick={() => setShowFavorites(!showFavorites)}
+          className="text-sm"
         >
-          <Star className={cn("h-4 w-4", showFavorites && "fill-current")} />
+          {showFavorites ? "All Ideas" : "Show Favorites"}
         </Button>
-
-        <AddIdeaDialog onIdeaSubmit={handleIdeaSubmit} />
+        <Button
+          variant={showDrafts ? "default" : "outline"}
+          size="sm"
+          onClick={() => setShowDrafts(!showDrafts)}
+          className="text-sm"
+        >
+          {showDrafts ? "Published" : "Show Drafts"}
+        </Button>
+        <span className="text-sm text-muted-foreground ml-auto mt-2 sm:mt-0">
+          {totalIdeas} {totalIdeas === 1 ? 'idea' : 'ideas'}
+        </span>
       </div>
     </div>
   );

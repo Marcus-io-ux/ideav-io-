@@ -1,27 +1,17 @@
-import { Button } from "@/components/ui/button";
 import { AddIdeaDialog } from "@/components/dashboard/AddIdeaDialog";
 
 interface EmptyStateProps {
-  onIdeaSubmit?: () => Promise<void>;
+  onIdeaSubmit: () => void;
 }
 
 export const EmptyState = ({ onIdeaSubmit }: EmptyStateProps) => {
-  const handleIdeaSubmit = async () => {
-    if (onIdeaSubmit) {
-      await onIdeaSubmit();
-    }
-  };
-
   return (
-    <div className="flex flex-col items-center justify-center py-8 sm:py-12 text-center space-y-4 px-4">
-      <div className="rounded-full bg-primary/10 p-4">
-        <div className="h-12 w-12 text-primary" />
-      </div>
-      <h3 className="text-lg font-semibold">No ideas yet</h3>
-      <p className="text-muted-foreground max-w-sm">
-        You haven't saved any ideas yet. Click '+ Add New Idea' to get started!
+    <div className="flex flex-col items-center justify-center min-h-[400px] text-center px-4 py-8 sm:py-12 space-y-4">
+      <h3 className="text-lg sm:text-xl font-semibold">No ideas found</h3>
+      <p className="text-muted-foreground max-w-md mx-auto">
+        Get started by creating your first idea. You can add details, tags, and even share it with the community later.
       </p>
-      <AddIdeaDialog onIdeaSubmit={handleIdeaSubmit} />
+      <AddIdeaDialog onIdeaSubmit={onIdeaSubmit} />
     </div>
   );
 };

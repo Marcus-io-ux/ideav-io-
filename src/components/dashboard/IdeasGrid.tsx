@@ -1,31 +1,26 @@
 import { IdeaCard } from "@/components/IdeaCard";
 import { EmptyState } from "@/components/dashboard/EmptyState";
-import { Skeleton } from "@/components/ui/skeleton";
+import { Idea } from "@/types/idea";
 
 interface IdeasGridProps {
-  ideas: Array<{
-    id: string;
-    title: string;
-    content: string;
-    createdAt: Date;
-  }>;
+  ideas: Idea[];
   isLoading: boolean;
   viewMode: "grid" | "list";
-  onDelete?: (id: string) => void;
-  onIdeaSubmit?: () => Promise<void>;
+  onDelete: (id: string) => void;
+  onIdeaSubmit: () => void;
 }
 
-export const IdeasGrid = ({ ideas, isLoading, viewMode, onDelete, onIdeaSubmit }: IdeasGridProps) => {
+export const IdeasGrid = ({
+  ideas,
+  isLoading,
+  viewMode,
+  onDelete,
+  onIdeaSubmit,
+}: IdeasGridProps) => {
   if (isLoading) {
     return (
-      <div className={`grid gap-4 sm:gap-6 ${
-        viewMode === "grid" 
-          ? "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3" 
-          : "grid-cols-1"
-      }`}>
-        {[...Array(6)].map((_, i) => (
-          <Skeleton key={i} className="h-[200px] w-full" />
-        ))}
+      <div className="flex items-center justify-center min-h-[200px]">
+        <p className="text-muted-foreground">Loading ideas...</p>
       </div>
     );
   }
@@ -35,11 +30,11 @@ export const IdeasGrid = ({ ideas, isLoading, viewMode, onDelete, onIdeaSubmit }
   }
 
   return (
-    <div className={`grid gap-4 sm:gap-6 ${
-      viewMode === "grid" 
-        ? "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3" 
-        : "grid-cols-1"
-    }`}>
+    <div className={
+      viewMode === "grid"
+        ? "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6"
+        : "flex flex-col gap-4 sm:gap-6"
+    }>
       {ideas.map((idea) => (
         <IdeaCard
           key={idea.id}

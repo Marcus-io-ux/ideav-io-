@@ -122,7 +122,7 @@ const Dashboard = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <div className="container px-4 sm:px-6 py-4 sm:py-6 mx-auto space-y-6 sm:space-y-8">
+      <div className="container max-w-7xl mx-auto px-4 py-4 sm:px-6 sm:py-6 space-y-4 sm:space-y-6">
         <PageHeader
           title={`Welcome back, ${userName}!`}
           description="Your personal vault of saved and developing ideas."
@@ -133,20 +133,22 @@ const Dashboard = () => {
           "{dailyQuote}"
         </div>
         
-        <div className="flex items-center gap-4 mb-6">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
           <FeedbackButton onClick={() => setIsFeedbackModalOpen(true)} />
-          <DashboardActionsBar
-            totalIdeas={ideasData.length}
-            searchQuery={searchQuery}
-            setSearchQuery={setSearchQuery}
-            viewMode={viewMode}
-            setViewMode={setViewMode}
-            showFavorites={showFavorites}
-            setShowFavorites={setShowFavorites}
-            showDrafts={showDrafts}
-            setShowDrafts={setShowDrafts}
-            handleIdeaSubmit={handleIdeaSubmit}
-          />
+          <div className="w-full">
+            <DashboardActionsBar
+              totalIdeas={ideasData.length}
+              searchQuery={searchQuery}
+              setSearchQuery={setSearchQuery}
+              viewMode={viewMode}
+              setViewMode={setViewMode}
+              showFavorites={showFavorites}
+              setShowFavorites={setShowFavorites}
+              showDrafts={showDrafts}
+              setShowDrafts={setShowDrafts}
+              handleIdeaSubmit={handleIdeaSubmit}
+            />
+          </div>
         </div>
 
         <IdeasGrid
