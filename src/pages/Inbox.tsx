@@ -8,7 +8,6 @@ import { MessageThreadList } from "@/components/inbox/MessageThreadList";
 import { NewMessageDialog } from "@/components/inbox/NewMessageDialog";
 import { CollaborationRequestCard } from "@/components/inbox/CollaborationRequestCard";
 import { useMessages } from "@/hooks/use-messages";
-import { Bell } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 
 const Inbox = () => {
@@ -71,25 +70,12 @@ const Inbox = () => {
     <div className="container max-w-4xl mx-auto p-6">
       <div className="flex items-center justify-between mb-8">
         <MessageHeader />
-        <div className="flex items-center gap-4">
-          <Button
-            onClick={() => setIsNewMessageOpen(true)}
-            className="gap-2"
-          >
-            New Message
-          </Button>
-          <Button variant="ghost" className="relative">
-            <Bell className="h-4 w-4" />
-            {unreadMessagesCount > 0 && (
-              <Badge 
-                variant="secondary"
-                className="absolute -top-2 -right-2 min-w-[20px] h-5"
-              >
-                {unreadMessagesCount}
-              </Badge>
-            )}
-          </Button>
-        </div>
+        <Button
+          onClick={() => setIsNewMessageOpen(true)}
+          className="gap-2"
+        >
+          New Message
+        </Button>
       </div>
 
       <Tabs defaultValue="messages" className="mt-8">
