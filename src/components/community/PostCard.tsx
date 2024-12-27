@@ -62,7 +62,6 @@ export const PostCard = ({
         description: "Your collaboration request has been sent to the post owner",
       });
 
-      // Ask user if they want to view their sent request in inbox
       const viewInInbox = window.confirm("Would you like to view your sent request in your inbox?");
       if (viewInInbox) {
         navigate("/inbox");
@@ -104,7 +103,10 @@ export const PostCard = ({
           </Button>
         )}
       </div>
+
+      <h2 className="text-xl font-semibold mb-3">{post.title}</h2>
       <p className="mb-4">{post.content}</p>
+
       {post.tags && post.tags.length > 0 && (
         <div className="flex flex-wrap gap-2 mb-4">
           {post.tags.map((tag: string, index: number) => (
