@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { Card } from "@/components/ui/card";
-import { Lightbulb, Rocket, Users, Star, MessageSquare } from "lucide-react";
+import { Lightbulb, Rocket, Users, Star, MessageSquare, Heart } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useEffect } from "react";
 import { useQueryClient } from "@tanstack/react-query";
@@ -122,7 +122,7 @@ export const StatsSection = ({ userId }: { userId: string }) => {
         description="Active Collaborations"
       />
       <StatCard
-        icon={<Star className="h-6 w-6 text-primary" />}
+        icon={<Heart className="h-6 w-6 text-primary" />}
         label="Likes Received"
         value={stats?.likes || 0}
         description="Total Likes on Your Ideas"
