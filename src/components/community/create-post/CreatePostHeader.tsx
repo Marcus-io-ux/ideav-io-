@@ -1,22 +1,15 @@
-import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
 
 interface CreatePostHeaderProps {
-  onPost: () => void;
+  onPost?: () => void;
   showOnlyMyPosts: boolean;
-  onToggleMyPosts: (show: boolean) => void;
+  onToggleMyPosts: (value: boolean) => void;
 }
 
 export const CreatePostHeader = ({ onPost, showOnlyMyPosts, onToggleMyPosts }: CreatePostHeaderProps) => {
   return (
-    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
+    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4 items-center">
       <h2 className="text-xl font-semibold whitespace-nowrap">What's on your mind?</h2>
       <div className="flex items-center gap-4">
         <div className="flex items-center space-x-2">
@@ -25,23 +18,8 @@ export const CreatePostHeader = ({ onPost, showOnlyMyPosts, onToggleMyPosts }: C
             checked={showOnlyMyPosts}
             onCheckedChange={onToggleMyPosts}
           />
-          <Label htmlFor="show-my-posts">Show only my shared ideas</Label>
+          <Label htmlFor="show-my-posts">Show only my posts</Label>
         </div>
-        <TooltipProvider>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button 
-                onClick={onPost} 
-                className="shadow-sm hover:shadow-md transition-all duration-300"
-              >
-                Share Your Idea
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent>
-              <p>Click to share your idea with the community and save it to your ideas!</p>
-            </TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
       </div>
     </div>
   );
