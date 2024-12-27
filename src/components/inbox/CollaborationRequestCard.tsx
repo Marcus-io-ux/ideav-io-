@@ -1,154 +1,54 @@
 import { useState } from "react";
-import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { useToast } from "@/hooks/use-toast";
-import { supabase } from "@/integrations/supabase/client";
-import { useQueryClient } from "@tanstack/react-query";
-import { MessageSquare, Trash2 } from "lucide-react";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { MessageDialog } from "./MessageDialog";
+import { useNavigate } from "react-router-dom";
 
 interface CollaborationRequestCardProps {
   request: any;
 }
 
 export const CollaborationRequestCard = ({ request }: CollaborationRequestCardProps) => {
-  const [isLoading, setIsLoading] = useState(false);
   const [isMessageDialogOpen, setIsMessageDialogOpen] = useState(false);
-  const { toast } = useToast();
-  const queryClient = useQueryClient();
+  const navigate = useNavigate();
 
-  const handleResponse = async (status: 'accepted' | 'rejected') => {
-    try {
-      setIsLoading(true);
-      const { error } = await supabase
-        .from('collaboration_requests')
-        .update({ status })
-        .eq('id', request.id);
-
-      if (error) throw error;
-
-      await queryClient.invalidateQueries({ queryKey: ['collaboration-requests'] });
-
-      toast({
-        title: `Request ${status}`,
-        description: `You have ${status} the collaboration request`,
-      });
-    } catch (error) {
-      console.error('Error updating request:', error);
-      toast({
-        title: "Error",
-        description: "Failed to update request status",
-        variant: "destructive",
-      });
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleDelete = async () => {
-    try {
-      setIsLoading(true);
-      const { error } = await supabase
-        .from('collaboration_requests')
-        .delete()
-        .eq('id', request.id);
-
-      if (error) throw error;
-
-      await queryClient.invalidateQueries({ queryKey: ['collaboration-requests'] });
-
-      toast({
-        title: "Request deleted",
-        description: "The collaboration request has been deleted",
-      });
-    } catch (error) {
-      console.error('Error deleting request:', error);
-      toast({
-        title: "Error",
-        description: "Failed to delete request",
-        variant: "destructive",
-      });
-    } finally {
-      setIsLoading(false);
-    }
+  const handleMessageSent = () => {
+    setIsMessageDialogOpen(false);
+    navigate("/inbox?folder=sent");
   };
 
   return (
-    <Card className="p-6">
-      <div className="flex items-start justify-between">
-        <div className="flex items-start space-x-4">
-          <Avatar>
-            <AvatarImage src={request.requester?.avatar_url} />
-            <AvatarFallback>
-              {request.requester?.username?.[0]?.toUpperCase() || 'U'}
-            </AvatarFallback>
-          </Avatar>
-          <div>
-            <h3 className="font-semibold">
-              {request.requester?.username} wants to collaborate
-            </h3>
-            <p className="text-sm text-muted-foreground mt-1">
-              on post: {request.post?.title}
-            </p>
-            <p className="mt-2">{request.message}</p>
-            {request.post?.tags?.length > 0 && (
-              <div className="flex flex-wrap gap-2 mt-2">
-                {request.post.tags.map((tag: string, index: number) => (
-                  <Badge key={index} variant="secondary">
-                    #{tag}
-                  </Badge>
-                ))}
-              </div>
-            )}
+    <div className="bg-card rounded-lg p-4 md:p-6 shadow-sm">
+      <div className="flex items-start gap-4">
+        <Avatar>
+          <AvatarImage src={request.requester?.avatar_url} />
+          <AvatarFallback>
+            {request.requester?.username?.[0]?.toUpperCase() || 'U'}
+          </AvatarFallback>
+        </Avatar>
+        <div className="flex-1">
+          <div className="flex items-center justify-between mb-2">
+            <h3 className="font-semibold">{request.requester?.username}</h3>
+            <Badge variant={request.status === 'pending' ? 'secondary' : request.status === 'accepted' ? 'success' : 'destructive'}>
+              {request.status}
+            </Badge>
           </div>
-        </div>
-        <div className="flex items-center space-x-2">
-          {request.status === 'pending' ? (
-            <>
-              <Button
-                variant="outline"
-                onClick={() => handleResponse('rejected')}
-                disabled={isLoading}
-              >
-                Decline
-              </Button>
-              <Button
-                onClick={() => handleResponse('accepted')}
-                disabled={isLoading}
-              >
-                Accept
-              </Button>
-            </>
-          ) : (
-            <div className="flex items-center gap-2">
-              <Badge variant={request.status === 'accepted' ? 'default' : 'secondary'}>
-                {request.status.charAt(0).toUpperCase() + request.status.slice(1)}
-              </Badge>
-              {request.status === 'accepted' && (
-                <>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => setIsMessageDialogOpen(true)}
-                  >
-                    <MessageSquare className="h-4 w-4 mr-2" />
-                    Message
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={handleDelete}
-                    disabled={isLoading}
-                    className="text-destructive hover:text-destructive"
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
-                </>
-              )}
-            </div>
-          )}
+          <p className="text-sm text-muted-foreground mb-4">
+            Requested collaboration on post: {request.post?.title}
+          </p>
+          <div className="bg-muted/50 rounded-md p-3 mb-4">
+            <p className="text-sm">{request.message}</p>
+          </div>
+          <div className="flex gap-2">
+            <Button 
+              variant="outline" 
+              size="sm"
+              onClick={() => setIsMessageDialogOpen(true)}
+            >
+              Send Message
+            </Button>
+          </div>
         </div>
       </div>
 
@@ -158,6 +58,6 @@ export const CollaborationRequestCard = ({ request }: CollaborationRequestCardPr
         recipientId={request.requester_id}
         recipientUsername={request.requester?.username}
       />
-    </Card>
+    </div>
   );
 };
