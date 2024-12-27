@@ -26,7 +26,18 @@ export const MessageThreadList = ({ messages }: MessageThreadListProps) => {
     try {
       setDeletingMessageId(messageId);
       
-      // First, delete all child messages that reference this message as parent
+      // First, delete all messages in the thread
+      const { error: threadError } = await supabase
+        .from('messages')
+        .delete()
+        .eq('thread_id', messageId);
+
+      if (threadError) {
+        console.error('Error deleting thread messages:', threadError);
+        throw threadError;
+      }
+
+      // Then delete any child messages that reference this message as parent
       const { error: childrenError } = await supabase
         .from('messages')
         .delete()
@@ -37,7 +48,7 @@ export const MessageThreadList = ({ messages }: MessageThreadListProps) => {
         throw childrenError;
       }
 
-      // Then delete the message itself
+      // Finally delete the message itself
       const { error } = await supabase
         .from('messages')
         .delete()
@@ -55,7 +66,7 @@ export const MessageThreadList = ({ messages }: MessageThreadListProps) => {
       console.error('Error deleting message:', error);
       toast({
         title: "Error",
-        description: "Failed to delete message",
+        description: "Failed to delete message. Please try again.",
         variant: "destructive",
       });
     } finally {

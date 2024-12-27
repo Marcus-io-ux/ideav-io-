@@ -22,6 +22,7 @@ export const MessageThread = ({ open, onOpenChange, selectedMessage }: MessageTh
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [threadMessages, setThreadMessages] = useState<Message[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     if (open && selectedMessage) {
@@ -33,49 +34,79 @@ export const MessageThread = ({ open, onOpenChange, selectedMessage }: MessageTh
   if (!selectedMessage) return null;
 
   const fetchThreadMessages = async () => {
-    const threadId = selectedMessage.thread_id || selectedMessage.id;
-    const { data, error } = await supabase
-      .from('messages')
-      .select(`
-        *,
-        sender:profiles!messages_sender_id_fkey (
-          username,
-          avatar_url,
-          user_id
-        ),
-        recipient:profiles!messages_recipient_id_fkey (
-          username,
-          avatar_url,
-          user_id
-        )
-      `)
-      .eq('thread_id', threadId)
-      .order('created_at', { ascending: true });
+    try {
+      setIsLoading(true);
+      const threadId = selectedMessage.thread_id || selectedMessage.id;
+      
+      if (!threadId) {
+        console.error('No thread ID available');
+        return;
+      }
 
-    if (error) {
-      console.error('Error fetching thread messages:', error);
-      return;
+      const { data, error } = await supabase
+        .from('messages')
+        .select(`
+          *,
+          sender:profiles!messages_sender_id_fkey (
+            username,
+            avatar_url,
+            user_id
+          ),
+          recipient:profiles!messages_recipient_id_fkey (
+            username,
+            avatar_url,
+            user_id
+          )
+        `)
+        .eq('thread_id', threadId)
+        .order('created_at', { ascending: true });
+
+      if (error) {
+        console.error('Error fetching thread messages:', error);
+        toast({
+          title: "Error",
+          description: "Failed to load messages. Please try again.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      setThreadMessages(data || []);
+    } catch (error) {
+      console.error('Error in fetchThreadMessages:', error);
+      toast({
+        title: "Error",
+        description: "An unexpected error occurred. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
     }
-
-    setThreadMessages(data || []);
   };
 
   const markMessageAsRead = async () => {
     if (!selectedMessage.is_read) {
-      const { error } = await supabase
-        .from('messages')
-        .update({ is_read: true })
-        .eq('id', selectedMessage.id);
+      try {
+        const { error } = await supabase
+          .from('messages')
+          .update({ is_read: true })
+          .eq('id', selectedMessage.id);
 
-      if (error) {
-        console.error('Error marking message as read:', error);
-      } else {
+        if (error) {
+          console.error('Error marking message as read:', error);
+          return;
+        }
+
         await queryClient.invalidateQueries({ queryKey: ['messages'] });
+      } catch (error) {
+        console.error('Error in markMessageAsRead:', error);
       }
     }
   };
 
   const handleSendReply = async () => {
+    if (!reply.trim()) return;
+
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error("Not authenticated");
@@ -107,7 +138,7 @@ export const MessageThread = ({ open, onOpenChange, selectedMessage }: MessageTh
       console.error('Error sending reply:', error);
       toast({
         title: "Error",
-        description: "Failed to send reply",
+        description: "Failed to send reply. Please try again.",
         variant: "destructive",
       });
     }
@@ -132,33 +163,39 @@ export const MessageThread = ({ open, onOpenChange, selectedMessage }: MessageTh
         </DialogHeader>
 
         <ScrollArea className="flex-1 pr-4">
-          <div className="space-y-6">
-            {threadMessages.map((message) => (
-              <div key={message.id} className="bg-muted/30 rounded-lg p-4">
-                <div className="flex items-start space-x-4">
-                  <Avatar className="h-10 w-10">
-                    <AvatarImage src={message.sender.avatar_url} />
-                    <AvatarFallback>
-                      {message.sender.username?.[0]?.toUpperCase() || 'U'}
-                    </AvatarFallback>
-                  </Avatar>
-                  <div className="flex-1">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <p className="font-semibold">{message.sender.username}</p>
-                        <p className="text-sm text-muted-foreground">
-                          {format(new Date(message.created_at), "MMM d, yyyy 'at' h:mm a")}
-                        </p>
+          {isLoading ? (
+            <div className="flex items-center justify-center h-full">
+              <p className="text-muted-foreground">Loading messages...</p>
+            </div>
+          ) : (
+            <div className="space-y-6">
+              {threadMessages.map((message) => (
+                <div key={message.id} className="bg-muted/30 rounded-lg p-4">
+                  <div className="flex items-start space-x-4">
+                    <Avatar className="h-10 w-10">
+                      <AvatarImage src={message.sender.avatar_url} />
+                      <AvatarFallback>
+                        {message.sender.username?.[0]?.toUpperCase() || 'U'}
+                      </AvatarFallback>
+                    </Avatar>
+                    <div className="flex-1">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="font-semibold">{message.sender.username}</p>
+                          <p className="text-sm text-muted-foreground">
+                            {format(new Date(message.created_at), "MMM d, yyyy 'at' h:mm a")}
+                          </p>
+                        </div>
                       </div>
-                    </div>
-                    <div className="mt-2 text-sm">
-                      {message.content}
+                      <div className="mt-2 text-sm">
+                        {message.content}
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
         </ScrollArea>
 
         <div className="mt-4 space-y-4">
@@ -189,7 +226,7 @@ export const MessageThread = ({ open, onOpenChange, selectedMessage }: MessageTh
               </Button>
               <Button
                 onClick={handleSendReply}
-                disabled={!reply.trim()}
+                disabled={!reply.trim() || isLoading}
               >
                 Send Reply
               </Button>
