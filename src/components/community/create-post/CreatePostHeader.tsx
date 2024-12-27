@@ -17,7 +17,7 @@ interface CreatePostHeaderProps {
 export const CreatePostHeader = ({ onPost, showOnlyMyPosts, onToggleMyPosts }: CreatePostHeaderProps) => {
   return (
     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
-      <h2 className="text-xl font-semibold whitespace-nowrap">What's on your mind?</h2>
+      <h2 className="text-xl font-semibold whitespace-nowrap text-center sm:text-left">What's on your mind?</h2>
       <div className="flex items-center gap-4">
         <div className="flex items-center space-x-2">
           <Switch
