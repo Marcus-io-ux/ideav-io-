@@ -9,6 +9,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
+import { cn } from "@/lib/utils";
 
 interface MessageThreadListProps {
   messages: Message[];
@@ -61,7 +62,10 @@ export const MessageThreadList = ({ messages, onReply }: MessageThreadListProps)
         {messages.map((message) => (
           <div 
             key={message.id} 
-            className="p-6 border-b last:border-b-0 hover:bg-muted/50 transition-colors cursor-pointer"
+            className={cn(
+              "p-6 border-b last:border-b-0 hover:bg-muted/50 transition-colors cursor-pointer relative",
+              !message.is_read && "bg-blue-50/50 dark:bg-blue-950/20"
+            )}
             onClick={() => onReply(message)}
           >
             <div className="flex items-start space-x-4">
@@ -73,17 +77,17 @@ export const MessageThreadList = ({ messages, onReply }: MessageThreadListProps)
               </Avatar>
               <div className="flex-1 min-w-0">
                 <div className="flex items-start justify-between gap-x-2">
-                  <div>
+                  <div className="flex items-center gap-2">
                     <p className="font-semibold text-foreground">
                       {message.sender.username}
                     </p>
-                    <p className="text-sm text-muted-foreground">
-                      {formatDistanceToNow(new Date(message.created_at), { addSuffix: true })}
-                    </p>
+                    {!message.is_read && (
+                      <Badge variant="secondary" className="h-2 w-2 rounded-full bg-blue-500 p-0" />
+                    )}
                   </div>
                   <div 
                     className="flex items-center gap-2 shrink-0"
-                    onClick={(e) => e.stopPropagation()} // Prevent triggering the parent onClick
+                    onClick={(e) => e.stopPropagation()}
                   >
                     <Button
                       variant="ghost"
@@ -105,6 +109,9 @@ export const MessageThreadList = ({ messages, onReply }: MessageThreadListProps)
                     </Button>
                   </div>
                 </div>
+                <p className="text-sm text-muted-foreground">
+                  {formatDistanceToNow(new Date(message.created_at), { addSuffix: true })}
+                </p>
                 <div className="mt-2 text-sm leading-6 text-foreground">
                   {message.content}
                 </div>
