@@ -6,10 +6,10 @@ import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useCollaborationRequest } from "@/hooks/use-collaboration-request";
-import { CommentList } from "./comments/CommentList";
+import { PostComments } from "./comments/PostComments";
 import { PostCardHeader } from "./post-card/PostCardHeader";
 import { PostCardContent } from "./post-card/PostCardContent";
-import { PostCardActions } from "./post-card/PostCardActions";
+import { PostCardFooter } from "./post-card/PostCardFooter";
 
 interface PostCardProps {
   post: any;
@@ -154,15 +154,25 @@ export const PostCard = ({
         setIsEditing={setIsEditing}
       />
       
-      <PostCardActions
+      <PostCardFooter
         currentUserId={currentUserId}
         post={post}
         setIsCollabDialogOpen={setIsCollabDialogOpen}
+        isCommentsExpanded={isExpanded}
+        onToggleComments={() => onToggleComments(post.id)}
+        isLiked={post.is_liked}
+        likesCount={post.likes_count}
+        commentsCount={post.comments_count}
+        onLike={() => onLike(post.id)}
       />
       
       {isExpanded && (
         <div className="mt-4 pt-4 border-t">
-          <CommentList postId={post.id} />
+          <PostComments
+            postId={post.id}
+            comments={post.comments || []}
+            onCommentAdded={() => onToggleComments(post.id)}
+          />
         </div>
       )}
 
