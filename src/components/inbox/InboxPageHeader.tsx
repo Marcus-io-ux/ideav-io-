@@ -11,7 +11,7 @@ export const InboxPageHeader = ({
   return (
     <div className="space-y-4">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <h1 className="text-2xl md:text-3xl font-bold">Messages</h1>
+        <h1 className="text-2xl md:text-3xl font-bold text-primary">Messages</h1>
       </div>
 
       <div className="flex-1 relative">
