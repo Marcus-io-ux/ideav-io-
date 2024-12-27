@@ -7,7 +7,7 @@ export const useCommunityFeed = () => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [expandedPost, setExpandedPost] = useState<string | null>(null);
-  const [selectedChannel, setSelectedChannel] = useState("general");
+  const [selectedChannel, setSelectedChannel] = useState("feedback"); // Changed default from 'general' to 'feedback'
   const [showOnlyMyPosts, setShowOnlyMyPosts] = useState(false);
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
 
@@ -74,6 +74,7 @@ export const useCommunityFeed = () => {
             avatar_url
           )
         `)
+        .neq('channel', 'general') // Filter out general channel posts
         .order('created_at', { ascending: false });
 
       if (selectedChannel !== 'all') {
