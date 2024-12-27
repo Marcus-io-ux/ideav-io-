@@ -10,9 +10,11 @@ import { CreatePostTags } from "./create-post/CreatePostTags";
 
 interface CreatePostProps {
   selectedChannel: string;
+  showOnlyMyPosts: boolean;
+  onToggleMyPosts: (show: boolean) => void;
 }
 
-export const CreatePost = ({ selectedChannel }: CreatePostProps) => {
+export const CreatePost = ({ selectedChannel, showOnlyMyPosts, onToggleMyPosts }: CreatePostProps) => {
   const [postTitle, setPostTitle] = useState("");
   const [postContent, setPostContent] = useState("");
   const [tagInput, setTagInput] = useState("");
@@ -118,7 +120,11 @@ export const CreatePost = ({ selectedChannel }: CreatePostProps) => {
 
   return (
     <div className="bg-card rounded-lg p-6 shadow-sm space-y-4">
-      <CreatePostHeader onPost={handlePost} />
+      <CreatePostHeader 
+        onPost={handlePost} 
+        showOnlyMyPosts={showOnlyMyPosts}
+        onToggleMyPosts={onToggleMyPosts}
+      />
 
       <div className="space-y-4">
         <CreatePostChannelSelect 

@@ -26,12 +26,14 @@ export const CommunityFeed = () => {
     <div className="space-y-6">
       <FeedFilters
         selectedChannel={selectedChannel}
-        showOnlyMyPosts={showOnlyMyPosts}
         onChannelSelect={setSelectedChannel}
-        onToggleMyPosts={setShowOnlyMyPosts}
       />
 
-      <CreatePost selectedChannel={selectedChannel} />
+      <CreatePost 
+        selectedChannel={selectedChannel}
+        showOnlyMyPosts={showOnlyMyPosts}
+        onToggleMyPosts={setShowOnlyMyPosts}
+      />
 
       {isLoading ? (
         <div>Loading posts...</div>
