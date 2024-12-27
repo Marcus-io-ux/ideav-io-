@@ -3,7 +3,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
-import { PaperclipIcon, SmileIcon, AtSign } from "lucide-react";
+import { PaperclipIcon, SmileIcon, AtSign, X } from "lucide-react";
 
 interface NewMessageDialogProps {
   open: boolean;
@@ -25,8 +25,16 @@ export const NewMessageDialog = ({ open, onOpenChange, onSend }: NewMessageDialo
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[525px]">
-        <DialogHeader>
+        <DialogHeader className="flex flex-row items-center justify-between">
           <DialogTitle>Start a New Conversation</DialogTitle>
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => onOpenChange(false)}
+            className="h-6 w-6 rounded-full"
+          >
+            <X className="h-4 w-4" />
+          </Button>
         </DialogHeader>
         <div className="grid gap-4 py-4">
           <div className="space-y-2">

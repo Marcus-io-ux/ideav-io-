@@ -20,6 +20,7 @@ interface MessageThreadProps {
 
 export const MessageThread = ({ open, onOpenChange, selectedMessage }: MessageThreadProps) => {
   const [reply, setReply] = useState("");
+  const [attachedFile, setAttachedFile] = useState<File | null>(null);
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [threadMessages, setThreadMessages] = useState<Message[]>([]);
@@ -92,14 +93,51 @@ export const MessageThread = ({ open, onOpenChange, selectedMessage }: MessageTh
     }
   };
 
+  const handleFileAttachment = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      if (file.size > 5 * 1024 * 1024) { // 5MB limit
+        toast({
+          title: "File too large",
+          description: "Please select a file smaller than 5MB",
+          variant: "destructive",
+        });
+        return;
+      }
+      setAttachedFile(file);
+      toast({
+        title: "File attached",
+        description: file.name,
+      });
+    }
+  };
+
   const handleSendReply = async () => {
-    if (!reply.trim()) return;
+    if (!reply.trim() && !attachedFile) return;
 
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error("Not authenticated");
 
       const threadId = selectedMessage.thread_id || selectedMessage.id;
+
+      let fileUrl = null;
+      if (attachedFile) {
+        const fileExt = attachedFile.name.split('.').pop();
+        const filePath = `${crypto.randomUUID()}.${fileExt}`;
+        
+        const { error: uploadError } = await supabase.storage
+          .from('message-attachments')
+          .upload(filePath, attachedFile);
+
+        if (uploadError) throw uploadError;
+        
+        const { data: { publicUrl } } = supabase.storage
+          .from('message-attachments')
+          .getPublicUrl(filePath);
+          
+        fileUrl = publicUrl;
+      }
 
       const { error } = await supabase
         .from('messages')
@@ -110,7 +148,8 @@ export const MessageThread = ({ open, onOpenChange, selectedMessage }: MessageTh
           parent_id: selectedMessage.id,
           thread_id: threadId,
           is_read: false,
-          title: selectedMessage.title // Keep the original title without modification
+          title: selectedMessage.title,
+          attachment_url: fileUrl
         });
 
       if (error) throw error;
@@ -121,6 +160,7 @@ export const MessageThread = ({ open, onOpenChange, selectedMessage }: MessageTh
       });
 
       setReply("");
+      setAttachedFile(null);
       await queryClient.invalidateQueries({ queryKey: ['messages'] });
       await fetchThreadMessages();
     } catch (error) {
@@ -176,13 +216,27 @@ export const MessageThread = ({ open, onOpenChange, selectedMessage }: MessageTh
               />
             </div>
             <div className="flex items-center justify-between">
-              <Button variant="ghost" size="sm" className="text-muted-foreground">
-                <PaperclipIcon className="h-4 w-4 mr-2" />
-                Attach files
-              </Button>
+              <div className="flex items-center gap-2">
+                <input
+                  type="file"
+                  id="file-upload"
+                  className="hidden"
+                  onChange={handleFileAttachment}
+                  accept="image/*,.pdf,.doc,.docx,.txt"
+                />
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="text-muted-foreground"
+                  onClick={() => document.getElementById('file-upload')?.click()}
+                >
+                  <PaperclipIcon className="h-4 w-4 mr-2" />
+                  {attachedFile ? attachedFile.name : 'Attach files'}
+                </Button>
+              </div>
               <Button
                 onClick={handleSendReply}
-                disabled={!reply.trim() || isLoading}
+                disabled={(!reply.trim() && !attachedFile) || isLoading}
               >
                 Send Reply
               </Button>
