@@ -6,7 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useQueryClient } from "@tanstack/react-query";
-import { MessageSquare } from "lucide-react";
+import { MessageSquare, Trash2 } from "lucide-react";
 import { MessageDialog } from "./MessageDialog";
 
 interface CollaborationRequestCardProps {
@@ -40,6 +40,34 @@ export const CollaborationRequestCard = ({ request }: CollaborationRequestCardPr
       toast({
         title: "Error",
         description: "Failed to update request status",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleDelete = async () => {
+    try {
+      setIsLoading(true);
+      const { error } = await supabase
+        .from('collaboration_requests')
+        .delete()
+        .eq('id', request.id);
+
+      if (error) throw error;
+
+      await queryClient.invalidateQueries({ queryKey: ['collaboration-requests'] });
+
+      toast({
+        title: "Request deleted",
+        description: "The collaboration request has been deleted",
+      });
+    } catch (error) {
+      console.error('Error deleting request:', error);
+      toast({
+        title: "Error",
+        description: "Failed to delete request",
         variant: "destructive",
       });
     } finally {
@@ -99,14 +127,25 @@ export const CollaborationRequestCard = ({ request }: CollaborationRequestCardPr
                 {request.status.charAt(0).toUpperCase() + request.status.slice(1)}
               </Badge>
               {request.status === 'accepted' && (
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setIsMessageDialogOpen(true)}
-                >
-                  <MessageSquare className="h-4 w-4 mr-2" />
-                  Message
-                </Button>
+                <>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setIsMessageDialogOpen(true)}
+                  >
+                    <MessageSquare className="h-4 w-4 mr-2" />
+                    Message
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={handleDelete}
+                    disabled={isLoading}
+                    className="text-destructive hover:text-destructive"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                </>
               )}
             </div>
           )}
