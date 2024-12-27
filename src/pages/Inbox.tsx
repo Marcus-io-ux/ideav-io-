@@ -75,7 +75,10 @@ const Inbox = () => {
   const folderCounts = {
     inbox: unreadMessagesCount,
     starred: 0,
-    sent: messages?.filter(msg => msg.sender_id === supabase.auth.user()?.id).length || 0,
+    sent: messages?.filter(msg => {
+      const { data: { user } } = await supabase.auth.getUser();
+      return msg.sender_id === user?.id;
+    }).length || 0,
     archived: 0,
     trash: 0,
   };
