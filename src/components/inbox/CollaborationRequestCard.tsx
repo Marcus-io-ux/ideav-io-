@@ -6,7 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useQueryClient } from "@tanstack/react-query";
-import { MessageSquare, Trash2 } from "lucide-react";
+import { MessageSquare } from "lucide-react";
 import { MessageDialog } from "./MessageDialog";
 
 interface CollaborationRequestCardProps {
@@ -60,14 +60,14 @@ export const CollaborationRequestCard = ({ request }: CollaborationRequestCardPr
       await queryClient.invalidateQueries({ queryKey: ['collaboration-requests'] });
 
       toast({
-        title: "Request deleted",
-        description: "The collaboration request has been deleted",
+        title: "Request removed",
+        description: "The collaboration request has been removed",
       });
     } catch (error: any) {
       console.error('Error deleting request:', error);
       toast({
         title: "Error",
-        description: "Failed to delete request",
+        description: "Failed to remove request",
         variant: "destructive",
       });
     } finally {
@@ -137,12 +137,12 @@ export const CollaborationRequestCard = ({ request }: CollaborationRequestCardPr
                     Message
                   </Button>
                   <Button
-                    variant="ghost"
+                    variant="destructive"
                     size="sm"
                     onClick={handleDelete}
                     disabled={isLoading}
                   >
-                    <Trash2 className="h-4 w-4 text-destructive" />
+                    Remove
                   </Button>
                 </>
               )}
