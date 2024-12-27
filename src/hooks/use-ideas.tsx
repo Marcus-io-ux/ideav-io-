@@ -17,12 +17,13 @@ export const useIdeas = () => {
       const { data: { session } } = await supabase.auth.getSession();
       if (!session?.user) return;
 
-      // Fetch ideas and favorites in parallel
+      // Fetch ideas and favorites in parallel, excluding community-shared ideas
       const [ideasResponse, favoritesResponse] = await Promise.all([
         supabase
           .from('ideas')
           .select('*')
           .eq('deleted', false)
+          .eq('shared_to_community', false) // Only fetch non-community-shared ideas
           .order('created_at', { ascending: false }),
         supabase
           .from('favorites')
