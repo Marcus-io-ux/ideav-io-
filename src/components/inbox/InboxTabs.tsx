@@ -26,7 +26,7 @@ export const InboxTabs = ({
   setIsNewMessageOpen,
 }: InboxTabsProps) => {
   return (
-    <Tabs defaultValue="messages" className="mt-8">
+    <Tabs defaultValue="messages" className="mt-6">
       <TabsList className="grid w-full grid-cols-2">
         <TabsTrigger value="messages" className="flex items-center gap-2">
           Messages
@@ -37,7 +37,7 @@ export const InboxTabs = ({
           )}
         </TabsTrigger>
         <TabsTrigger value="requests" className="flex items-center gap-2">
-          Collaboration Requests
+          Requests
           {pendingRequestsCount > 0 && (
             <Badge variant="secondary">
               {pendingRequestsCount}
@@ -46,34 +46,34 @@ export const InboxTabs = ({
         </TabsTrigger>
       </TabsList>
 
-      <TabsContent value="messages" className="mt-4">
+      <TabsContent value="messages" className="mt-6">
         {isLoadingMessages ? (
-          <div>Loading messages...</div>
+          <div className="text-center text-muted-foreground">Loading messages...</div>
         ) : filteredMessages?.length === 0 ? (
-          <div className="text-center text-muted-foreground">
+          <div className="text-center text-muted-foreground py-8">
             No messages found
           </div>
         ) : (
           <MessageThreadList
             messages={filteredMessages}
-            onReply={(message) => {
-              setIsNewMessageOpen(true);
-            }}
+            onReply={() => setIsNewMessageOpen(true)}
           />
         )}
       </TabsContent>
 
-      <TabsContent value="requests" className="mt-4 space-y-4">
+      <TabsContent value="requests" className="mt-6">
         {isLoadingRequests ? (
-          <div>Loading requests...</div>
+          <div className="text-center text-muted-foreground">Loading requests...</div>
         ) : requests?.length === 0 ? (
-          <div className="text-center text-muted-foreground">
+          <div className="text-center text-muted-foreground py-8">
             No collaboration requests yet
           </div>
         ) : (
-          requests?.map((request) => (
-            <CollaborationRequestCard key={request.id} request={request} />
-          ))
+          <div className="space-y-4">
+            {requests?.map((request) => (
+              <CollaborationRequestCard key={request.id} request={request} />
+            ))}
+          </div>
         )}
       </TabsContent>
     </Tabs>

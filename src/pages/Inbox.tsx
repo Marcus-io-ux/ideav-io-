@@ -2,21 +2,15 @@ import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useMessages } from "@/hooks/use-messages";
-import { InboxSidebar } from "@/components/inbox/InboxSidebar";
 import { InboxPageHeader } from "@/components/inbox/InboxPageHeader";
 import { InboxTabs } from "@/components/inbox/InboxTabs";
 import { NewMessageDialog } from "@/components/inbox/NewMessageDialog";
-import { useLocation } from "react-router-dom";
-import { useIsMobile } from "@/hooks/use-mobile";
 
 const Inbox = () => {
   const [isNewMessageOpen, setIsNewMessageOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [activeFilters, setActiveFilters] = useState<string[]>([]);
   const { sendMessage } = useMessages();
-  const location = useLocation();
-  const currentFolder = new URLSearchParams(location.search).get("folder") || "inbox";
-  const isMobile = useIsMobile();
 
   const { data: currentUser } = useQuery({
     queryKey: ['currentUser'],
@@ -75,27 +69,9 @@ const Inbox = () => {
     }
   });
 
-  const pendingRequestsCount = requests?.filter(req => req.status === 'pending').length || 0;
-  const unreadMessagesCount = messages?.filter(msg => !msg.is_read).length || 0;
-
-  // Filter messages based on current folder, search query, and active filters
+  // Filter messages based on search query and active filters
   const filteredMessages = messages?.filter(msg => {
-    // First apply folder filter
-    switch (currentFolder) {
-      case 'inbox':
-        return !msg.is_read;
-      case 'starred':
-        return false;
-      case 'sent':
-        return msg.sender_id === currentUser?.id;
-      case 'archived':
-        return false;
-      case 'trash':
-        return false;
-      default:
-        return true;
-    }
-  })?.filter(msg => {
+    // Apply search filter
     if (searchQuery) {
       const searchLower = searchQuery.toLowerCase();
       return (
@@ -104,59 +80,42 @@ const Inbox = () => {
         msg.recipient.username?.toLowerCase().includes(searchLower)
       );
     }
-    return true;
-  })?.filter(msg => {
+    // Apply unread filter
     if (activeFilters.includes('unread')) {
       return !msg.is_read;
-    }
-    if (activeFilters.includes('has_attachments')) {
-      return false;
     }
     return true;
   });
 
-  const folderCounts = {
-    inbox: unreadMessagesCount,
-    starred: 0,
-    sent: messages?.filter(msg => msg.sender_id === currentUser?.id).length || 0,
-    archived: 0,
-    trash: 0,
-  };
+  const pendingRequestsCount = requests?.filter(req => req.status === 'pending').length || 0;
+  const unreadMessagesCount = messages?.filter(msg => !msg.is_read).length || 0;
 
   return (
-    <div className="flex h-[calc(100vh-4rem)]">
-      {!isMobile && <InboxSidebar counts={folderCounts} />}
-      
-      <div className="flex-1 overflow-auto p-4 md:p-6">
-        <div className="max-w-4xl mx-auto">
-          <InboxPageHeader
-            onSearch={setSearchQuery}
-            onFilterChange={setActiveFilters}
-            activeFilters={activeFilters}
-            onNewMessage={() => setIsNewMessageOpen(true)}
-          />
+    <div className="min-h-[calc(100vh-4rem)] bg-background">
+      <div className="container mx-auto p-4 md:p-6">
+        <InboxPageHeader
+          onSearch={setSearchQuery}
+          onFilterChange={setActiveFilters}
+          activeFilters={activeFilters}
+          onNewMessage={() => setIsNewMessageOpen(true)}
+        />
 
-          <InboxTabs
-            messages={messages}
-            filteredMessages={filteredMessages}
-            requests={requests}
-            isLoadingMessages={isLoadingMessages}
-            isLoadingRequests={isLoadingRequests}
-            unreadMessagesCount={unreadMessagesCount}
-            pendingRequestsCount={pendingRequestsCount}
-            setIsNewMessageOpen={setIsNewMessageOpen}
-          />
+        <InboxTabs
+          messages={messages}
+          filteredMessages={filteredMessages}
+          requests={requests}
+          isLoadingMessages={isLoadingMessages}
+          isLoadingRequests={isLoadingRequests}
+          unreadMessagesCount={unreadMessagesCount}
+          pendingRequestsCount={pendingRequestsCount}
+          setIsNewMessageOpen={setIsNewMessageOpen}
+        />
 
-          <NewMessageDialog
-            open={isNewMessageOpen}
-            onOpenChange={setIsNewMessageOpen}
-            onSend={sendMessage}
-          />
-
-          <div className="mt-8 text-center text-muted-foreground">
-            <p>Need help? Visit our support page for tips on using your inbox!</p>
-          </div>
-        </div>
+        <NewMessageDialog
+          open={isNewMessageOpen}
+          onOpenChange={setIsNewMessageOpen}
+          onSend={sendMessage}
+        />
       </div>
     </div>
   );
