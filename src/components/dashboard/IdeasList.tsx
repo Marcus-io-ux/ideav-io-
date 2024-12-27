@@ -8,6 +8,7 @@ import { AllIdeasTab } from "./tabs/AllIdeasTab";
 import { FavoritesTab } from "./tabs/FavoritesTab";
 import { Idea } from "@/types/idea";
 import { useQueryClient } from "@tanstack/react-query";
+import { useToast } from "@/hooks/use-toast";
 
 interface IdeasListProps {
   ideas: Idea[];
@@ -25,6 +26,7 @@ export const IdeasList = ({
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [activeTab, setActiveTab] = useState("recent");
   const queryClient = useQueryClient();
+  const { toast } = useToast();
 
   const handleSelect = (id: string) => {
     setSelectedIds(prev => 
@@ -34,13 +36,31 @@ export const IdeasList = ({
     );
   };
 
-  const handleBulkDelete = () => {
-    onDeleteIdeas(selectedIds);
-    setSelectedIds([]);
+  const handleBulkDelete = async () => {
+    console.log('Deleting ideas:', selectedIds);
+    try {
+      await onDeleteIdeas(selectedIds);
+      console.log('Ideas deleted successfully');
+      setSelectedIds([]);
+      // Invalidate both ideas and community posts queries
+      await queryClient.invalidateQueries({ queryKey: ["my-ideas"] });
+      await queryClient.invalidateQueries({ queryKey: ["community-posts"] });
+      
+      toast({
+        title: "Success",
+        description: "Selected ideas have been deleted",
+      });
+    } catch (error) {
+      console.error('Error deleting ideas:', error);
+      toast({
+        title: "Error",
+        description: "Failed to delete ideas. Please try again.",
+        variant: "destructive",
+      });
+    }
   };
 
   const handleIdeaSubmit = async () => {
-    // Refresh the ideas list
     await queryClient.invalidateQueries({ queryKey: ["my-ideas"] });
   };
 
@@ -81,7 +101,10 @@ export const IdeasList = ({
             selectedIds={selectedIds}
             onSelect={handleSelect}
             onEdit={onEditIdea}
-            onDelete={(id) => onDeleteIdeas([id])}
+            onDelete={(id) => {
+              console.log('Deleting single idea:', id);
+              onDeleteIdeas([id]);
+            }}
           />
         </TabsContent>
         
@@ -91,7 +114,10 @@ export const IdeasList = ({
             selectedIds={selectedIds}
             onSelect={handleSelect}
             onEdit={onEditIdea}
-            onDelete={(id) => onDeleteIdeas([id])}
+            onDelete={(id) => {
+              console.log('Deleting single idea:', id);
+              onDeleteIdeas([id]);
+            }}
           />
         </TabsContent>
 
@@ -101,7 +127,10 @@ export const IdeasList = ({
             selectedIds={selectedIds}
             onSelect={handleSelect}
             onEdit={onEditIdea}
-            onDelete={(id) => onDeleteIdeas([id])}
+            onDelete={(id) => {
+              console.log('Deleting single idea:', id);
+              onDeleteIdeas([id]);
+            }}
           />
         </TabsContent>
       </Tabs>
