@@ -61,7 +61,8 @@ export const MessageThreadList = ({ messages, onReply }: MessageThreadListProps)
         {messages.map((message) => (
           <div 
             key={message.id} 
-            className="p-6 border-b last:border-b-0 hover:bg-muted/50 transition-colors"
+            className="p-6 border-b last:border-b-0 hover:bg-muted/50 transition-colors cursor-pointer"
+            onClick={() => onReply(message)}
           >
             <div className="flex items-start space-x-4">
               <Avatar className="h-10 w-10">
@@ -80,7 +81,10 @@ export const MessageThreadList = ({ messages, onReply }: MessageThreadListProps)
                       {formatDistanceToNow(new Date(message.created_at), { addSuffix: true })}
                     </p>
                   </div>
-                  <div className="flex items-center gap-2 shrink-0">
+                  <div 
+                    className="flex items-center gap-2 shrink-0"
+                    onClick={(e) => e.stopPropagation()} // Prevent triggering the parent onClick
+                  >
                     <Button
                       variant="ghost"
                       size="sm"
