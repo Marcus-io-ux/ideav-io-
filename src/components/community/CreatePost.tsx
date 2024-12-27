@@ -1,34 +1,97 @@
 import { useState } from "react";
+import { CreatePostHeader } from "./create-post/CreatePostHeader";
+import { CreatePostTags } from "./create-post/CreatePostTags";
+import { CreatePostChannelSelect } from "./create-post/CreatePostChannelSelect";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
-import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
 import { useQueryClient } from "@tanstack/react-query";
-import { CreatePostHeader } from "./create-post/CreatePostHeader";
-import { CreatePostChannelSelect } from "./create-post/CreatePostChannelSelect";
-import { CreatePostTags } from "./create-post/CreatePostTags";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
 
 interface CreatePostProps {
   selectedChannel: string;
+  showOnlyMyPosts: boolean;
+  onToggleMyPosts: (show: boolean) => void;
 }
 
-export const CreatePost = ({ selectedChannel }: CreatePostProps) => {
-  const [postTitle, setPostTitle] = useState("");
-  const [postContent, setPostContent] = useState("");
-  const [tagInput, setTagInput] = useState("");
+export const CreatePost = ({ selectedChannel, showOnlyMyPosts, onToggleMyPosts }: CreatePostProps) => {
+  const [title, setTitle] = useState("");
+  const [content, setContent] = useState("");
   const [tags, setTags] = useState<string[]>([]);
-  const [channel, setChannel] = useState(selectedChannel);
+  const [tagInput, setTagInput] = useState("");
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  const handleTagInput = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter' || e.key === ',') {
-      e.preventDefault();
-      const newTag = tagInput.trim();
-      if (newTag && !tags.includes(newTag) && tags.length < 5) {
-        setTags([...tags, newTag]);
-        setTagInput("");
+  const handlePost = async () => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error("Not authenticated");
+
+      if (!title.trim() || !content.trim()) {
+        toast({
+          title: "Missing fields",
+          description: "Please fill in both title and content",
+          variant: "destructive",
+        });
+        return;
       }
+
+      const { error } = await supabase
+        .from('community_posts')
+        .insert([
+          {
+            title,
+            content,
+            tags,
+            channel: selectedChannel,
+            user_id: user.id,
+          }
+        ]);
+
+      if (error) throw error;
+
+      // Update ideas table to mark as shared
+      await supabase
+        .from('ideas')
+        .update({ shared_to_community: true })
+        .match({
+          title,
+          content,
+          user_id: user.id,
+        });
+
+      setTitle("");
+      setContent("");
+      setTags([]);
+      setTagInput("");
+
+      queryClient.invalidateQueries({ queryKey: ['community-posts'] });
+      queryClient.invalidateQueries({ queryKey: ['ideas'] });
+
+      toast({
+        title: "Success",
+        description: "Your idea has been shared with the community!",
+      });
+    } catch (error) {
+      console.error('Error sharing post:', error);
+      toast({
+        title: "Error",
+        description: "Failed to share your idea. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleTagInput = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if ((e.key === 'Enter' || e.key === ',') && tagInput.trim()) {
+      e.preventDefault();
+      const newTag = tagInput.trim().toLowerCase();
+      if (!tags.includes(newTag)) {
+        setTags([...tags, newTag]);
+      }
+      setTagInput("");
     }
   };
 
@@ -36,120 +99,45 @@ export const CreatePost = ({ selectedChannel }: CreatePostProps) => {
     setTags(tags.filter(tag => tag !== tagToRemove));
   };
 
-  const handlePost = async () => {
-    if (!postTitle.trim()) {
-      toast({
-        title: "Error",
-        description: "Please enter a title for your post.",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    if (!postContent.trim()) {
-      toast({
-        title: "Error",
-        description: "Please enter some content for your post.",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error("Not authenticated");
-
-      // First create the idea
-      const { data: idea, error: ideaError } = await supabase
-        .from('ideas')
-        .insert([
-          {
-            title: postTitle,
-            content: postContent,
-            user_id: user.id,
-            tags: tags,
-            shared_to_community: true
-          }
-        ])
-        .select()
-        .single();
-
-      if (ideaError) throw ideaError;
-
-      // Then create the community post
-      const { error: postError } = await supabase
-        .from('community_posts')
-        .insert([
-          {
-            user_id: user.id,
-            title: postTitle,
-            content: postContent,
-            channel: channel,
-            tags: tags
-          }
-        ]);
-
-      if (postError) throw postError;
-
-      // Invalidate both queries to refresh the UI
-      await Promise.all([
-        queryClient.invalidateQueries({ queryKey: ['community-posts'] }),
-        queryClient.invalidateQueries({ queryKey: ['my-ideas'] })
-      ]);
-
-      setPostTitle("");
-      setPostContent("");
-      setTags([]);
-      setTagInput("");
-      
-      toast({
-        title: "Success",
-        description: "Your idea has been shared and saved to your ideas!",
-      });
-    } catch (error) {
-      console.error('Error creating post:', error);
-      toast({
-        title: "Error",
-        description: "Failed to create post. Please try again.",
-        variant: "destructive",
-      });
-    }
-  };
-
   return (
-    <div className="bg-card rounded-lg p-6 shadow-sm space-y-4">
-      <CreatePostHeader onPost={handlePost} />
-
-      <div className="space-y-4">
-        <CreatePostChannelSelect 
-          value={channel}
-          onChange={setChannel}
-        />
-
-        <div className="space-y-2">
-          <Input
-            placeholder="Give your idea a title..."
-            value={postTitle}
-            onChange={(e) => setPostTitle(e.target.value)}
-            className="font-medium"
+    <div className="bg-card rounded-lg p-4 md:p-6 shadow-sm space-y-4">
+      <div className="flex items-center justify-between gap-4">
+        <CreatePostHeader onPost={handlePost} />
+        <div className="flex items-center space-x-2">
+          <Switch
+            id="show-my-posts"
+            checked={showOnlyMyPosts}
+            onCheckedChange={onToggleMyPosts}
           />
-
-          <Textarea
-            placeholder="Share your latest idea, ask a question, or start a discussion..."
-            value={postContent}
-            onChange={(e) => setPostContent(e.target.value)}
-            className="min-h-[100px]"
-          />
+          <Label htmlFor="show-my-posts">Show only my shared ideas</Label>
         </div>
-
-        <CreatePostTags
-          tags={tags}
-          tagInput={tagInput}
-          onTagInput={handleTagInput}
-          onTagInputChange={setTagInput}
-          onRemoveTag={removeTag}
-        />
       </div>
+
+      <Input
+        placeholder="Title"
+        value={title}
+        onChange={(e) => setTitle(e.target.value)}
+        className="mb-2"
+      />
+      
+      <Textarea
+        placeholder="Share your thoughts..."
+        value={content}
+        onChange={(e) => setContent(e.target.value)}
+        className="min-h-[100px]"
+      />
+
+      <CreatePostTags
+        tags={tags}
+        tagInput={tagInput}
+        onTagInput={handleTagInput}
+        onTagInputChange={setTagInput}
+        onRemoveTag={removeTag}
+      />
+
+      <CreatePostChannelSelect
+        selectedChannel={selectedChannel}
+      />
     </div>
   );
 };
