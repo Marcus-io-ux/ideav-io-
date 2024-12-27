@@ -2,14 +2,16 @@ import { useState, useEffect } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
+import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useQueryClient } from "@tanstack/react-query";
 import { Message } from "@/types/inbox";
-import { formatDistanceToNow, format } from "date-fns";
+import { formatDistanceToNow } from "date-fns";
 import { PaperclipIcon } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { MessageItem } from "./MessageItem";
+import { QuickReplies } from "./QuickReplies";
 
 interface MessageThreadProps {
   open: boolean;
@@ -19,6 +21,7 @@ interface MessageThreadProps {
 
 export const MessageThread = ({ open, onOpenChange, selectedMessage }: MessageThreadProps) => {
   const [reply, setReply] = useState("");
+  const [title, setTitle] = useState("");
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [threadMessages, setThreadMessages] = useState<Message[]>([]);
@@ -28,6 +31,8 @@ export const MessageThread = ({ open, onOpenChange, selectedMessage }: MessageTh
     if (open && selectedMessage) {
       fetchThreadMessages();
       markMessageAsRead();
+      // Set default reply title
+      setTitle(`Re: ${selectedMessage.title || 'No title'}`);
     }
   }, [open, selectedMessage]);
 
@@ -61,22 +66,13 @@ export const MessageThread = ({ open, onOpenChange, selectedMessage }: MessageTh
         .eq('thread_id', threadId)
         .order('created_at', { ascending: true });
 
-      if (error) {
-        console.error('Error fetching thread messages:', error);
-        toast({
-          title: "Error",
-          description: "Failed to load messages. Please try again.",
-          variant: "destructive",
-        });
-        return;
-      }
-
+      if (error) throw error;
       setThreadMessages(data || []);
     } catch (error) {
-      console.error('Error in fetchThreadMessages:', error);
+      console.error('Error fetching thread messages:', error);
       toast({
         title: "Error",
-        description: "An unexpected error occurred. Please try again.",
+        description: "Failed to load messages. Please try again.",
         variant: "destructive",
       });
     } finally {
@@ -92,20 +88,16 @@ export const MessageThread = ({ open, onOpenChange, selectedMessage }: MessageTh
           .update({ is_read: true })
           .eq('id', selectedMessage.id);
 
-        if (error) {
-          console.error('Error marking message as read:', error);
-          return;
-        }
-
+        if (error) throw error;
         await queryClient.invalidateQueries({ queryKey: ['messages'] });
       } catch (error) {
-        console.error('Error in markMessageAsRead:', error);
+        console.error('Error marking message as read:', error);
       }
     }
   };
 
   const handleSendReply = async () => {
-    if (!reply.trim()) return;
+    if (!reply.trim() || !title.trim()) return;
 
     try {
       const { data: { user } } = await supabase.auth.getUser();
@@ -119,6 +111,7 @@ export const MessageThread = ({ open, onOpenChange, selectedMessage }: MessageTh
           sender_id: user.id,
           recipient_id: selectedMessage.sender.user_id,
           content: reply,
+          title: title,
           parent_id: selectedMessage.id,
           thread_id: threadId,
           is_read: false
@@ -132,6 +125,7 @@ export const MessageThread = ({ open, onOpenChange, selectedMessage }: MessageTh
       });
 
       setReply("");
+      setTitle(`Re: ${selectedMessage.title || 'No title'}`);
       await queryClient.invalidateQueries({ queryKey: ['messages'] });
       await fetchThreadMessages();
     } catch (error) {
@@ -143,12 +137,6 @@ export const MessageThread = ({ open, onOpenChange, selectedMessage }: MessageTh
       });
     }
   };
-
-  const quickReplies = [
-    "Thanks for your input!",
-    "Let's set up a time to discuss further.",
-    "I'll get back to you soon.",
-  ];
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -170,55 +158,40 @@ export const MessageThread = ({ open, onOpenChange, selectedMessage }: MessageTh
           ) : (
             <div className="space-y-6">
               {threadMessages.map((message) => (
-                <div key={message.id} className="bg-muted/30 rounded-lg p-4">
-                  <div className="flex items-start space-x-4">
-                    <Avatar className="h-10 w-10">
-                      <AvatarImage src={message.sender.avatar_url} />
-                      <AvatarFallback>
-                        {message.sender.username?.[0]?.toUpperCase() || 'U'}
-                      </AvatarFallback>
-                    </Avatar>
-                    <div className="flex-1">
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <p className="font-semibold">{message.sender.username}</p>
-                          <p className="text-sm text-muted-foreground">
-                            {format(new Date(message.created_at), "MMM d, yyyy 'at' h:mm a")}
-                          </p>
-                        </div>
-                      </div>
-                      <div className="mt-2 text-sm">
-                        {message.content}
-                      </div>
-                    </div>
-                  </div>
-                </div>
+                <MessageItem key={message.id} message={message} />
               ))}
             </div>
           )}
         </ScrollArea>
 
         <div className="mt-4 space-y-4">
-          <div className="flex flex-wrap gap-2">
-            {quickReplies.map((quickReply) => (
-              <Button
-                key={quickReply}
-                variant="secondary"
-                size="sm"
-                onClick={() => setReply(quickReply)}
-              >
-                {quickReply}
-              </Button>
-            ))}
-          </div>
+          <QuickReplies onSelect={setReply} />
 
           <div className="space-y-2">
-            <Textarea
-              value={reply}
-              onChange={(e) => setReply(e.target.value)}
-              placeholder="Write your reply here..."
-              className="min-h-[100px]"
-            />
+            <div className="space-y-2">
+              <label htmlFor="title" className="text-sm font-medium text-foreground">
+                Title
+              </label>
+              <Input
+                id="title"
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                placeholder="Enter message title..."
+                className="w-full"
+              />
+            </div>
+            <div className="space-y-2">
+              <label htmlFor="reply" className="text-sm font-medium text-foreground">
+                Message
+              </label>
+              <Textarea
+                id="reply"
+                value={reply}
+                onChange={(e) => setReply(e.target.value)}
+                placeholder="Write your reply here..."
+                className="min-h-[100px]"
+              />
+            </div>
             <div className="flex items-center justify-between">
               <Button variant="ghost" size="sm" className="text-muted-foreground">
                 <PaperclipIcon className="h-4 w-4 mr-2" />
@@ -226,7 +199,7 @@ export const MessageThread = ({ open, onOpenChange, selectedMessage }: MessageTh
               </Button>
               <Button
                 onClick={handleSendReply}
-                disabled={!reply.trim() || isLoading}
+                disabled={!reply.trim() || !title.trim() || isLoading}
               >
                 Send Reply
               </Button>

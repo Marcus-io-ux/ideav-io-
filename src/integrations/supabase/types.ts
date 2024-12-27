@@ -353,6 +353,7 @@ export type Database = {
           recipient_id: string | null
           sender_id: string | null
           thread_id: string | null
+          title: string | null
         }
         Insert: {
           content: string
@@ -363,6 +364,7 @@ export type Database = {
           recipient_id?: string | null
           sender_id?: string | null
           thread_id?: string | null
+          title?: string | null
         }
         Update: {
           content?: string
@@ -373,6 +375,7 @@ export type Database = {
           recipient_id?: string | null
           sender_id?: string | null
           thread_id?: string | null
+          title?: string | null
         }
         Relationships: [
           {
