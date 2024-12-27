@@ -13,10 +13,12 @@ export interface Message {
   sender: {
     username: string;
     avatar_url?: string;
+    user_id: string;
   };
   recipient: {
     username: string;
     avatar_url?: string;
+    user_id: string;
   };
 }
 
