@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Textarea } from "@/components/ui/textarea";
+import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useQueryClient } from "@tanstack/react-query";
@@ -12,6 +13,7 @@ interface CreatePostProps {
 }
 
 export const CreatePost = ({ selectedChannel }: CreatePostProps) => {
+  const [postTitle, setPostTitle] = useState("");
   const [postContent, setPostContent] = useState("");
   const [tagInput, setTagInput] = useState("");
   const [tags, setTags] = useState<string[]>([]);
@@ -35,6 +37,15 @@ export const CreatePost = ({ selectedChannel }: CreatePostProps) => {
   };
 
   const handlePost = async () => {
+    if (!postTitle.trim()) {
+      toast({
+        title: "Error",
+        description: "Please enter a title for your post.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     if (!postContent.trim()) {
       toast({
         title: "Error",
@@ -53,7 +64,7 @@ export const CreatePost = ({ selectedChannel }: CreatePostProps) => {
         .from('ideas')
         .insert([
           {
-            title: "Community Post",
+            title: postTitle,
             content: postContent,
             user_id: user.id,
             tags: tags,
@@ -71,7 +82,7 @@ export const CreatePost = ({ selectedChannel }: CreatePostProps) => {
         .insert([
           {
             user_id: user.id,
-            title: "New Post",
+            title: postTitle,
             content: postContent,
             channel: channel,
             tags: tags
@@ -86,6 +97,7 @@ export const CreatePost = ({ selectedChannel }: CreatePostProps) => {
         queryClient.invalidateQueries({ queryKey: ['my-ideas'] })
       ]);
 
+      setPostTitle("");
       setPostContent("");
       setTags([]);
       setTagInput("");
@@ -114,12 +126,21 @@ export const CreatePost = ({ selectedChannel }: CreatePostProps) => {
           onChange={setChannel}
         />
 
-        <Textarea
-          placeholder="Share your latest idea, ask a question, or start a discussion..."
-          value={postContent}
-          onChange={(e) => setPostContent(e.target.value)}
-          className="mb-4 min-h-[100px]"
-        />
+        <div className="space-y-2">
+          <Input
+            placeholder="Give your idea a title..."
+            value={postTitle}
+            onChange={(e) => setPostTitle(e.target.value)}
+            className="font-medium"
+          />
+
+          <Textarea
+            placeholder="Share your latest idea, ask a question, or start a discussion..."
+            value={postContent}
+            onChange={(e) => setPostContent(e.target.value)}
+            className="min-h-[100px]"
+          />
+        </div>
 
         <CreatePostTags
           tags={tags}
