@@ -1,30 +1,18 @@
 import { useState, useEffect } from "react";
-import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 
-interface Comment {
-  id: string;
-  content: string;
-  created_at: string;
-  profiles: {
-    username: string;
-    avatar_url: string;
-  };
-}
-
-export const useIdeaInteractions = (ideaId: string, userId: string | undefined) => {
+export const useIdeaInteractions = (ideaId: string, userId: string | null) => {
   const [isLiked, setIsLiked] = useState(false);
   const [likesCount, setLikesCount] = useState(0);
   const [commentsCount, setCommentsCount] = useState(0);
-  const [comments, setComments] = useState<Comment[]>([]);
+  const [comments, setComments] = useState<any[]>([]);
   const [isCommentsExpanded, setIsCommentsExpanded] = useState(false);
-  const { toast } = useToast();
 
   useEffect(() => {
     const fetchInitialState = async () => {
       if (!userId) return;
 
-      // Check if user has liked the idea
+      // Check if idea is liked by current user
       const { data: likeData } = await supabase
         .from("idea_likes")
         .select()
@@ -34,7 +22,7 @@ export const useIdeaInteractions = (ideaId: string, userId: string | undefined) 
 
       setIsLiked(!!likeData);
 
-      // Get idea stats
+      // Get initial counts
       const { data: idea } = await supabase
         .from("ideas")
         .select("likes_count, comments_count")
@@ -49,7 +37,7 @@ export const useIdeaInteractions = (ideaId: string, userId: string | undefined) 
 
     fetchInitialState();
 
-    // Subscribe to real-time updates
+    // Subscribe to real-time updates for likes and comments
     const channel = supabase.channel(`idea-${ideaId}`)
       .on(
         'postgres_changes',
@@ -61,8 +49,10 @@ export const useIdeaInteractions = (ideaId: string, userId: string | undefined) 
         },
         (payload) => {
           const newIdea = payload.new as any;
-          setLikesCount(newIdea.likes_count || 0);
-          setCommentsCount(newIdea.comments_count || 0);
+          if (newIdea) {
+            setLikesCount(newIdea.likes_count || 0);
+            setCommentsCount(newIdea.comments_count || 0);
+          }
         }
       )
       .subscribe();
@@ -72,73 +62,47 @@ export const useIdeaInteractions = (ideaId: string, userId: string | undefined) 
     };
   }, [ideaId, userId]);
 
-  const fetchComments = async () => {
-    const { data, error } = await supabase
-      .from("idea_comments")
-      .select(`
-        id,
-        content,
-        created_at,
-        profiles (
-          username,
-          avatar_url
-        )
-      `)
-      .eq("idea_id", ideaId)
-      .order("created_at", { ascending: false });
-
-    if (error) {
-      console.error('Error fetching comments:', error);
-      return;
-    }
-
-    setComments(data as Comment[]);
-  };
-
   const handleLike = async () => {
-    if (!userId) {
-      toast({
-        title: "Authentication required",
-        description: "Please sign in to like ideas",
-        variant: "destructive",
-      });
-      return;
-    }
+    if (!userId) return;
 
     try {
-      if (!isLiked) {
-        const { error } = await supabase
-          .from("idea_likes")
-          .insert([{ idea_id: ideaId, user_id: userId }]);
-
-        if (error) throw error;
-        setIsLiked(true);
-        setLikesCount(prev => prev + 1);
-      } else {
-        const { error } = await supabase
+      if (isLiked) {
+        await supabase
           .from("idea_likes")
           .delete()
           .eq("idea_id", ideaId)
           .eq("user_id", userId);
-
-        if (error) throw error;
-        setIsLiked(false);
-        setLikesCount(prev => Math.max(0, prev - 1));
+      } else {
+        await supabase
+          .from("idea_likes")
+          .insert([
+            { idea_id: ideaId, user_id: userId }
+          ]);
       }
+
+      setIsLiked(!isLiked);
     } catch (error) {
-      console.error('Error toggling like:', error);
-      toast({
-        title: "Error",
-        description: "Failed to update like status. Please try again.",
-        variant: "destructive",
-      });
+      console.error("Error toggling like:", error);
     }
   };
 
-  const toggleComments = async () => {
+  const toggleComments = () => {
     setIsCommentsExpanded(!isCommentsExpanded);
     if (!isCommentsExpanded) {
-      await fetchComments();
+      fetchComments();
+    }
+  };
+
+  const fetchComments = async () => {
+    try {
+      const { data } = await supabase
+        .rpc('get_idea_comments', {
+          p_idea_id: ideaId
+        });
+      
+      setComments(data || []);
+    } catch (error) {
+      console.error("Error fetching comments:", error);
     }
   };
 
