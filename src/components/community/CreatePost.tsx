@@ -61,24 +61,7 @@ export const CreatePost = ({ selectedChannel, showOnlyMyPosts, onToggleMyPosts }
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error("Not authenticated");
 
-      // First create the idea
-      const { data: idea, error: ideaError } = await supabase
-        .from('ideas')
-        .insert([
-          {
-            title: postTitle,
-            content: postContent,
-            user_id: user.id,
-            tags: tags,
-            shared_to_community: true
-          }
-        ])
-        .select()
-        .single();
-
-      if (ideaError) throw ideaError;
-
-      // Then create the community post
+      // Create only the community post
       const { error: postError } = await supabase
         .from('community_posts')
         .insert([
@@ -93,11 +76,8 @@ export const CreatePost = ({ selectedChannel, showOnlyMyPosts, onToggleMyPosts }
 
       if (postError) throw postError;
 
-      // Invalidate both queries to refresh the UI
-      await Promise.all([
-        queryClient.invalidateQueries({ queryKey: ['community-posts'] }),
-        queryClient.invalidateQueries({ queryKey: ['my-ideas'] })
-      ]);
+      // Invalidate only community posts query
+      await queryClient.invalidateQueries({ queryKey: ['community-posts'] });
 
       setPostTitle("");
       setPostContent("");
@@ -106,7 +86,7 @@ export const CreatePost = ({ selectedChannel, showOnlyMyPosts, onToggleMyPosts }
       
       toast({
         title: "Success",
-        description: "Your idea has been shared and saved to your ideas!",
+        description: "Your post has been shared to the community!",
       });
     } catch (error) {
       console.error('Error creating post:', error);
