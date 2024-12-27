@@ -1,16 +1,15 @@
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { MessageSquare, ThumbsUp, Trash2, UserPlus, Edit2 } from "lucide-react";
-import { CommentList } from "./comments/CommentList";
-import { useCollaborationRequest } from "@/hooks/use-collaboration-request";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { useState } from "react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
+import { useCollaborationRequest } from "@/hooks/use-collaboration-request";
+import { CommentList } from "./comments/CommentList";
+import { PostCardHeader } from "./post-card/PostCardHeader";
+import { PostCardContent } from "./post-card/PostCardContent";
+import { PostCardActions } from "./post-card/PostCardActions";
 
 interface PostCardProps {
   post: any;
@@ -133,161 +132,33 @@ export const PostCard = ({
     setEditedTags(newTags);
   };
 
-  const handleLike = async () => {
-    if (!currentUserId) {
-      toast({
-        title: "Authentication required",
-        description: "Please sign in to like posts",
-        variant: "destructive",
-      });
-      return;
-    }
-    onLike(post.id);
-  };
-
-  const handleComment = () => {
-    if (!currentUserId) {
-      toast({
-        title: "Authentication required",
-        description: "Please sign in to comment on posts",
-        variant: "destructive",
-      });
-      return;
-    }
-    onToggleComments(post.id);
-  };
-
   return (
     <div className="bg-card rounded-lg p-4 md:p-6 shadow-sm">
-      <div className="flex flex-col md:flex-row md:items-center justify-between mb-4 gap-4">
-        <div className="flex items-center gap-4">
-          <Avatar>
-            <AvatarImage src={post.profiles?.avatar_url} />
-            <AvatarFallback>
-              {post.profiles?.username?.[0]?.toUpperCase() || 'U'}
-            </AvatarFallback>
-          </Avatar>
-          <div>
-            <h3 className="font-semibold">{post.profiles?.username || 'Anonymous'}</h3>
-            <p className="text-sm text-muted-foreground">
-              Posted {new Date(post.created_at).toLocaleDateString()}
-            </p>
-          </div>
-        </div>
-        <div className="flex gap-2">
-          {post.user_id === currentUserId && (
-            <>
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => setIsEditing(true)}
-                className="text-muted-foreground hover:text-primary"
-              >
-                <Edit2 className="h-4 w-4" />
-              </Button>
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => onDelete(post.id)}
-                className="text-muted-foreground hover:text-destructive"
-              >
-                <Trash2 className="h-4 w-4" />
-              </Button>
-            </>
-          )}
-        </div>
-      </div>
+      <PostCardHeader
+        post={post}
+        currentUserId={currentUserId}
+        onDelete={onDelete}
+        setIsEditing={setIsEditing}
+      />
 
-      {isEditing ? (
-        <div className="space-y-4">
-          <div>
-            <Input
-              value={editedTitle}
-              onChange={(e) => setEditedTitle(e.target.value)}
-              className="mb-2"
-              placeholder="Title"
-            />
-            <Textarea
-              value={editedContent}
-              onChange={(e) => setEditedContent(e.target.value)}
-              className="min-h-[100px]"
-              placeholder="Content"
-            />
-          </div>
-          <div>
-            <Input
-              value={editedTags.join(', ')}
-              onChange={(e) => handleTagsChange(e.target.value)}
-              placeholder="Tags (comma-separated)"
-              className="mb-2"
-            />
-          </div>
-          <div className="flex gap-2">
-            <Button onClick={handleSaveEdit}>Save</Button>
-            <Button 
-              variant="outline" 
-              onClick={() => {
-                setIsEditing(false);
-                setEditedTitle(post.title);
-                setEditedContent(post.content);
-                setEditedTags(post.tags || []);
-              }}
-            >
-              Cancel
-            </Button>
-          </div>
-        </div>
-      ) : (
-        <>
-          <h2 className="text-xl font-semibold mb-3">{post.title}</h2>
-          <p className="mb-4">{post.content}</p>
-
-          {post.tags && post.tags.length > 0 && (
-            <div className="flex flex-wrap gap-2 mb-4">
-              {post.tags.map((tag: string, index: number) => (
-                <Badge 
-                  key={index} 
-                  variant="secondary"
-                  className="px-2 md:px-3 py-1 text-xs md:text-sm bg-primary/10 text-primary hover:bg-primary/20 transition-colors"
-                >
-                  #{tag}
-                </Badge>
-              ))}
-            </div>
-          )}
-        </>
-      )}
-
-      <div className="flex gap-4">
-        <Button 
-          variant="ghost" 
-          size="sm" 
-          onClick={handleLike}
-          className="flex items-center gap-2"
-        >
-          <ThumbsUp className="w-4 h-4" />
-          <span>{post.likes_count || 0}</span>
-        </Button>
-        <Button 
-          variant="ghost" 
-          size="sm" 
-          onClick={handleComment}
-          className="flex items-center gap-2"
-        >
-          <MessageSquare className="w-4 h-4" />
-          <span>{post.comments_count || 0}</span>
-        </Button>
-        <Button 
-          variant="ghost" 
-          size="sm" 
-          onClick={() => setIsCollabDialogOpen(true)}
-          className="text-primary hover:text-primary/80"
-          disabled={post.user_id === currentUserId}
-        >
-          <UserPlus className="w-4 h-4 mr-2" />
-          Collaborate
-        </Button>
-      </div>
+      <PostCardContent
+        post={post}
+        isEditing={isEditing}
+        editedTitle={editedTitle}
+        editedContent={editedContent}
+        editedTags={editedTags}
+        setEditedTitle={setEditedTitle}
+        setEditedContent={setEditedContent}
+        handleTagsChange={handleTagsChange}
+        handleSaveEdit={handleSaveEdit}
+        setIsEditing={setIsEditing}
+      />
+      
+      <PostCardActions
+        currentUserId={currentUserId}
+        post={post}
+        setIsCollabDialogOpen={setIsCollabDialogOpen}
+      />
       
       {isExpanded && (
         <div className="mt-4 pt-4 border-t">
