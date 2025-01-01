@@ -1,11 +1,46 @@
 import { Check, Award } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
 
 export const PricingSection = () => {
+  const { toast } = useToast();
+  const navigate = useNavigate();
+
+  const handleUpgradeClick = async () => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      if (!user) {
+        navigate('/login');
+        return;
+      }
+
+      const { data, error } = await supabase.functions.invoke('create-checkout-session', {
+        body: {
+          user,
+          priceId: 'your_stripe_price_id', // Replace with your actual Stripe price ID
+        },
+      });
+
+      if (error) throw error;
+
+      if (data?.url) {
+        window.location.href = data.url;
+      }
+    } catch (error) {
+      console.error('Error creating checkout session:', error);
+      toast({
+        title: "Error",
+        description: "Failed to start checkout process. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
+
   return (
     <section className="py-24 bg-gradient-to-br from-blue-50 to-indigo-50 pricing-section">
-      {/* Section Header */}
       <div className="text-center mb-16">
         <h2 className="text-4xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-indigo-500">
           Choose Your Plan. Start Building Today.
@@ -15,7 +50,6 @@ export const PricingSection = () => {
         </p>
       </div>
 
-      {/* Pricing Cards */}
       <div className="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto px-4">
         {/* Starter Plan */}
         <div className="bg-white/70 backdrop-blur-sm p-8 rounded-xl border border-blue-100 hover:border-blue-200 transition-all duration-300 hover:shadow-lg">
@@ -71,18 +105,16 @@ export const PricingSection = () => {
               </li>
             ))}
           </ul>
-          <Link to="/signup?plan=pro">
-            <Button
-              size="lg"
-              className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white py-6 text-lg"
-            >
-              Upgrade to Pro
-            </Button>
-          </Link>
+          <Button
+            size="lg"
+            className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white py-6 text-lg"
+            onClick={handleUpgradeClick}
+          >
+            Upgrade to Pro
+          </Button>
         </div>
       </div>
 
-      {/* Trust Signals */}
       <div className="mt-12 text-center space-y-4">
         <p className="text-blue-600/80">No credit card required for Starter Plan • Upgrade anytime, risk-free</p>
         <div className="max-w-2xl mx-auto bg-blue-50/50 backdrop-blur-sm p-6 rounded-lg">
