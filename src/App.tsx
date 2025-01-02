@@ -21,7 +21,14 @@ import Inbox from "./pages/Inbox";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      retry: 1,
+      refetchOnWindowFocus: false,
+    },
+  },
+});
 
 const App = () => {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
@@ -41,6 +48,11 @@ const App = () => {
 
     return () => subscription.unsubscribe();
   }, []);
+
+  // Don't render routes until auth state is determined
+  if (isAuthenticated === null) {
+    return null;
+  }
 
   return (
     <QueryClientProvider client={queryClient}>
@@ -129,6 +141,17 @@ const App = () => {
               path="/inbox"
               element={
                 isAuthenticated ? <Inbox /> : <Navigate to="/login" replace />
+              }
+            />
+            {/* Catch all route - redirect to dashboard if authenticated, otherwise to landing */}
+            <Route
+              path="*"
+              element={
+                isAuthenticated ? (
+                  <Navigate to="/dashboard" replace />
+                ) : (
+                  <Navigate to="/" replace />
+                )
               }
             />
           </Routes>
