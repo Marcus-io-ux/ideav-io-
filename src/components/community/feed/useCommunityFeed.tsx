@@ -65,7 +65,7 @@ export const useCommunityFeed = () => {
   const { data: posts, isLoading } = useQuery({
     queryKey: ['community-posts', selectedChannel, showOnlyMyPosts, currentUserId],
     queryFn: async () => {
-      // First, get all posts
+      // First, get all posts with their comments
       const postsQuery = supabase
         .from('community_posts')
         .select(`
@@ -74,7 +74,16 @@ export const useCommunityFeed = () => {
             username,
             avatar_url
           ),
-          comments:community_comments(count),
+          comments:community_comments (
+            id,
+            content,
+            created_at,
+            user_id,
+            profiles:user_id (
+              username,
+              avatar_url
+            )
+          ),
           likes:community_post_likes(count)
         `)
         .neq('channel', 'general')
@@ -103,7 +112,7 @@ export const useCommunityFeed = () => {
           ...post,
           is_liked: userLikes?.some(like => like.post_id === post.id) || false,
           likes_count: post.likes?.[0]?.count || 0,
-          comments_count: post.comments?.[0]?.count || 0
+          comments_count: post.comments?.length || 0
         }));
       }
 
@@ -112,7 +121,7 @@ export const useCommunityFeed = () => {
         ...post,
         is_liked: false,
         likes_count: post.likes?.[0]?.count || 0,
-        comments_count: post.comments?.[0]?.count || 0
+        comments_count: post.comments?.length || 0
       }));
     },
     enabled: true,
