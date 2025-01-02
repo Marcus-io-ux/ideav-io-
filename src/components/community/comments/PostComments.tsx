@@ -12,7 +12,7 @@ interface Comment {
   profiles: {
     username: string;
     avatar_url: string;
-  };
+  } | null;
 }
 
 interface PostCommentsProps {
@@ -49,7 +49,7 @@ export const PostComments = ({
         .insert([
           {
             post_id: postId,
-            user_id: session.user.id,  // Add this line to set the user_id
+            user_id: session.user.id,
             content: newComment.trim(),
           },
         ]);
@@ -94,14 +94,14 @@ export const PostComments = ({
         {comments.map((comment) => (
           <div key={comment.id} className="flex gap-4 p-4 border rounded-lg">
             <Avatar>
-              <AvatarImage src={comment.profiles.avatar_url} />
+              <AvatarImage src={comment.profiles?.avatar_url} />
               <AvatarFallback>
-                {comment.profiles.username?.[0]?.toUpperCase() || "U"}
+                {comment.profiles?.username?.[0]?.toUpperCase() || "U"}
               </AvatarFallback>
             </Avatar>
             <div>
               <div className="flex items-center gap-2">
-                <p className="font-semibold">{comment.profiles.username}</p>
+                <p className="font-semibold">{comment.profiles?.username || "Anonymous"}</p>
                 <span className="text-sm text-muted-foreground">
                   {new Date(comment.created_at).toLocaleDateString()}
                 </span>
