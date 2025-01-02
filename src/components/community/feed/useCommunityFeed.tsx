@@ -7,7 +7,7 @@ export const useCommunityFeed = () => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [expandedPost, setExpandedPost] = useState<string | null>(null);
-  const [selectedChannel, setSelectedChannel] = useState("feedback"); // Changed default from 'general' to 'feedback'
+  const [selectedChannel, setSelectedChannel] = useState("feedback");
   const [showOnlyMyPosts, setShowOnlyMyPosts] = useState(false);
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
 
@@ -65,30 +65,55 @@ export const useCommunityFeed = () => {
   const { data: posts, isLoading } = useQuery({
     queryKey: ['community-posts', selectedChannel, showOnlyMyPosts, currentUserId],
     queryFn: async () => {
-      const query = supabase
+      // First, get all posts
+      const postsQuery = supabase
         .from('community_posts')
         .select(`
           *,
           profiles:user_id (
             username,
             avatar_url
-          )
+          ),
+          comments:community_comments(count),
+          likes:community_post_likes(count)
         `)
-        .neq('channel', 'general') // Filter out general channel posts
+        .neq('channel', 'general')
         .order('created_at', { ascending: false });
 
       if (selectedChannel !== 'all') {
-        query.eq('channel', selectedChannel);
+        postsQuery.eq('channel', selectedChannel);
       }
 
       if (showOnlyMyPosts && currentUserId) {
-        query.eq('user_id', currentUserId);
+        postsQuery.eq('user_id', currentUserId);
       }
 
-      const { data, error } = await query;
-      
-      if (error) throw error;
-      return data;
+      const { data: postsData, error: postsError } = await postsQuery;
+      if (postsError) throw postsError;
+
+      // If user is authenticated, get their likes for these posts
+      if (currentUserId) {
+        const { data: userLikes } = await supabase
+          .from('community_post_likes')
+          .select('post_id')
+          .eq('user_id', currentUserId);
+
+        // Add is_liked field to posts
+        return postsData.map(post => ({
+          ...post,
+          is_liked: userLikes?.some(like => like.post_id === post.id) || false,
+          likes_count: post.likes?.[0]?.count || 0,
+          comments_count: post.comments?.[0]?.count || 0
+        }));
+      }
+
+      // If user is not authenticated, return posts without is_liked field
+      return postsData.map(post => ({
+        ...post,
+        is_liked: false,
+        likes_count: post.likes?.[0]?.count || 0,
+        comments_count: post.comments?.[0]?.count || 0
+      }));
     },
     enabled: true,
   });
