@@ -70,7 +70,7 @@ export const IdeaCardFooter = ({
         </div>
       )}
       
-      <div className={cn("flex items-center gap-2", hideInteractions && "ml-auto")}>
+      <div className={cn("flex items-center gap-2 ml-auto")}>
         <Button
           variant="ghost"
           size="icon"
