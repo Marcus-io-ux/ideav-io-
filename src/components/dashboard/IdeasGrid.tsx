@@ -40,6 +40,7 @@ export const IdeasGrid = ({
           key={idea.id}
           {...idea}
           onDelete={onDelete}
+          hideInteractions={true}
         />
       ))}
     </div>
