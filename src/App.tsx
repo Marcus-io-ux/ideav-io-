@@ -4,6 +4,8 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { NavigationBar } from "./components/NavigationBar";
+import { LoadingSpinner } from "./components/LoadingSpinner";
+import { useAuthState } from "./hooks/useAuthState";
 import Index from "./pages/Index";
 import Dashboard from "./pages/Dashboard";
 import Landing from "./pages/Landing";
@@ -18,9 +20,6 @@ import Signup from "./pages/Signup";
 import Profile from "./pages/Profile";
 import Community from "./pages/Community";
 import Inbox from "./pages/Inbox";
-import { useEffect, useState } from "react";
-import { supabase } from "@/integrations/supabase/client";
-import { useToast } from "./hooks/use-toast";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -32,88 +31,16 @@ const queryClient = new QueryClient({
   },
 });
 
-const App = () => {
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const { toast } = useToast();
-
-  useEffect(() => {
-    // Check initial auth state
-    const checkSession = async () => {
-      try {
-        const { data: { session }, error } = await supabase.auth.getSession();
-        if (error) {
-          console.error("Session check error:", error);
-          toast({
-            title: "Authentication Error",
-            description: "Please try logging in again",
-            variant: "destructive",
-          });
-          setIsAuthenticated(false);
-        } else {
-          setIsAuthenticated(!!session);
+const AppRoutes = ({ isAuthenticated }: { isAuthenticated: boolean }) => (
+  <>
+    {isAuthenticated && <NavigationBar />}
+    <Routes>
+      <Route
+        path="/"
+        element={
+          isAuthenticated ? <Navigate to="/dashboard" replace /> : <Landing />
         }
-      } catch (error) {
-        console.error("Session check error:", error);
-        setIsAuthenticated(false);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    checkSession();
-
-    // Listen for auth changes
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange(async (event, session) => {
-      console.log("Auth state changed:", event, !!session);
-      
-      if (event === 'SIGNED_OUT') {
-        // Clear any cached data
-        queryClient.clear();
-        setIsAuthenticated(false);
-      } else if (event === 'SIGNED_IN') {
-        setIsAuthenticated(true);
-      } else if (event === 'TOKEN_REFRESHED') {
-        console.log('Token refreshed successfully');
-      } else if (event === 'USER_UPDATED') {
-        setIsAuthenticated(!!session);
-      }
-    });
-
-    return () => {
-      subscription.unsubscribe();
-    };
-  }, [toast]);
-
-  // Show loading state
-  if (isLoading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-      </div>
-    );
-  }
-
-  return (
-    <QueryClientProvider client={queryClient}>
-      <TooltipProvider>
-        <Toaster />
-        <Sonner />
-        <BrowserRouter>
-          {isAuthenticated && <NavigationBar />}
-          <Routes>
-            <Route
-              path="/"
-              element={
-                isAuthenticated ? (
-                  <Navigate to="/dashboard" replace />
-                ) : (
-                  <Landing />
-                )
-              }
-            />
+      />
             <Route
               path="/login"
               element={
@@ -196,7 +123,24 @@ const App = () => {
                 )
               }
             />
-          </Routes>
+    </Routes>
+  </>
+);
+
+const App = () => {
+  const { isAuthenticated, isLoading } = useAuthState(queryClient);
+
+  if (isLoading) {
+    return <LoadingSpinner />;
+  }
+
+  return (
+    <QueryClientProvider client={queryClient}>
+      <TooltipProvider>
+        <Toaster />
+        <Sonner />
+        <BrowserRouter>
+          <AppRoutes isAuthenticated={isAuthenticated} />
         </BrowserRouter>
       </TooltipProvider>
     </QueryClientProvider>
