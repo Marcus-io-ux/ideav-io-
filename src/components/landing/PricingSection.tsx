@@ -19,7 +19,7 @@ export const PricingSection = () => {
 
       const { data, error } = await supabase.functions.invoke('create-checkout-session', {
         body: {
-          priceId: 'your_stripe_price_id', // Replace with your actual Stripe price ID
+          priceId: 'price_1QeYAuLL02NvbAdXZ3YondMr',
         },
       });
 
