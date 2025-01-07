@@ -34,14 +34,12 @@ serve(async (req) => {
       apiVersion: '2023-10-16',
     })
 
-    const { priceId } = await req.json()
-
     console.log('Creating payment session...')
     const session = await stripe.checkout.sessions.create({
       customer_email: email,
       line_items: [
         {
-          price: priceId,
+          price: 'price_1QeYAuLL02NvbAdXZ3YondMr',
           quantity: 1,
         },
       ],
