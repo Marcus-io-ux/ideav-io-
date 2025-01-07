@@ -6,7 +6,6 @@ import Index from "@/pages/Index";
 import Dashboard from "@/pages/Dashboard";
 import Landing from "@/pages/Landing";
 import Features from "@/pages/Features";
-import Pricing from "@/pages/Pricing";
 import AboutUs from "@/pages/AboutUs";
 import Onboarding from "@/pages/Onboarding";
 import Settings from "@/pages/Settings";
@@ -64,7 +63,6 @@ export const AppRoutes = ({ isAuthenticated }: AppRoutesProps) => {
           }
         />
         <Route path="/features" element={<Features />} />
-        <Route path="/pricing" element={<Pricing />} />
         <Route path="/about" element={<AboutUs />} />
         <Route
           path="/onboarding"

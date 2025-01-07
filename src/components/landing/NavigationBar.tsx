@@ -47,12 +47,6 @@ export const NavigationBar = () => {
               Community
             </button>
             <button 
-              onClick={() => scrollToSection('pricing-section')}
-              className="text-gray-600 hover:text-primary transition-colors"
-            >
-              Pricing
-            </button>
-            <button 
               onClick={() => scrollToSection('faq-section')}
               className="text-gray-600 hover:text-primary transition-colors"
             >
@@ -94,12 +88,6 @@ export const NavigationBar = () => {
                   className="flex items-center px-2 py-3 text-lg font-medium transition-colors hover:text-primary"
                 >
                   Community
-                </button>
-                <button
-                  onClick={() => scrollToSection('pricing-section')}
-                  className="flex items-center px-2 py-3 text-lg font-medium transition-colors hover:text-primary"
-                >
-                  Pricing
                 </button>
                 <button
                   onClick={() => scrollToSection('faq-section')}
