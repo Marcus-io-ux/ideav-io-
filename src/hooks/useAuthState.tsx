@@ -14,12 +14,12 @@ export const useAuthState = (queryClient: QueryClient) => {
         const { data: { session }, error } = await supabase.auth.getSession();
         if (error) {
           console.error("Session check error:", error);
+          setIsAuthenticated(false);
           toast({
             title: "Authentication Error",
             description: "Please try logging in again",
             variant: "destructive",
           });
-          setIsAuthenticated(false);
         } else {
           setIsAuthenticated(!!session);
         }
@@ -31,20 +31,21 @@ export const useAuthState = (queryClient: QueryClient) => {
       }
     };
 
+    // Initial session check
     checkSession();
 
+    // Listen for auth changes
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(async (event, session) => {
       console.log("Auth state changed:", event, !!session);
       
       if (event === 'SIGNED_OUT') {
+        // Clear any cached data
         queryClient.clear();
         setIsAuthenticated(false);
-      } else if (event === 'SIGNED_IN') {
+      } else if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
         setIsAuthenticated(true);
-      } else if (event === 'TOKEN_REFRESHED') {
-        console.log('Token refreshed successfully');
       } else if (event === 'USER_UPDATED') {
         setIsAuthenticated(!!session);
       }

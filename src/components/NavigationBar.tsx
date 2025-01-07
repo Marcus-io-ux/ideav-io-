@@ -17,20 +17,44 @@ export const NavigationBar = () => {
 
   const handleLogout = async () => {
     try {
-      const { error } = await supabase.auth.signOut();
-      if (error) throw error;
+      // First check if we have a valid session
+      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+      
+      if (sessionError) {
+        console.error('Session error:', sessionError);
+        // If there's no session, just redirect to home
+        navigate("/");
+        return;
+      }
+
+      if (session) {
+        const { error } = await supabase.auth.signOut();
+        if (error) {
+          console.error('Logout error:', error);
+          toast({
+            title: "Error",
+            description: "Failed to log out. Please try again.",
+            variant: "destructive",
+          });
+          return;
+        }
+      }
+
+      // Clear any local state/storage if needed
+      localStorage.removeItem('supabase.auth.token');
       
       toast({
         title: "Logged out successfully",
         description: "You have been logged out of your account",
       });
       
+      // Navigate to home page
       navigate("/");
     } catch (error) {
-      console.error('Error logging out:', error);
+      console.error('Error during logout:', error);
       toast({
         title: "Error",
-        description: "Failed to log out. Please try again.",
+        description: "An unexpected error occurred. Please try again.",
         variant: "destructive",
       });
     }
