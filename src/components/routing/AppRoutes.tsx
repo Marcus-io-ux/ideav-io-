@@ -42,6 +42,7 @@ export const AppRoutes = ({ isAuthenticated }: AppRoutesProps) => {
             isAuthenticated ? <Navigate to="/dashboard" replace /> : <Landing />
           }
         />
+        <Route path="/index" element={<Index />} />
         <Route
           path="/login"
           element={
