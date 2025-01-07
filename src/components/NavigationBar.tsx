@@ -17,15 +17,12 @@ export const NavigationBar = () => {
 
   const handleLogout = async () => {
     try {
-      const { error } = await supabase.auth.signOut();
-      if (error) throw error;
-      
+      await supabase.auth.signOut();
+      navigate("/");
       toast({
         title: "Logged out successfully",
         description: "You have been logged out of your account",
       });
-      
-      navigate("/");
     } catch (error) {
       console.error('Error logging out:', error);
       toast({
