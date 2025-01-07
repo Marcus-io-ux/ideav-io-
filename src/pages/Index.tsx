@@ -2,7 +2,6 @@ import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { ArrowRight, Brain, Lock, Search, LogIn, HelpCircle } from "lucide-react";
 import { TestimonialsCarousel } from "@/components/testimonials/TestimonialsCarousel";
-import { PricingSection } from "@/components/pricing/PricingSection";
 import {
   Accordion,
   AccordionContent,
@@ -89,11 +88,6 @@ const Index = () => {
         {/* Testimonials Section */}
         <div className="w-full mb-16">
           <TestimonialsCarousel />
-        </div>
-
-        {/* Pricing Section */}
-        <div className="mb-16 w-full">
-          <PricingSection />
         </div>
 
         {/* FAQ Section */}
