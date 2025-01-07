@@ -95,12 +95,12 @@ export const IdeaCard = ({
       isDraft={isDraft}
       onClick={() => setIsEditing(true)}
       sharedToCommunity={sharedToCommunity}
-      className="w-full max-w-[400px] min-w-[300px]"
+      className="w-full"
     >
-      <CardHeader className="space-y-2">
+      <CardHeader>
         <div className="flex flex-col space-y-2">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-            <div className="flex items-center gap-2 flex-1 min-w-0">
+            <div className="flex items-center gap-2 flex-1">
               <IdeaCardTitle
                 title={title}
                 isEditing={isEditing}
@@ -110,7 +110,7 @@ export const IdeaCard = ({
                 isDraft={isDraft}
               />
             </div>
-            <div className="flex items-center gap-2 shrink-0">
+            <div className="flex items-center gap-2">
               <IdeaCardMetadata createdAt={createdAt} />
               <IdeaCardSelection
                 isSelected={isSelected}
@@ -127,15 +127,13 @@ export const IdeaCard = ({
         </div>
       </CardHeader>
       <CardContent className="relative pb-16">
-        <div className="break-words">
-          <IdeaCardContent
-            content={content}
-            isEditing={isEditing}
-            editedContent={editedContent}
-            onContentChange={setEditedContent}
-            onKeyDown={handleKeyDown}
-          />
-        </div>
+        <IdeaCardContent
+          content={content}
+          isEditing={isEditing}
+          editedContent={editedContent}
+          onContentChange={setEditedContent}
+          onKeyDown={handleKeyDown}
+        />
         
         <IdeaCardFooter
           isCurrentlyFavorite={isCurrentlyFavorite}
