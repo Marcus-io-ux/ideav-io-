@@ -6,12 +6,14 @@ import { useState } from "react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { useSubscriptionStatus } from "@/hooks/use-subscription-status";
 
 export const NavigationBar = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
   const { toast } = useToast();
+  const { data: isSubscribed } = useSubscriptionStatus();
 
   const handleLogout = async () => {
     try {
@@ -34,14 +36,20 @@ export const NavigationBar = () => {
     }
   };
 
-  const navItems = [
+  const getFreeNavItems = () => [
     { label: "My Ideas", icon: Home, path: "/dashboard" },
-    { label: "Community", icon: Users, path: "/community" },
-    { label: "Inbox", icon: Inbox, path: "/inbox" },
     { label: "Announcements", icon: Bell, path: "/announcements" },
-    { label: "Profile", icon: User, path: "/profile" },
     { label: "Settings", icon: Settings, path: "/settings" },
   ];
+
+  const getProNavItems = () => [
+    ...getFreeNavItems(),
+    { label: "Community", icon: Users, path: "/community" },
+    { label: "Inbox", icon: Inbox, path: "/inbox" },
+    { label: "Profile", icon: User, path: "/profile" },
+  ];
+
+  const navItems = isSubscribed ? getProNavItems() : getFreeNavItems();
 
   return (
     <nav className="sticky top-0 z-50 w-full border-b bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/60">
