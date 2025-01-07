@@ -38,21 +38,14 @@ export const NavigationBar = () => {
     }
   };
 
-  const getFreeNavItems = () => [
+  const navItems = [
     { label: "My Ideas", icon: Home, path: "/dashboard" },
     { label: "Community", icon: Users, path: "/community" },
     { label: "Announcements", icon: Bell, path: "/announcements" },
-    { label: "Settings", icon: Settings, path: "/settings" },
-  ];
-
-  const getProNavItems = () => [
-    ...getFreeNavItems(),
     { label: "Inbox", icon: Inbox, path: "/inbox" },
     { label: "Profile", icon: User, path: "/profile" },
+    { label: "Settings", icon: Settings, path: "/settings" },
   ];
-
-  // Wait for subscription status to load before deciding which nav items to show
-  const navItems = isLoading ? getFreeNavItems() : (isSubscribed ? getProNavItems() : getFreeNavItems());
 
   return (
     <nav className="sticky top-0 z-50 w-full border-b bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/60">
