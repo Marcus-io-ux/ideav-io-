@@ -4,11 +4,12 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Check, Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 
 export const PlanTab = () => {
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
+  const queryClient = useQueryClient();
 
   const { data: currentPlan } = useQuery({
     queryKey: ["user-membership"],
@@ -16,25 +17,27 @@ export const PlanTab = () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error("No user found");
       
-      const { data } = await supabase
+      const { data, error } = await supabase
         .from("user_memberships")
         .select("*, membership_tiers(*)")
-        .eq("user_id", user.id);
+        .eq("user_id", user.id)
+        .maybeSingle();
       
-      // Return the first membership if exists, otherwise null
-      return data?.[0] || null;
+      if (error) throw error;
+      return data;
     },
   });
 
   const { data: availablePlans } = useQuery({
     queryKey: ["membership-tiers"],
     queryFn: async () => {
-      const { data } = await supabase
+      const { data, error } = await supabase
         .from("membership_tiers")
         .select("*")
         .order("price");
       
-      // Ensure features is parsed as an array
+      if (error) throw error;
+      
       return data?.map(plan => ({
         ...plan,
         features: Array.isArray(plan.features) ? plan.features : []
@@ -48,7 +51,6 @@ export const PlanTab = () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error("No user found");
 
-      // In a real app, this would integrate with a payment provider like Stripe
       const { error } = await supabase
         .from("user_memberships")
         .upsert({
@@ -59,11 +61,16 @@ export const PlanTab = () => {
 
       if (error) throw error;
 
+      // Invalidate queries to refresh the data
+      await queryClient.invalidateQueries({ queryKey: ["user-membership"] });
+      await queryClient.invalidateQueries({ queryKey: ["subscription-status"] });
+
       toast({
         title: "Plan updated",
         description: "Your subscription plan has been updated successfully.",
       });
     } catch (error) {
+      console.error("Error upgrading plan:", error);
       toast({
         title: "Error",
         description: "Failed to update plan. Please try again.",
@@ -115,7 +122,14 @@ export const PlanTab = () => {
                 disabled={isLoading || currentPlan?.tier_id === plan.id}
                 onClick={() => handleUpgrade(plan.id)}
               >
-                {currentPlan?.tier_id === plan.id ? "Current Plan" : "Upgrade"}
+                {isLoading ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Updating...
+                  </>
+                ) : (
+                  currentPlan?.tier_id === plan.id ? "Current Plan" : "Upgrade"
+                )}
               </Button>
             </div>
           </Card>
