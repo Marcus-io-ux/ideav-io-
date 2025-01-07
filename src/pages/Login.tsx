@@ -1,7 +1,8 @@
-import { useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
+import { Auth } from "@supabase/auth-ui-react";
+import { ThemeSupa } from "@supabase/auth-ui-shared";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { Button } from "@/components/ui/button";
 import { AuthLogo } from "@/components/auth/AuthLogo";
 import { FAQDialog } from "@/components/auth/FAQDialog";
 import { useEffect } from "react";
@@ -9,111 +10,113 @@ import { AuthError, AuthApiError } from "@supabase/supabase-js";
 
 const Login = () => {
   const { toast } = useToast();
-  const navigate = useNavigate();
 
   useEffect(() => {
-    // Listen for authentication state changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
-      console.log('Auth state changed:', event);
-      
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === 'SIGNED_IN') {
+        console.log('Successfully signed in');
+      } else if (event === 'SIGNED_OUT') {
+        console.log('Successfully signed out');
+      } else if (event === 'USER_UPDATED') {
+        console.log('User updated');
+      }
+    });
+
+    // Set up error handling for sign-in attempts
+    const handleSignInError = (error: AuthError) => {
+      toast({
+        title: "Authentication Error",
+        description: getErrorMessage(error),
+        variant: "destructive",
+      });
+    };
+
+    // Subscribe to auth state changes
+    const authListener = supabase.auth.onAuthStateChange((event, session) => {
       if (event === 'SIGNED_IN' && session?.user) {
-        console.log('User signed in successfully:', session.user.id);
-        navigate('/dashboard');
+        console.log('User signed in successfully');
       }
     });
 
     return () => {
       subscription.unsubscribe();
+      authListener.data.subscription.unsubscribe();
     };
-  }, [navigate]);
+  }, [toast]);
 
-  const handleAuthError = (error: AuthError) => {
-    console.error('Authentication error:', error);
-    
-    let errorMessage = 'An error occurred during authentication.';
-    
+  const getErrorMessage = (error: AuthError) => {
     if (error instanceof AuthApiError) {
       switch (error.message) {
         case 'Invalid login credentials':
-          errorMessage = 'Invalid email or password. Please check your credentials and try again.';
-          break;
+          return 'Invalid email or password. Please check your credentials and try again.';
         case 'Email not confirmed':
-          errorMessage = 'Please verify your email address before signing in.';
-          break;
+          return 'Please verify your email address before signing in.';
         case 'User not found':
-          errorMessage = 'No account found with these credentials.';
-          break;
+          return 'No user found with these credentials.';
         default:
-          errorMessage = error.message;
+          return error.message;
       }
     }
-
-    toast({
-      title: "Authentication Error",
-      description: errorMessage,
-      variant: "destructive",
-    });
+    return error.message;
   };
 
   return (
-    <div className="min-h-screen bg-background flex flex-col">
-      <div className="flex-1 flex flex-col justify-center items-center px-4 sm:px-6 lg:px-8">
-        <AuthLogo />
-        <div className="w-full max-w-sm space-y-6 text-center">
-          <div className="space-y-2">
-            <h1 className="text-2xl font-semibold tracking-tight">
-              Welcome back
-            </h1>
-            <p className="text-sm text-muted-foreground">
-              Sign in to your account to continue
-            </p>
-          </div>
+    <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white">
+      <nav className="container mx-auto px-4 py-6 flex justify-between items-center">
+        <Link 
+          to="/" 
+          className="text-2xl font-bold text-primary hover:opacity-80 transition-opacity"
+        >
+          IdeaVault
+        </Link>
+        <div className="flex gap-4 items-center">
+          <FAQDialog />
+        </div>
+      </nav>
 
-          <div className="space-y-4">
-            <Button
-              variant="outline"
-              className="w-full"
-              onClick={async () => {
-                try {
-                  const { error } = await supabase.auth.signInWithOAuth({
-                    provider: 'github',
-                    options: {
-                      redirectTo: `${window.location.origin}/auth/callback`
-                    }
-                  });
-                  if (error) throw error;
-                } catch (error) {
-                  handleAuthError(error as AuthError);
-                }
-              }}
-            >
-              Continue with GitHub
-            </Button>
-
-            <Button
-              variant="outline"
-              className="w-full"
-              onClick={async () => {
-                try {
-                  const { error } = await supabase.auth.signInWithOAuth({
-                    provider: 'google',
-                    options: {
-                      redirectTo: `${window.location.origin}/auth/callback`
-                    }
-                  });
-                  if (error) throw error;
-                } catch (error) {
-                  handleAuthError(error as AuthError);
-                }
-              }}
-            >
-              Continue with Google
-            </Button>
-          </div>
+      <div className="max-w-md mx-auto px-4 py-12">
+        <div className="text-center mb-8">
+          <AuthLogo />
+          <h2 className="text-3xl font-bold text-gray-900">Welcome Back!</h2>
+          <p className="mt-2 text-sm text-gray-600">
+            Sign in to continue your journey with IdeaVault.
+          </p>
         </div>
 
-        <div className="mt-8">
-          <FAQDialog />
+        <div className="bg-white p-8 rounded-lg shadow-md">
+          <Auth
+            supabaseClient={supabase}
+            appearance={{
+              theme: ThemeSupa,
+              variables: {
+                default: {
+                  colors: {
+                    brand: "rgb(59, 130, 246)", // primary blue color
+                    brandAccent: "rgb(99, 102, 241)", // hover color
+                  },
+                },
+              },
+              className: {
+                container: "space-y-4",
+                button: "w-full bg-primary hover:bg-primary-hover text-white px-4 py-2 rounded-full transition-colors",
+                input: "w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent",
+                label: "block text-sm font-medium text-gray-700 mb-1",
+              },
+            }}
+            providers={[]}
+            redirectTo={`${window.location.origin}/dashboard`}
+          />
+
+          <p className="mt-8 text-center text-sm text-gray-600">
+            Don't have an account?{" "}
+            <Link to="/signup" className="text-primary hover:underline">
+              Sign Up
+            </Link>
+          </p>
+
+          <p className="mt-4 text-center text-xs text-gray-500">
+            Your data is secure and will never be shared.
+          </p>
         </div>
       </div>
     </div>
