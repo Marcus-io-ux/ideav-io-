@@ -101,7 +101,7 @@ export const AppRoutes = ({ isAuthenticated }: AppRoutesProps) => {
         <Route
           path="/community"
           element={
-            <ProtectedRoute isAuthenticated={isAuthenticated} requiresSubscription>
+            <ProtectedRoute isAuthenticated={isAuthenticated}>
               <Community />
             </ProtectedRoute>
           }
