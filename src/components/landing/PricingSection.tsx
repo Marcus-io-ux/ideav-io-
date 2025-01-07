@@ -1,8 +1,8 @@
-import { Check, Award } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { Check, Award } from "lucide-react";
 
 export const PricingSection = () => {
   const { toast } = useToast();
@@ -19,7 +19,6 @@ export const PricingSection = () => {
 
       const { data, error } = await supabase.functions.invoke('create-checkout-session', {
         body: {
-          user,
           priceId: 'your_stripe_price_id', // Replace with your actual Stripe price ID
         },
       });

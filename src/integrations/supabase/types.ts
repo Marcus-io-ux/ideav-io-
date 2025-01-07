@@ -170,6 +170,7 @@ export type Database = {
           id: string
           is_pinned: boolean | null
           likes_count: number | null
+          subscription_required: boolean | null
           tags: string[] | null
           title: string
           updated_at: string | null
@@ -186,6 +187,7 @@ export type Database = {
           id?: string
           is_pinned?: boolean | null
           likes_count?: number | null
+          subscription_required?: boolean | null
           tags?: string[] | null
           title: string
           updated_at?: string | null
@@ -202,6 +204,7 @@ export type Database = {
           id?: string
           is_pinned?: boolean | null
           likes_count?: number | null
+          subscription_required?: boolean | null
           tags?: string[] | null
           title?: string
           updated_at?: string | null
@@ -775,6 +778,12 @@ export type Database = {
           username: string
           avatar_url: string
         }[]
+      }
+      is_subscribed: {
+        Args: {
+          user_id: string
+        }
+        Returns: boolean
       }
       update_collaboration_status: {
         Args: {
