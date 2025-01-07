@@ -1,33 +1,34 @@
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Check } from "lucide-react";
+import { Check, Star } from "lucide-react";
 
 export const PricingSection = () => {
   const plans = [
     {
       name: "Starter",
-      price: "Free",
+      price: "$0",
+      period: "/month",
       description: "Perfect for getting started",
       features: [
-        "Up to 50 ideas",
-        "Basic idea organization",
-        "Community access (read-only)",
-        "Standard support",
+        "Access to basic idea tracking tools",
+        "5 active idea slots",
+        "Community access",
+        "Basic support",
       ],
-      buttonText: "Get Started",
+      buttonText: "Get Started for Free",
       isPopular: false,
     },
     {
       name: "Pro",
       price: "$20",
       period: "/month",
-      description: "Best for active ideators",
+      description: "Best for serious ideators",
       features: [
-        "Unlimited ideas",
-        "Advanced organization tools",
-        "Full community access",
+        "Unlimited idea slots",
+        "Advanced collaboration tools",
+        "Analytics dashboard",
+        "File attachments",
         "Priority support",
-        "Collaboration features",
         "Custom categories",
       ],
       buttonText: "Upgrade to Pro",
@@ -40,10 +41,10 @@ export const PricingSection = () => {
       <div className="container px-4 md:px-6">
         <div className="text-center mb-12">
           <h2 className="text-3xl font-bold tracking-tight mb-4">
-            Simple, Transparent Pricing
+            Choose Your Plan
           </h2>
           <p className="text-muted-foreground max-w-2xl mx-auto">
-            Choose the perfect plan for your needs. No hidden fees.
+            Start for free or unlock all features with our Pro plan. No hidden fees.
           </p>
         </div>
         <div className="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto">
@@ -52,38 +53,41 @@ export const PricingSection = () => {
               key={plan.name}
               className={`relative p-8 ${
                 plan.isPopular
-                  ? "border-primary shadow-lg"
+                  ? "border-primary shadow-lg scale-105 md:scale-110"
                   : "border-border shadow-sm"
               }`}
             >
               {plan.isPopular && (
                 <div className="absolute -top-4 left-1/2 -translate-x-1/2">
-                  <span className="bg-primary text-white text-sm font-medium px-3 py-1 rounded-full">
-                    Most Popular
+                  <span className="bg-primary text-primary-foreground text-sm font-medium px-4 py-1 rounded-full flex items-center gap-1">
+                    <Star className="w-4 h-4" /> Best Value
                   </span>
                 </div>
               )}
               <div className="mb-6">
                 <h3 className="text-2xl font-bold">{plan.name}</h3>
-                <div className="mt-2">
-                  <span className="text-3xl font-bold">{plan.price}</span>
+                <div className="mt-4 flex items-baseline">
+                  <span className="text-4xl font-bold">{plan.price}</span>
                   {plan.period && (
-                    <span className="text-muted-foreground">{plan.period}</span>
+                    <span className="text-muted-foreground ml-1">{plan.period}</span>
                   )}
                 </div>
                 <p className="text-muted-foreground mt-2">{plan.description}</p>
               </div>
-              <ul className="space-y-3 mb-6">
+              <ul className="space-y-4 mb-8">
                 {plan.features.map((feature) => (
-                  <li key={feature} className="flex items-center gap-2">
-                    <Check className="h-4 w-4 text-primary" />
-                    <span>{feature}</span>
+                  <li key={feature} className="flex items-start gap-3">
+                    <Check className="h-5 w-5 text-primary mt-0.5 shrink-0" />
+                    <span className="text-sm">{feature}</span>
                   </li>
                 ))}
               </ul>
               <Button
-                className="w-full"
+                className={`w-full ${
+                  plan.isPopular ? "bg-primary hover:bg-primary-hover" : ""
+                }`}
                 variant={plan.isPopular ? "default" : "outline"}
+                size="lg"
               >
                 {plan.buttonText}
               </Button>
