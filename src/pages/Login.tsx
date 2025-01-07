@@ -1,8 +1,8 @@
+import { useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Auth } from "@supabase/auth-ui-react";
 import { ThemeSupa } from "@supabase/auth-ui-shared";
 import { supabase } from "@/integrations/supabase/client";
-import { useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { AuthError, AuthApiError } from "@supabase/supabase-js";
 
@@ -13,12 +13,40 @@ const Login = () => {
   const from = location.state?.from || '/dashboard';
 
   useEffect(() => {
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+      console.log('Auth state changed:', event);
       if (event === 'SIGNED_IN' && session) {
-        console.log('Successfully signed in');
-        // If user came from pricing, redirect them back there
         if (from === '/pricing') {
-          navigate('/pricing');
+          try {
+            console.log('Creating checkout session...');
+            const { data, error } = await supabase.functions.invoke('create-checkout-session', {
+              body: { 
+                userId: session.user.id,
+                email: session.user.email,
+                returnUrl: window.location.origin + '/dashboard'
+              }
+            });
+
+            if (error) {
+              console.error('Checkout session error:', error);
+              throw error;
+            }
+
+            if (data?.url) {
+              console.log('Redirecting to checkout:', data.url);
+              window.location.href = data.url;
+            } else {
+              throw new Error('No checkout URL received');
+            }
+          } catch (error) {
+            console.error('Error creating checkout session:', error);
+            toast({
+              title: "Error",
+              description: "Failed to start checkout process. Please try again.",
+              variant: "destructive",
+            });
+            navigate('/dashboard');
+          }
         } else {
           navigate('/dashboard');
         }
