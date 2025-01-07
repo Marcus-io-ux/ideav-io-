@@ -44,7 +44,7 @@ serve(async (req) => {
       customer: customer.id,
       line_items: [
         {
-          price: 'price_1QeYAuLL02NvbAdXZ3YondMr', // Replace with your actual price ID from Stripe
+          price: 'price_1QeaLNLL02NvbAdXk91Bohhw',
           quantity: 1,
         },
       ],
