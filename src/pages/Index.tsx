@@ -86,12 +86,14 @@ const Index = () => {
           </div>
         </div>
 
-        {/* Pricing Section */}
-        <PricingSection />
-
         {/* Testimonials Section */}
         <div className="w-full mb-16">
           <TestimonialsCarousel />
+        </div>
+
+        {/* Pricing Section */}
+        <div className="mb-16">
+          <PricingSection />
         </div>
 
         {/* FAQ Section */}
