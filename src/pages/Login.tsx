@@ -6,39 +6,58 @@ import { useToast } from "@/hooks/use-toast";
 import { AuthLogo } from "@/components/auth/AuthLogo";
 import { FAQDialog } from "@/components/auth/FAQDialog";
 import { useEffect } from "react";
-import { AuthError } from "@supabase/supabase-js";
+import { AuthError, AuthApiError } from "@supabase/supabase-js";
 
 const Login = () => {
   const { toast } = useToast();
 
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      if (event === 'USER_UPDATED' || event === 'SIGNED_IN') {
-        const error = session?.error as AuthError | undefined;
-        if (error) {
-          toast({
-            title: "Authentication Error",
-            description: getErrorMessage(error),
-            variant: "destructive",
-          });
-        }
+      if (event === 'SIGNED_IN') {
+        console.log('Successfully signed in');
+      } else if (event === 'SIGNED_OUT') {
+        console.log('Successfully signed out');
+      } else if (event === 'USER_UPDATED') {
+        console.log('User updated');
       }
     });
 
-    return () => subscription.unsubscribe();
+    // Set up error handling for sign-in attempts
+    const handleSignInError = (error: AuthError) => {
+      toast({
+        title: "Authentication Error",
+        description: getErrorMessage(error),
+        variant: "destructive",
+      });
+    };
+
+    // Subscribe to auth state changes
+    const authListener = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === 'SIGNED_IN' && session?.user) {
+        console.log('User signed in successfully');
+      }
+    });
+
+    return () => {
+      subscription.unsubscribe();
+      authListener.data.subscription.unsubscribe();
+    };
   }, [toast]);
 
   const getErrorMessage = (error: AuthError) => {
-    switch (error.message) {
-      case 'Invalid login credentials':
-        return 'Invalid email or password. Please check your credentials and try again.';
-      case 'Email not confirmed':
-        return 'Please verify your email address before signing in.';
-      case 'User not found':
-        return 'No user found with these credentials.';
-      default:
-        return error.message;
+    if (error instanceof AuthApiError) {
+      switch (error.message) {
+        case 'Invalid login credentials':
+          return 'Invalid email or password. Please check your credentials and try again.';
+        case 'Email not confirmed':
+          return 'Please verify your email address before signing in.';
+        case 'User not found':
+          return 'No user found with these credentials.';
+        default:
+          return error.message;
+      }
     }
+    return error.message;
   };
 
   return (
