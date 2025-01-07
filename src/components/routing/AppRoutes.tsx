@@ -2,6 +2,8 @@ import { Routes, Route, Navigate } from "react-router-dom";
 import { NavigationBar } from "@/components/NavigationBar";
 import { useToast } from "@/hooks/use-toast";
 import { ProtectedRoute } from "./ProtectedRoute";
+import { useEffect } from "react";
+import { supabase } from "@/integrations/supabase/client";
 import Index from "@/pages/Index";
 import Dashboard from "@/pages/Dashboard";
 import Landing from "@/pages/Landing";
@@ -23,6 +25,31 @@ interface AppRoutesProps {
 
 export const AppRoutes = ({ isAuthenticated }: AppRoutesProps) => {
   const { toast } = useToast();
+
+  useEffect(() => {
+    // Set up session handling
+    supabase.auth.onAuthStateChange((event, session) => {
+      if (event === 'SIGNED_OUT') {
+        // Clear any auth data from localStorage
+        localStorage.removeItem('supabase.auth.token');
+      }
+    });
+
+    // Initialize session
+    const initSession = async () => {
+      const { data: { session }, error } = await supabase.auth.getSession();
+      if (error) {
+        console.error('Error fetching session:', error);
+        toast({
+          title: "Authentication Error",
+          description: "Please try logging in again",
+          variant: "destructive",
+        });
+      }
+    };
+
+    initSession();
+  }, [toast]);
 
   window.addEventListener('unhandledrejection', (event) => {
     console.error('Unhandled promise rejection:', event.reason);
