@@ -76,7 +76,7 @@ export const useAuthState = (queryClient: QueryClient) => {
     } = supabase.auth.onAuthStateChange(async (event, session) => {
       console.log("Auth state changed:", event, !!session);
       
-      if (event === 'SIGNED_OUT' || event === 'USER_DELETED') {
+      if (event === 'SIGNED_OUT') {
         queryClient.clear();
         setIsAuthenticated(false);
         navigate('/login');
