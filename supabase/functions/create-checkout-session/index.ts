@@ -36,10 +36,6 @@ serve(async (req) => {
 
     const { priceId } = await req.json()
 
-    if (!priceId) {
-      throw new Error('No price ID provided')
-    }
-
     console.log('Creating payment session...')
     const session = await stripe.checkout.sessions.create({
       customer_email: email,
