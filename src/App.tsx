@@ -20,6 +20,7 @@ import Signup from "./pages/Signup";
 import Profile from "./pages/Profile";
 import Community from "./pages/Community";
 import Inbox from "./pages/Inbox";
+import { useToast } from "./hooks/use-toast";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -27,14 +28,35 @@ const queryClient = new QueryClient({
       retry: 1,
       refetchOnWindowFocus: false,
       staleTime: 5 * 60 * 1000, // 5 minutes
+      onError: (error: Error) => {
+        console.error('Query error:', error);
+      },
+    },
+    mutations: {
+      onError: (error: Error) => {
+        console.error('Mutation error:', error);
+      },
     },
   },
 });
 
-const AppRoutes = ({ isAuthenticated }: { isAuthenticated: boolean }) => (
-  <>
-    {isAuthenticated && <NavigationBar />}
-    <Routes>
+const AppRoutes = ({ isAuthenticated }: { isAuthenticated: boolean }) => {
+  const { toast } = useToast();
+
+  // Global error handler for fetch requests
+  window.addEventListener('unhandledrejection', (event) => {
+    console.error('Unhandled promise rejection:', event.reason);
+    toast({
+      title: "Error",
+      description: "An error occurred. Please try again later.",
+      variant: "destructive",
+    });
+  });
+
+  return (
+    <>
+      {isAuthenticated && <NavigationBar />}
+      <Routes>
       <Route
         path="/"
         element={
@@ -123,9 +145,10 @@ const AppRoutes = ({ isAuthenticated }: { isAuthenticated: boolean }) => (
                 )
               }
             />
-    </Routes>
-  </>
-);
+      </Routes>
+    </>
+  );
+};
 
 const App = () => {
   const { isAuthenticated, isLoading } = useAuthState(queryClient);
