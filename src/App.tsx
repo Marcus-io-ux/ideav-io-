@@ -29,7 +29,7 @@ const queryClient = new QueryClient({
   },
 });
 
-const AppContent = () => {
+const App = () => {
   const { isAuthenticated, isLoading } = useAuthState(queryClient);
 
   if (isLoading) {
@@ -37,21 +37,15 @@ const AppContent = () => {
   }
 
   return (
-    <AppRoutes isAuthenticated={isAuthenticated} />
-  );
-};
-
-const App = () => {
-  return (
-    <BrowserRouter>
-      <QueryClientProvider client={queryClient}>
-        <TooltipProvider>
-          <Toaster />
-          <Sonner />
-          <AppContent />
-        </TooltipProvider>
-      </QueryClientProvider>
-    </BrowserRouter>
+    <QueryClientProvider client={queryClient}>
+      <TooltipProvider>
+        <Toaster />
+        <Sonner />
+        <BrowserRouter>
+          <AppRoutes isAuthenticated={isAuthenticated} />
+        </BrowserRouter>
+      </TooltipProvider>
+    </QueryClientProvider>
   );
 };
 
