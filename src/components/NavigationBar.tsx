@@ -40,13 +40,13 @@ export const NavigationBar = () => {
 
   const getFreeNavItems = () => [
     { label: "My Ideas", icon: Home, path: "/dashboard" },
+    { label: "Community", icon: Users, path: "/community" },
     { label: "Announcements", icon: Bell, path: "/announcements" },
     { label: "Settings", icon: Settings, path: "/settings" },
   ];
 
   const getProNavItems = () => [
     ...getFreeNavItems(),
-    { label: "Community", icon: Users, path: "/community" },
     { label: "Inbox", icon: Inbox, path: "/inbox" },
     { label: "Profile", icon: User, path: "/profile" },
   ];
