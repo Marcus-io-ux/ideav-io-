@@ -17,17 +17,21 @@ export const PricingSection = () => {
         return;
       }
 
+      console.log('Creating checkout session...');
       const { data, error } = await supabase.functions.invoke('create-checkout-session', {
-        body: {
-          user,
-          priceId: 'your_stripe_price_id', // Replace with your actual Stripe price ID
-        },
+        body: { user }
       });
 
-      if (error) throw error;
+      if (error) {
+        console.error('Checkout session error:', error);
+        throw error;
+      }
 
       if (data?.url) {
+        console.log('Redirecting to checkout:', data.url);
         window.location.href = data.url;
+      } else {
+        throw new Error('No checkout URL received');
       }
     } catch (error) {
       console.error('Error creating checkout session:', error);
