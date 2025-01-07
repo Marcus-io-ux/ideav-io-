@@ -32,7 +32,7 @@ export const IdeaCardContent = ({
   }
 
   return (
-    <p className="text-muted-foreground whitespace-pre-wrap">
+    <p className="text-muted-foreground break-words overflow-hidden">
       {content}
     </p>
   );
