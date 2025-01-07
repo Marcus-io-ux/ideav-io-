@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Check, Loader2 } from "lucide-react";
+import { Check, Loader2, Lock } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 
@@ -38,9 +38,30 @@ export const PlanTab = () => {
       
       if (error) throw error;
       
+      const defaultFeatures = {
+        free: [
+          "Create up to 50 ideas",
+          "Basic organization",
+          "Community access",
+          "Basic support"
+        ],
+        pro: [
+          "Unlimited ideas",
+          "Advanced organization",
+          "Priority support",
+          "Collaboration features",
+          "Custom tags",
+          "Advanced analytics",
+          "Early access to new features",
+          "No ads"
+        ]
+      };
+
       return data?.map(plan => ({
         ...plan,
-        features: Array.isArray(plan.features) ? plan.features : []
+        features: plan.name.toLowerCase() === 'pro' 
+          ? defaultFeatures.pro 
+          : defaultFeatures.free
       })) || [];
     },
   });
@@ -61,7 +82,6 @@ export const PlanTab = () => {
 
       if (error) throw error;
 
-      // Invalidate queries to refresh the data
       await queryClient.invalidateQueries({ queryKey: ["user-membership"] });
       await queryClient.invalidateQueries({ queryKey: ["subscription-status"] });
 
@@ -100,10 +120,17 @@ export const PlanTab = () => {
 
       <div className="grid md:grid-cols-2 gap-6">
         {availablePlans.map((plan) => (
-          <Card key={plan.id} className="p-6">
+          <Card key={plan.id} className={`p-6 ${plan.name.toLowerCase() === 'pro' ? 'border-primary' : ''}`}>
             <div className="space-y-4">
               <div>
-                <h3 className="text-xl font-semibold">{plan.name}</h3>
+                <div className="flex items-center justify-between">
+                  <h3 className="text-xl font-semibold">{plan.name}</h3>
+                  {plan.name.toLowerCase() === 'pro' && (
+                    <span className="bg-primary text-primary-foreground text-xs px-2 py-1 rounded-full">
+                      Recommended
+                    </span>
+                  )}
+                </div>
                 <p className="text-2xl font-bold">${plan.price}<span className="text-sm text-muted-foreground">/month</span></p>
               </div>
               
