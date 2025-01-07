@@ -75,14 +75,6 @@ export const AppRoutes = ({ isAuthenticated }: AppRoutesProps) => {
           }
         />
         <Route
-          path="/tags"
-          element={
-            <ProtectedRoute isAuthenticated={isAuthenticated} requiresSubscription>
-              <Index />
-            </ProtectedRoute>
-          }
-        />
-        <Route
           path="/settings"
           element={
             <ProtectedRoute isAuthenticated={isAuthenticated}>
