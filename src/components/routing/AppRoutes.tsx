@@ -29,7 +29,7 @@ export const AppRoutes = ({ isAuthenticated }: AppRoutesProps) => {
   useEffect(() => {
     // Set up session handling
     supabase.auth.onAuthStateChange((event, session) => {
-      if (event === 'SIGNED_OUT' || event === 'USER_DELETED') {
+      if (event === 'SIGNED_OUT') {
         // Clear any auth data from localStorage
         localStorage.removeItem('supabase.auth.token');
       }
