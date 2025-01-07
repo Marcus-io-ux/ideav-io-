@@ -3,23 +3,55 @@ import { Button } from "@/components/ui/button";
 import { Link, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { useQuery } from "@tanstack/react-query";
 
 export const PricingSection = () => {
   const { toast } = useToast();
   const navigate = useNavigate();
+
+  // Check if user is already subscribed
+  const { data: isSubscribed } = useQuery({
+    queryKey: ['subscription-status'],
+    queryFn: async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return false;
+
+      const { data } = await supabase
+        .from('user_memberships')
+        .select('*, membership_tiers(name)')
+        .eq('user_id', user.id)
+        .eq('status', 'active')
+        .single();
+
+      return data?.membership_tiers?.name === 'pro';
+    },
+  });
 
   const handleUpgradeClick = async () => {
     try {
       const { data: { user } } = await supabase.auth.getUser();
       
       if (!user) {
-        navigate('/login');
+        navigate('/login', { state: { from: '/pricing' } });
+        return;
+      }
+
+      // If already subscribed, show message
+      if (isSubscribed) {
+        toast({
+          title: "Already Subscribed",
+          description: "You are already subscribed to the Pro plan.",
+        });
         return;
       }
 
       console.log('Creating checkout session...');
       const { data, error } = await supabase.functions.invoke('create-checkout-session', {
-        body: { user }
+        body: { 
+          userId: user.id,
+          email: user.email,
+          returnUrl: window.location.origin + '/dashboard'
+        }
       });
 
       if (error) {
@@ -85,38 +117,37 @@ export const PricingSection = () => {
           </Link>
         </div>
 
-        {/* Pro Plan */}
-        <div className="bg-white/70 backdrop-blur-sm p-8 rounded-xl border-2 border-blue-200 shadow-xl hover:shadow-2xl transition-all duration-300 relative">
-          <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-4 py-1 rounded-full flex items-center gap-1">
-            <Award className="w-4 h-4" />
-            <span className="text-sm font-medium">Best Value</span>
-          </div>
-          <h3 className="text-2xl font-bold mb-4 text-blue-900">Pro</h3>
-          <div className="mb-6">
-            <span className="text-4xl font-bold text-blue-600">$10</span>
-            <span className="text-blue-600/60">/month</span>
-          </div>
-          <ul className="space-y-4 mb-8">
-            {[
-              "Unlimited personal idea storage",
-              "Share ideas with the community for feedback",
-              "Collaborate with up to 5 users per idea",
-              "Priority support for Pro members",
-            ].map((feature) => (
-              <li key={feature} className="flex items-center gap-3">
-                <Check className="w-5 h-5 text-blue-500" />
-                <span className="text-blue-600/80">{feature}</span>
-              </li>
-            ))}
-          </ul>
-          <Button
-            size="lg"
-            className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white py-6 text-lg"
-            onClick={handleUpgradeClick}
-          >
-            Upgrade to Pro
-          </Button>
+      {/* Pro Plan */}
+      <div className="bg-white/70 backdrop-blur-sm p-8 rounded-xl border-2 border-blue-200 shadow-xl hover:shadow-2xl transition-all duration-300 relative">
+        <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-4 py-1 rounded-full flex items-center gap-1">
+          <Award className="w-4 h-4" />
+          <span className="text-sm font-medium">Best Value</span>
         </div>
+        <h3 className="text-2xl font-bold mb-4 text-blue-900">Pro</h3>
+        <div className="mb-6">
+          <span className="text-4xl font-bold text-blue-600">$10</span>
+          <span className="text-blue-600/60">/month</span>
+        </div>
+        <ul className="space-y-4 mb-8">
+          {[
+            "Unlimited personal idea storage",
+            "Share ideas with the community for feedback",
+            "Collaborate with up to 5 users per idea",
+            "Priority support for Pro members",
+          ].map((feature) => (
+            <li key={feature} className="flex items-center gap-3">
+              <Check className="w-5 h-5 text-blue-500" />
+              <span className="text-blue-600/80">{feature}</span>
+            </li>
+          ))}
+        </ul>
+        <Button
+          size="lg"
+          className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white py-6 text-lg"
+          onClick={handleUpgradeClick}
+        >
+          {isSubscribed ? 'Already Subscribed' : 'Upgrade to Pro'}
+        </Button>
       </div>
 
       <div className="mt-12 text-center space-y-4">
