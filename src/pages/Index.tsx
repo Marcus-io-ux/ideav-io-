@@ -2,6 +2,7 @@ import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { ArrowRight, Brain, Lock, Search, LogIn, HelpCircle } from "lucide-react";
 import { TestimonialsCarousel } from "@/components/testimonials/TestimonialsCarousel";
+import { PricingSection } from "@/components/pricing/PricingSection";
 import {
   Accordion,
   AccordionContent,
@@ -84,6 +85,9 @@ const Index = () => {
             </p>
           </div>
         </div>
+
+        {/* Pricing Section */}
+        <PricingSection />
 
         {/* Testimonials Section */}
         <div className="w-full mb-16">
