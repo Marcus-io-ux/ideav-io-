@@ -16,11 +16,9 @@ import Features from "@/pages/Features";
 import Pricing from "@/pages/Pricing";
 import Announcements from "@/pages/Announcements";
 
-interface AppRoutesProps {
-  isAuthenticated: boolean;
-}
+export const AppRoutes = () => {
+  const { isAuthenticated, isLoading, user } = useAuthState();
 
-export const AppRoutes = ({ isAuthenticated }: AppRoutesProps) => {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
