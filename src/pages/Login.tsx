@@ -22,11 +22,25 @@ const Login = () => {
         } else {
           navigate('/dashboard');
         }
+      } else if (event === 'SIGNED_OUT') {
+        console.log('Signed out');
+      } else if (event === 'USER_UPDATED') {
+        console.log('User updated');
+        // Check for any auth errors
+        supabase.auth.getSession().then(({ error }) => {
+          if (error) {
+            toast({
+              title: "Error",
+              description: getErrorMessage(error),
+              variant: "destructive",
+            });
+          }
+        });
       }
     });
 
     return () => subscription.unsubscribe();
-  }, [navigate, from]);
+  }, [navigate, from, toast]);
 
   const getErrorMessage = (error: AuthError) => {
     if (error instanceof AuthApiError) {
@@ -79,13 +93,6 @@ const Login = () => {
             }}
             providers={[]}
             redirectTo={`${window.location.origin}${from}`}
-            onError={(error) => {
-              toast({
-                title: "Error",
-                description: getErrorMessage(error),
-                variant: "destructive",
-              });
-            }}
           />
 
           <p className="mt-4 text-center text-xs text-gray-500">
