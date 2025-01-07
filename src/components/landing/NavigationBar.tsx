@@ -11,7 +11,7 @@ export const NavigationBar = () => {
     const element = document.querySelector(`.${sectionId}`);
     if (element) {
       element.scrollIntoView({ behavior: 'smooth' });
-      setIsOpen(false); // Close mobile menu after clicking
+      setIsOpen(false);
     }
   };
 
@@ -21,47 +21,47 @@ export const NavigationBar = () => {
         <div className="flex items-center justify-between">
           <Link 
             to="/" 
-            className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary to-primary-light hover:opacity-80 transition-opacity"
+            className="text-xl sm:text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary to-primary-light hover:opacity-80 transition-opacity"
           >
             IdeaVault
           </Link>
 
           {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center space-x-8">
+          <div className="hidden md:flex items-center space-x-6 lg:space-x-8">
             <button 
               onClick={() => scrollToSection('how-it-works')}
-              className="text-gray-600 hover:text-primary transition-colors"
+              className="text-gray-600 hover:text-primary transition-colors text-sm lg:text-base"
             >
               How it Works
             </button>
             <button 
               onClick={() => scrollToSection('about-us')}
-              className="text-gray-600 hover:text-primary transition-colors"
+              className="text-gray-600 hover:text-primary transition-colors text-sm lg:text-base"
             >
               About Us
             </button>
             <button 
               onClick={() => scrollToSection('community')}
-              className="text-gray-600 hover:text-primary transition-colors"
+              className="text-gray-600 hover:text-primary transition-colors text-sm lg:text-base"
             >
               Community
             </button>
             <button 
               onClick={() => scrollToSection('pricing-section')}
-              className="text-gray-600 hover:text-primary transition-colors"
+              className="text-gray-600 hover:text-primary transition-colors text-sm lg:text-base"
             >
               Pricing
             </button>
             <button 
               onClick={() => scrollToSection('faq-section')}
-              className="text-gray-600 hover:text-primary transition-colors"
+              className="text-gray-600 hover:text-primary transition-colors text-sm lg:text-base"
             >
               FAQ
             </button>
             <Button 
               asChild
               size="sm"
-              className="bg-primary hover:bg-primary-hover text-white px-6 rounded-full shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-300"
+              className="bg-primary hover:bg-primary-hover text-white px-4 lg:px-6 rounded-full shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-300"
             >
               <Link to="/login">Login</Link>
             </Button>
