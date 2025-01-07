@@ -31,29 +31,22 @@ export const useAuthState = (queryClient: QueryClient) => {
       }
     };
 
-    // Initial session check
     checkSession();
 
-    // Set up auth state change listener
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(async (event, session) => {
       console.log("Auth state changed:", event, !!session);
       
       if (event === 'SIGNED_OUT') {
-        // Clear session data
-        localStorage.removeItem('supabase.auth.token');
         queryClient.clear();
         setIsAuthenticated(false);
-      } else if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
-        // Validate session
-        const { data: { session: currentSession }, error } = await supabase.auth.getSession();
-        if (error) {
-          console.error("Session validation error:", error);
-          setIsAuthenticated(false);
-        } else {
-          setIsAuthenticated(!!currentSession);
-        }
+      } else if (event === 'SIGNED_IN') {
+        setIsAuthenticated(true);
+      } else if (event === 'TOKEN_REFRESHED') {
+        console.log('Token refreshed successfully');
+      } else if (event === 'USER_UPDATED') {
+        setIsAuthenticated(!!session);
       }
     });
 
