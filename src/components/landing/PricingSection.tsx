@@ -4,10 +4,22 @@ import { Link, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useQuery } from "@tanstack/react-query";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import { useState } from "react";
 
 export const PricingSection = () => {
   const { toast } = useToast();
   const navigate = useNavigate();
+  const [showSubscribeDialog, setShowSubscribeDialog] = useState(false);
 
   // Check if user is already subscribed
   const { data: isSubscribed } = useQuery({
@@ -21,27 +33,38 @@ export const PricingSection = () => {
         .select('*, membership_tiers(name)')
         .eq('user_id', user.id)
         .eq('status', 'active')
-        .maybeSingle();  // Changed from .single() to .maybeSingle()
+        .maybeSingle();
 
       return data?.membership_tiers?.name === 'pro';
     },
   });
 
   const handleUpgradeClick = async () => {
+    const { data: { user } } = await supabase.auth.getUser();
+      
+    if (!user) {
+      navigate('/login', { state: { from: '/pricing' } });
+      return;
+    }
+
+    // If already subscribed, show message
+    if (isSubscribed) {
+      toast({
+        title: "Already Subscribed",
+        description: "You are already subscribed to the Pro plan.",
+      });
+      return;
+    }
+
+    setShowSubscribeDialog(true);
+  };
+
+  const handleSubscribeConfirm = async () => {
     try {
       const { data: { user } } = await supabase.auth.getUser();
       
       if (!user) {
         navigate('/login', { state: { from: '/pricing' } });
-        return;
-      }
-
-      // If already subscribed, show message
-      if (isSubscribed) {
-        toast({
-          title: "Already Subscribed",
-          description: "You are already subscribed to the Pro plan.",
-        });
         return;
       }
 
@@ -160,6 +183,23 @@ export const PricingSection = () => {
           <p className="text-blue-600/70 mt-2">– Michael, Innovator</p>
         </div>
       </div>
+
+      <AlertDialog open={showSubscribeDialog} onOpenChange={setShowSubscribeDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Subscribe to IdeaVault Pro</AlertDialogTitle>
+            <AlertDialogDescription>
+              You're about to upgrade to our Pro plan for $10/month. Get ready to unlock unlimited storage, community sharing, and collaboration features!
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleSubscribeConfirm}>
+              Subscribe Now
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </section>
   );
 };
