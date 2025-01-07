@@ -93,7 +93,7 @@ export const AppRoutes = ({ isAuthenticated }: AppRoutesProps) => {
         <Route
           path="/profile"
           element={
-            <ProtectedRoute isAuthenticated={isAuthenticated} requiresSubscription>
+            <ProtectedRoute isAuthenticated={isAuthenticated}>
               <Profile />
             </ProtectedRoute>
           }
@@ -109,7 +109,7 @@ export const AppRoutes = ({ isAuthenticated }: AppRoutesProps) => {
         <Route
           path="/inbox"
           element={
-            <ProtectedRoute isAuthenticated={isAuthenticated} requiresSubscription>
+            <ProtectedRoute isAuthenticated={isAuthenticated}>
               <Inbox />
             </ProtectedRoute>
           }
