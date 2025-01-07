@@ -57,7 +57,11 @@ export const PlanTab = () => {
         ]
       };
 
-      return data?.map(plan => ({
+      // Filter to only include Free and Pro plans
+      return data?.filter(plan => 
+        plan.name.toLowerCase() === 'free' || 
+        plan.name.toLowerCase() === 'pro'
+      ).map(plan => ({
         ...plan,
         features: plan.name.toLowerCase() === 'pro' 
           ? defaultFeatures.pro 
