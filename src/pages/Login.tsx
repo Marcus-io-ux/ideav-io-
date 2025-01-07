@@ -3,10 +3,43 @@ import { Auth } from "@supabase/auth-ui-react";
 import { ThemeSupa } from "@supabase/auth-ui-shared";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { AuthLogo } from "@/components/auth/AuthLogo";
 import { FAQDialog } from "@/components/auth/FAQDialog";
+import { useEffect } from "react";
+import { AuthError } from "@supabase/supabase-js";
 
 const Login = () => {
   const { toast } = useToast();
+
+  useEffect(() => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === 'USER_UPDATED' || event === 'SIGNED_IN') {
+        const error = session?.error as AuthError | undefined;
+        if (error) {
+          toast({
+            title: "Authentication Error",
+            description: getErrorMessage(error),
+            variant: "destructive",
+          });
+        }
+      }
+    });
+
+    return () => subscription.unsubscribe();
+  }, [toast]);
+
+  const getErrorMessage = (error: AuthError) => {
+    switch (error.message) {
+      case 'Invalid login credentials':
+        return 'Invalid email or password. Please check your credentials and try again.';
+      case 'Email not confirmed':
+        return 'Please verify your email address before signing in.';
+      case 'User not found':
+        return 'No user found with these credentials.';
+      default:
+        return error.message;
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white">
@@ -24,6 +57,7 @@ const Login = () => {
 
       <div className="max-w-md mx-auto px-4 py-12">
         <div className="text-center mb-8">
+          <AuthLogo />
           <h2 className="text-3xl font-bold text-gray-900">Welcome Back!</h2>
           <p className="mt-2 text-sm text-gray-600">
             Sign in to continue your journey with IdeaVault.
@@ -52,18 +86,6 @@ const Login = () => {
             }}
             providers={[]}
             redirectTo={`${window.location.origin}/dashboard`}
-            localization={{
-              variables: {
-                sign_in: {
-                  email_label: "Email address",
-                  password_label: "Password",
-                  button_label: "Sign in",
-                  loading_button_label: "Signing in...",
-                  social_provider_text: "Sign in with {{provider}}",
-                  link_text: "Already have an account? Sign in",
-                },
-              },
-            }}
           />
 
           <p className="mt-8 text-center text-sm text-gray-600">
