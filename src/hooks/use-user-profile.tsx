@@ -10,27 +10,18 @@ export const useUserProfile = () => {
       if (!user) return;
 
       let { data: profile, error } = await supabase
-        .from('onboarding_data')
-        .select('full_name')
+        .from('profiles')
+        .select('username')
         .eq('user_id', user.id)
-        .maybeSingle();
+        .single();
 
-      if (!profile) {
-        const { data: newProfile, error: insertError } = await supabase
-          .from('onboarding_data')
-          .insert([{ 
-            user_id: user.id,
-            full_name: user.email?.split('@')[0] || 'User'
-          }])
-          .select('full_name')
-          .single();
+      if (error) throw error;
 
-        if (insertError) throw insertError;
-        profile = newProfile;
-      }
-
-      if (profile?.full_name) {
-        setUserName(profile.full_name.split(' ')[0]);
+      if (profile?.username) {
+        setUserName(profile.username);
+      } else {
+        // Fallback to email username if no profile username is set
+        setUserName(user.email?.split('@')[0] || 'User');
       }
     } catch (error) {
       console.error('Error fetching user profile:', error);
