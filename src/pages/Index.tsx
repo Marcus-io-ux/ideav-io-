@@ -92,9 +92,7 @@ const Index = () => {
         </div>
 
         {/* Pricing Section */}
-        <div className="mb-16">
-          <PricingSection />
-        </div>
+        <PricingSection />
 
         {/* FAQ Section */}
         <div id="faq-section" className="max-w-3xl mx-auto mb-16 scroll-mt-20">
