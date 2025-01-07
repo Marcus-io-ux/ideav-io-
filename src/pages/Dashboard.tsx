@@ -4,11 +4,12 @@ import { FeedbackButton } from "@/components/feedback/FeedbackButton";
 import { FeedbackModal } from "@/components/feedback/FeedbackModal";
 import { DashboardTutorial } from "@/components/dashboard/DashboardTutorial";
 import { useUserProfile } from "@/hooks/use-user-profile";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { IdeasGrid } from "@/components/dashboard/IdeasGrid";
 import { DashboardActionsBar } from "@/components/dashboard/DashboardActionsBar";
+import { useNavigate } from "react-router-dom";
 
 const Dashboard = () => {
   const [isFeedbackModalOpen, setIsFeedbackModalOpen] = useState(false);
@@ -18,31 +19,37 @@ const Dashboard = () => {
   const [showDrafts, setShowDrafts] = useState(false);
   const { userName } = useUserProfile();
   const { toast } = useToast();
-  const queryClient = useQueryClient();
+  const navigate = useNavigate();
 
+  // Check session and fetch ideas
   const { data: ideasData = [], isLoading } = useQuery({
     queryKey: ["my-ideas", showFavorites, showDrafts],
     queryFn: async () => {
       try {
-        const { data: { user } } = await supabase.auth.getUser();
-        if (!user) {
-          toast({
-            title: "Authentication required",
-            description: "Please sign in to view your ideas",
-            variant: "destructive",
-          });
-          throw new Error("No user found");
+        const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+        
+        if (sessionError) {
+          console.error('Session error:', sessionError);
+          navigate('/login');
+          return [];
+        }
+
+        if (!session?.user) {
+          console.log('No session found, redirecting to login');
+          navigate('/login');
+          return [];
         }
 
         const { data: ideas, error: ideasError } = await supabase
           .from("ideas")
           .select("*")
-          .eq("user_id", user.id)
+          .eq("user_id", session.user.id)
           .eq("deleted", false)
           .eq("is_draft", showDrafts)
           .order("created_at", { ascending: false });
 
         if (ideasError) {
+          console.error('Error fetching ideas:', ideasError);
           toast({
             title: "Error loading ideas",
             description: ideasError.message,
@@ -55,10 +62,11 @@ const Dashboard = () => {
           const { data: favorites, error: favoritesError } = await supabase
             .from("favorites")
             .select("idea_id")
-            .eq("user_id", user.id)
+            .eq("user_id", session.user.id)
             .eq("item_type", "idea");
 
           if (favoritesError) {
+            console.error('Error fetching favorites:', favoritesError);
             toast({
               title: "Error loading favorites",
               description: favoritesError.message,
@@ -80,10 +88,11 @@ const Dashboard = () => {
         const { data: favorites, error: favoritesError } = await supabase
           .from("favorites")
           .select("idea_id")
-          .eq("user_id", user.id)
+          .eq("user_id", session.user.id)
           .eq("item_type", "idea");
 
         if (favoritesError) {
+          console.error('Error fetching favorites:', favoritesError);
           toast({
             title: "Error loading favorites",
             description: favoritesError.message,
@@ -100,7 +109,7 @@ const Dashboard = () => {
           isFavorite: favoriteIdeaIds.has(idea.id)
         }));
       } catch (error: any) {
-        console.error('Error fetching ideas:', error);
+        console.error('Error in query function:', error);
         toast({
           title: "Error",
           description: error.message || "Failed to load ideas",
@@ -122,8 +131,6 @@ const Dashboard = () => {
 
       if (error) throw error;
 
-      await queryClient.invalidateQueries({ queryKey: ["my-ideas"] });
-      
       toast({
         title: "Success",
         description: "Idea moved to trash",
@@ -138,8 +145,7 @@ const Dashboard = () => {
     }
   };
 
-  const handleIdeaSubmit = async () => {
-    await queryClient.invalidateQueries({ queryKey: ["my-ideas"] });
+  const handleIdeaSubmit = () => {
     toast({
       title: "Success",
       description: "Your idea has been created successfully!",
