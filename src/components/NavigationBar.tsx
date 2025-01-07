@@ -13,7 +13,9 @@ export const NavigationBar = () => {
   const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
   const { toast } = useToast();
-  const { data: isSubscribed } = useSubscriptionStatus();
+  const { data: isSubscribed, isLoading } = useSubscriptionStatus();
+
+  console.log("Subscription status:", { isSubscribed, isLoading }); // Debug log
 
   const handleLogout = async () => {
     try {
@@ -49,7 +51,8 @@ export const NavigationBar = () => {
     { label: "Profile", icon: User, path: "/profile" },
   ];
 
-  const navItems = isSubscribed ? getProNavItems() : getFreeNavItems();
+  // Wait for subscription status to load before deciding which nav items to show
+  const navItems = isLoading ? getFreeNavItems() : (isSubscribed ? getProNavItems() : getFreeNavItems());
 
   return (
     <nav className="sticky top-0 z-50 w-full border-b bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/60">
