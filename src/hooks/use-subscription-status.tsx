@@ -13,14 +13,10 @@ export const useSubscriptionStatus = () => {
         .select("*, membership_tiers(name)")
         .eq("user_id", user.id)
         .eq("status", "active")
-        .maybeSingle();
+        .single();
 
-      if (error) {
-        console.error("Error fetching subscription status:", error);
-        return false;
-      }
-
-      return data?.membership_tiers?.name === "pro";
+      if (error || !data) return false;
+      return data.membership_tiers?.name === "pro";
     },
   });
 };
