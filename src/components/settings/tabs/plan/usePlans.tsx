@@ -1,17 +1,6 @@
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
-import { useToast } from "@
-
-The error occurs because the `status` property is not directly available on the `FunctionsResponse` type from Supabase. Let's fix this by accessing the status code correctly from the error object.
-
-<lov-code>
-Let's update the `usePlans.tsx` file to correctly handle the status code:
-
-<lov-write file_path="src/components/settings/tabs/plan/usePlans.tsx">
-import { supabase } from "@/integrations/supabase/client";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 
 export const usePlans = () => {
@@ -51,21 +40,19 @@ export const usePlans = () => {
       
       const planFeatures = {
         basic: [
-          "Save up to 50 ideas in your personal vault",
-          "Categorize and sort your ideas using folders and tags",
-          "Participate in community discussions",
-          "Mobile-friendly dashboard access",
-          "Basic analytics and monthly metrics"
+          "Create up to 50 ideas",
+          "Basic organization",
+          "Community access",
+          "Basic support",
+          "Basic analytics"
         ],
         pro: [
-          "Unlimited idea storage",
-          "Advanced AI-powered organization",
-          "Priority community features",
-          "24/7 priority support",
-          "Advanced analytics & insights",
-          "Custom tags & categories",
-          "Advanced idea validation tools",
-          "Priority feature access"
+          "Unlimited ideas",
+          "Advanced organization",
+          "Priority support",
+          "Collaboration features",
+          "Advanced analytics",
+          "Custom tags"
         ]
       };
 
