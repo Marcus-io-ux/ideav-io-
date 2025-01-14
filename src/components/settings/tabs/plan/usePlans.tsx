@@ -1,12 +1,11 @@
 import { supabase } from "@/integrations/supabase/client";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 
 export const usePlans = () => {
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
-  const queryClient = useQueryClient();
 
   const { data: currentPlan } = useQuery({
     queryKey: ["user-membership"],
@@ -14,16 +13,17 @@ export const usePlans = () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error("No user found");
       
-      // Changed from maybeSingle to select all active memberships
+      // Get all active memberships and order by creation date
       const { data, error } = await supabase
         .from("user_memberships")
         .select("*, membership_tiers(*)")
         .eq("user_id", user.id)
-        .eq("status", "active");
+        .eq("status", "active")
+        .order('created_at', { ascending: false });
       
       if (error) throw error;
       
-      // Return the most recent active membership if multiple exist
+      // Return the most recent active membership
       return data && data.length > 0 ? data[0] : null;
     },
   });
@@ -85,18 +85,15 @@ export const usePlans = () => {
 
       if (error) throw error;
 
-      await queryClient.invalidateQueries({ queryKey: ["user-membership"] });
-      await queryClient.invalidateQueries({ queryKey: ["subscription-status"] });
-
       toast({
-        title: "Plan updated",
-        description: "Your subscription plan has been updated successfully.",
+        title: "Success",
+        description: "Your subscription has been updated.",
       });
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error upgrading plan:", error);
       toast({
         title: "Error",
-        description: "Failed to update plan. Please try again.",
+        description: error.message || "Failed to upgrade plan",
         variant: "destructive",
       });
     } finally {
