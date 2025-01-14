@@ -76,7 +76,7 @@ export const AboutUsSection = () => {
             className="bg-primary hover:bg-primary-hover text-white px-8 py-6 text-lg rounded-full 
                      shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-300"
           >
-            <Link to="/signup">Get Started for Free</Link>
+            <Link to="/signup">Get Started</Link>
           </Button>
         </div>
       </div>
