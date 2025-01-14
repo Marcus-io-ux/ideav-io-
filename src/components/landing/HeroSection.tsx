@@ -64,7 +64,7 @@ export const HeroSection = () => {
                 className="bg-blue-600 hover:bg-blue-700 text-white px-6 sm:px-8 py-4 sm:py-6 rounded-full 
                          shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-300"
               >
-                Get Started for Free
+                Get Started
                 <ArrowRight className="ml-2 w-4 h-4 sm:w-5 sm:h-5" />
               </Button>
             </Link>

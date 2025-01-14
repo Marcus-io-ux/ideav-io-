@@ -135,7 +135,7 @@ export const PricingSection = () => {
               size="lg"
               className="w-full py-6 text-lg border-blue-200 hover:bg-blue-50 text-blue-600"
             >
-              Start for Free
+              Get Started
             </Button>
           </Link>
         </div>
