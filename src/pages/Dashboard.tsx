@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { PageHeader } from "@/components/ui/page-header";
 import { FeedbackButton } from "@/components/feedback/FeedbackButton";
 import { FeedbackModal } from "@/components/feedback/FeedbackModal";
@@ -13,13 +13,21 @@ import { useDashboardIdeas } from "@/hooks/use-dashboard-ideas";
 const Dashboard = () => {
   const [isFeedbackModalOpen, setIsFeedbackModalOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
-  const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
+  const [viewMode, setViewMode] = useState<"grid" | "list">(() => {
+    // Initialize from localStorage, default to "grid" if not set
+    return (localStorage.getItem("ideasViewMode") as "grid" | "list") || "grid";
+  });
   const [showFavorites, setShowFavorites] = useState(false);
   const [showDrafts, setShowDrafts] = useState(false);
   const { userName } = useUserProfile();
   const { toast } = useToast();
 
   const { data: ideasData = [], isLoading } = useDashboardIdeas(showFavorites, showDrafts);
+
+  // Save view mode to localStorage whenever it changes
+  useEffect(() => {
+    localStorage.setItem("ideasViewMode", viewMode);
+  }, [viewMode]);
 
   const handleDeleteIdea = async (id: string) => {
     try {
