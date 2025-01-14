@@ -1,4 +1,4 @@
-import { Check, Award } from "lucide-react";
+import { Check, Award, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -47,7 +47,6 @@ export const PricingSection = () => {
       return;
     }
 
-    // If already subscribed, show message
     if (isSubscribed) {
       toast({
         title: "Already Subscribed",
@@ -68,7 +67,6 @@ export const PricingSection = () => {
         return;
       }
 
-      console.log('Creating checkout session...');
       const { data, error } = await supabase.functions.invoke('create-checkout-session', {
         body: { 
           userId: user.id,
@@ -77,13 +75,9 @@ export const PricingSection = () => {
         }
       });
 
-      if (error) {
-        console.error('Checkout session error:', error);
-        throw error;
-      }
+      if (error) throw error;
 
       if (data?.url) {
-        console.log('Redirecting to checkout:', data.url);
         window.location.href = data.url;
       } else {
         throw new Error('No checkout URL received');
@@ -99,29 +93,35 @@ export const PricingSection = () => {
   };
 
   return (
-    <section className="py-24 bg-gradient-to-br from-blue-50 to-indigo-50 pricing-section">
+    <section className="py-24 bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
       <div className="text-center mb-16">
-        <h2 className="text-4xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-indigo-500">
-          Choose Your Plan. Start Building Today.
+        <h2 className="text-4xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-purple-600">
+          Unlock Your Creative Potential
         </h2>
         <p className="text-xl text-blue-600/80 max-w-3xl mx-auto">
-          Save your ideas for free or unlock powerful tools to share, collaborate, and bring your ideas to life.
+          Choose the perfect plan to organize, develop, and bring your ideas to life.
         </p>
       </div>
 
       <div className="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto px-4">
-        {/* Starter Plan */}
+        {/* Basic Plan */}
         <div className="bg-white/70 backdrop-blur-sm p-8 rounded-xl border border-blue-100 hover:border-blue-200 transition-all duration-300 hover:shadow-lg">
-          <h3 className="text-2xl font-bold mb-4 text-blue-900">Starter</h3>
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-2xl font-bold text-blue-900">Basic</h3>
+            <Sparkles className="w-6 h-6 text-blue-500" />
+          </div>
           <div className="mb-6">
-            <span className="text-4xl font-bold text-blue-600">$0</span>
+            <span className="text-4xl font-bold text-blue-600">$19.99</span>
             <span className="text-blue-600/60">/month</span>
           </div>
           <ul className="space-y-4 mb-8">
             {[
-              "Save up to 10 personal ideas",
-              "Access your private vault",
-              "Browse and explore community ideas",
+              "Store up to 100 ideas",
+              "Basic idea organization",
+              "Community access",
+              "Email support",
+              "Mobile app access",
+              "Basic analytics"
             ].map((feature) => (
               <li key={feature} className="flex items-center gap-3">
                 <Check className="w-5 h-5 text-blue-500" />
@@ -141,32 +141,40 @@ export const PricingSection = () => {
         </div>
 
         {/* Pro Plan */}
-        <div className="bg-white/70 backdrop-blur-sm p-8 rounded-xl border-2 border-blue-200 shadow-xl hover:shadow-2xl transition-all duration-300 relative">
-          <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-4 py-1 rounded-full flex items-center gap-1">
+        <div className="bg-white/70 backdrop-blur-sm p-8 rounded-xl border-2 border-purple-200 shadow-xl hover:shadow-2xl transition-all duration-300 relative">
+          <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 bg-gradient-to-r from-blue-600 to-purple-600 text-white px-4 py-1 rounded-full flex items-center gap-1">
             <Award className="w-4 h-4" />
-            <span className="text-sm font-medium">Best Value</span>
+            <span className="text-sm font-medium">Most Popular</span>
           </div>
-          <h3 className="text-2xl font-bold mb-4 text-blue-900">Pro</h3>
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-2xl font-bold text-purple-900">Pro</h3>
+            <Award className="w-6 h-6 text-purple-500" />
+          </div>
           <div className="mb-6">
-            <span className="text-4xl font-bold text-blue-600">$10</span>
-            <span className="text-blue-600/60">/month</span>
+            <span className="text-4xl font-bold text-purple-600">$49.99</span>
+            <span className="text-purple-600/60">/month</span>
           </div>
           <ul className="space-y-4 mb-8">
             {[
-              "Unlimited personal idea storage",
-              "Share ideas with the community for feedback",
-              "Collaborate with up to 5 users per idea",
-              "Priority support for Pro members",
+              "Unlimited idea storage",
+              "Advanced organization tools",
+              "Priority community features",
+              "24/7 priority support",
+              "Advanced analytics & insights",
+              "Custom tags & categories",
+              "Team collaboration tools",
+              "API access",
+              "Custom integrations"
             ].map((feature) => (
               <li key={feature} className="flex items-center gap-3">
-                <Check className="w-5 h-5 text-blue-500" />
-                <span className="text-blue-600/80">{feature}</span>
+                <Check className="w-5 h-5 text-purple-500" />
+                <span className="text-purple-600/80">{feature}</span>
               </li>
             ))}
           </ul>
           <Button
             size="lg"
-            className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white py-6 text-lg"
+            className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white py-6 text-lg"
             onClick={handleUpgradeClick}
           >
             {isSubscribed ? 'Already Subscribed' : 'Upgrade to Pro'}
@@ -175,27 +183,27 @@ export const PricingSection = () => {
       </div>
 
       <div className="mt-12 text-center space-y-4">
-        <p className="text-blue-600/80">No credit card required for Starter Plan • Upgrade anytime, risk-free</p>
-        <div className="max-w-2xl mx-auto bg-blue-50/50 backdrop-blur-sm p-6 rounded-lg">
-          <p className="text-blue-600/90 italic">
-            "Pro helped me collaborate and launch my ideas faster than ever!"
+        <p className="text-blue-600/80">30-day money-back guarantee • Cancel anytime • No hidden fees</p>
+        <div className="max-w-2xl mx-auto bg-white/50 backdrop-blur-sm p-6 rounded-lg border border-purple-100">
+          <p className="text-purple-600/90 italic text-lg">
+            "IdeaVault Pro transformed how I manage my creative projects. The collaboration features are game-changing!"
           </p>
-          <p className="text-blue-600/70 mt-2">– Michael, Innovator</p>
+          <p className="text-purple-600/70 mt-2">– Sarah Chen, Product Designer</p>
         </div>
       </div>
 
       <AlertDialog open={showSubscribeDialog} onOpenChange={setShowSubscribeDialog}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Subscribe to IdeaVault Pro</AlertDialogTitle>
+            <AlertDialogTitle>Upgrade to IdeaVault Pro</AlertDialogTitle>
             <AlertDialogDescription>
-              You're about to upgrade to our Pro plan for $10/month. Get ready to unlock unlimited storage, community sharing, and collaboration features!
+              You're about to upgrade to our Pro plan for $49.99/month. Get ready to unlock unlimited storage, advanced collaboration features, and priority support!
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
             <AlertDialogAction onClick={handleSubscribeConfirm}>
-              Subscribe Now
+              Confirm Upgrade
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
