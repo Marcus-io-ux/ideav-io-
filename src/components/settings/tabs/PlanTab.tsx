@@ -13,9 +13,6 @@ export const PlanTab = () => {
     );
   }
 
-  // Filter out the free plan
-  const proPlans = availablePlans.filter(plan => plan.name.toLowerCase() !== 'free');
-
   return (
     <div className="space-y-6">
       <div>
@@ -26,7 +23,7 @@ export const PlanTab = () => {
       </div>
 
       <div className="max-w-xl mx-auto">
-        {proPlans.map((plan) => (
+        {availablePlans.map((plan) => (
           <PlanCard
             key={plan.id}
             plan={plan}

@@ -32,24 +32,34 @@ export const usePlans = () => {
       const { data, error } = await supabase
         .from("membership_tiers")
         .select("*")
+        .in('name', ['basic', 'pro'])
         .order("price");
       
       if (error) throw error;
       
-      const defaultFeatures = {
+      const planFeatures = {
+        basic: [
+          "Save up to 50 ideas in your personal vault",
+          "Categorize and sort your ideas using folders and tags",
+          "Participate in community discussions",
+          "Mobile-friendly dashboard access",
+          "Basic analytics and monthly metrics"
+        ],
         pro: [
-          "Unlimited ideas",
-          "Advanced organization",
-          "Priority support",
-          "Collaboration features",
-          "Advanced analytics",
-          "Custom tags"
+          "Unlimited idea storage",
+          "Advanced AI-powered organization",
+          "Priority community features",
+          "24/7 priority support",
+          "Advanced analytics & insights",
+          "Custom tags & categories",
+          "Advanced idea validation tools",
+          "Priority feature access"
         ]
       };
 
       return data?.map(plan => ({
         ...plan,
-        features: defaultFeatures.pro
+        features: planFeatures[plan.name.toLowerCase() as keyof typeof planFeatures] || []
       })) || [];
     },
   });
