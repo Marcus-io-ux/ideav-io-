@@ -18,7 +18,7 @@ export const PlanTab = () => {
       <div>
         <h2 className="text-2xl font-bold">Subscription Plan</h2>
         <p className="text-muted-foreground">
-          Manage your subscription plan and billing
+          Choose the perfect plan to capture, develop, and bring your innovative ideas to life
         </p>
       </div>
 
@@ -32,6 +32,15 @@ export const PlanTab = () => {
             onUpgrade={handleUpgrade}
           />
         ))}
+      </div>
+
+      <div className="mt-12 text-center">
+        <div className="max-w-2xl mx-auto bg-white/50 backdrop-blur-sm p-6 rounded-lg border border-purple-100">
+          <p className="text-purple-600/90 italic text-lg">
+            "IdeaVault Pro transformed how I manage my creative projects. The collaboration features and AI-powered insights have been game-changing for my business!"
+          </p>
+          <p className="text-purple-600/70 mt-2">– Sarah Chen, Product Designer</p>
+        </div>
       </div>
     </div>
   );

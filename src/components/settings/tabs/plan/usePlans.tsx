@@ -13,7 +13,6 @@ export const usePlans = () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error("No user found");
       
-      // Get all active memberships and order by creation date
       const { data, error } = await supabase
         .from("user_memberships")
         .select("*, membership_tiers(*)")
@@ -23,7 +22,6 @@ export const usePlans = () => {
       
       if (error) throw error;
       
-      // Return the most recent active membership
       return data && data.length > 0 ? data[0] : null;
     },
   });
@@ -43,17 +41,16 @@ export const usePlans = () => {
           "Create up to 50 ideas",
           "Basic organization",
           "Community access",
-          "Basic support"
+          "Basic support",
+          "Basic analytics"
         ],
         pro: [
           "Unlimited ideas",
           "Advanced organization",
           "Priority support",
           "Collaboration features",
-          "Custom tags",
           "Advanced analytics",
-          "Early access to new features",
-          "No ads"
+          "Custom tags"
         ]
       };
 
@@ -75,19 +72,19 @@ export const usePlans = () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error("No user found");
 
-      const { error } = await supabase
-        .from("user_memberships")
-        .upsert({
-          user_id: user.id,
-          tier_id: tierId,
-          status: "active",
-        });
+      const { error } = await supabase.functions.invoke('create-checkout-session', {
+        body: { 
+          userId: user.id,
+          email: user.email,
+          returnUrl: window.location.origin + '/dashboard'
+        }
+      });
 
       if (error) throw error;
 
       toast({
         title: "Success",
-        description: "Your subscription has been updated.",
+        description: "Redirecting to checkout...",
       });
     } catch (error: any) {
       console.error("Error upgrading plan:", error);
