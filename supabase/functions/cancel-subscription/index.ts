@@ -43,10 +43,20 @@ serve(async (req) => {
       .select('*')
       .eq('user_id', userId)
       .eq('status', 'active')
-      .single();
+      .maybeSingle();
 
-    if (membershipError || !membership) {
-      throw new Error('No active subscription found');
+    if (membershipError) {
+      throw membershipError;
+    }
+
+    if (!membership) {
+      return new Response(
+        JSON.stringify({ message: 'No active subscription found' }),
+        { 
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          status: 404,
+        }
+      );
     }
 
     // Update membership status in database

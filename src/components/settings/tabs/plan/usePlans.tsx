@@ -103,11 +103,20 @@ export const usePlans = () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error("No user found");
 
-      const { error } = await supabase.functions.invoke('cancel-subscription', {
+      const { error, status } = await supabase.functions.invoke('cancel-subscription', {
         body: { userId: user.id }
       });
 
-      if (error) throw error;
+      if (error) {
+        if (status === 404) {
+          toast({
+            title: "Notice",
+            description: "You don't have an active subscription to cancel",
+          });
+          return;
+        }
+        throw error;
+      }
 
       // Invalidate the membership query to refresh the UI
       await queryClient.invalidateQueries({ queryKey: ["user-membership"] });
