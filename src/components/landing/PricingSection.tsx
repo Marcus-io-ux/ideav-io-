@@ -1,4 +1,4 @@
-import { Check, Award, Sparkles, Zap, Brain, Users, Lock, Gauge } from "lucide-react";
+import { Check, Award, Sparkles, Zap, Brain, Users, Lock, Gauge, FolderOpen, FileTemplate, Bell, Phone, BarChart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -116,14 +116,13 @@ export const PricingSection = () => {
           </div>
           <ul className="space-y-4 mb-8">
             {[
-              { icon: Brain, text: "Store up to 100 brilliant ideas" },
-              { icon: Lock, text: "Smart idea organization tools" },
-              { icon: Users, text: "Access to the creator community" },
-              { icon: Gauge, text: "Basic analytics dashboard" },
-              { icon: Check, text: "Email support within 24 hours" },
-              { icon: Check, text: "Mobile app access" },
-              { icon: Check, text: "Basic collaboration tools" },
-              { icon: Check, text: "Standard idea templates" }
+              { icon: Brain, text: "Save up to 100 ideas in your personal vault" },
+              { icon: FolderOpen, text: "Categorize and sort your ideas using folders and tags" },
+              { icon: FileTemplate, text: "Access a limited library of pre-designed templates" },
+              { icon: Users, text: "Participate in community discussions" },
+              { icon: Bell, text: "Daily reminders to revisit and refine ideas" },
+              { icon: Phone, text: "Mobile-friendly dashboard access" },
+              { icon: BarChart, text: "Basic analytics and monthly metrics" }
             ].map((feature) => (
               <li key={feature.text} className="flex items-center gap-3">
                 <feature.icon className="w-5 h-5 text-blue-500" />
