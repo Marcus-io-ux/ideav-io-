@@ -1,4 +1,4 @@
-import { Check, Award, Sparkles, Zap, Brain, Users, Lock, Gauge, FolderOpen, FileText, Bell, Phone, BarChart } from "lucide-react";
+import { Check, Award, Sparkles, Zap, Brain, Users, Lock, Gauge, FolderOpen, Phone, BarChart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -119,7 +119,6 @@ export const PricingSection = () => {
               { icon: Brain, text: "Save up to 100 ideas in your personal vault" },
               { icon: FolderOpen, text: "Categorize and sort your ideas using folders and tags" },
               { icon: Users, text: "Participate in community discussions" },
-              { icon: Bell, text: "Daily reminders to revisit and refine ideas" },
               { icon: Phone, text: "Mobile-friendly dashboard access" },
               { icon: BarChart, text: "Basic analytics and monthly metrics" }
             ].map((feature) => (
@@ -179,6 +178,7 @@ export const PricingSection = () => {
             {isSubscribed ? "Already Subscribed" : "Upgrade to Pro"}
           </Button>
         </div>
+
       </div>
 
       <div className="mt-12 text-center">
