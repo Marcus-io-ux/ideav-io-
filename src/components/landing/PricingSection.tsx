@@ -96,10 +96,10 @@ export const PricingSection = () => {
     <section className="py-24 bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
       <div className="text-center mb-16">
         <h2 className="text-4xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-purple-600">
-          Unlock Your Creative Potential
+          Transform Your Ideas into Reality
         </h2>
         <p className="text-xl text-blue-600/80 max-w-3xl mx-auto">
-          Choose the perfect plan to organize, develop, and bring your ideas to life.
+          Choose the perfect plan to capture, develop, and bring your innovative ideas to life
         </p>
       </div>
 
@@ -116,12 +116,14 @@ export const PricingSection = () => {
           </div>
           <ul className="space-y-4 mb-8">
             {[
-              "Store up to 100 ideas",
-              "Basic idea organization",
-              "Community access",
-              "Email support",
+              "Store up to 100 brilliant ideas",
+              "Smart idea organization tools",
+              "Access to the creator community",
+              "Basic analytics dashboard",
+              "Email support within 24 hours",
               "Mobile app access",
-              "Basic analytics"
+              "Basic collaboration tools",
+              "Standard idea templates"
             ].map((feature) => (
               <li key={feature} className="flex items-center gap-3">
                 <Check className="w-5 h-5 text-blue-500" />
@@ -135,7 +137,7 @@ export const PricingSection = () => {
               size="lg"
               className="w-full py-6 text-lg border-blue-200 hover:bg-blue-50 text-blue-600"
             >
-              Get Started
+              Start Creating Today
             </Button>
           </Link>
         </div>
@@ -157,14 +159,16 @@ export const PricingSection = () => {
           <ul className="space-y-4 mb-8">
             {[
               "Unlimited idea storage",
-              "Advanced organization tools",
+              "Advanced AI-powered organization",
               "Priority community features",
               "24/7 priority support",
               "Advanced analytics & insights",
               "Custom tags & categories",
-              "Team collaboration tools",
-              "API access",
-              "Custom integrations"
+              "Team collaboration suite",
+              "API access for integration",
+              "Custom workflow automation",
+              "Advanced idea validation tools",
+              "Priority feature access"
             ].map((feature) => (
               <li key={feature} className="flex items-center gap-3">
                 <Check className="w-5 h-5 text-purple-500" />
@@ -177,7 +181,7 @@ export const PricingSection = () => {
             className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white py-6 text-lg"
             onClick={handleUpgradeClick}
           >
-            {isSubscribed ? 'Already Subscribed' : 'Upgrade to Pro'}
+            {isSubscribed ? "Already Subscribed" : "Upgrade to Pro"}
           </Button>
         </div>
       </div>
@@ -186,7 +190,7 @@ export const PricingSection = () => {
         <p className="text-blue-600/80">30-day money-back guarantee • Cancel anytime • No hidden fees</p>
         <div className="max-w-2xl mx-auto bg-white/50 backdrop-blur-sm p-6 rounded-lg border border-purple-100">
           <p className="text-purple-600/90 italic text-lg">
-            "IdeaVault Pro transformed how I manage my creative projects. The collaboration features are game-changing!"
+            "IdeaVault Pro transformed how I manage my creative projects. The collaboration features and AI-powered insights have been game-changing for my business!"
           </p>
           <p className="text-purple-600/70 mt-2">– Sarah Chen, Product Designer</p>
         </div>
