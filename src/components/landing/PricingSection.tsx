@@ -134,7 +134,7 @@ export const PricingSection = () => {
               size="lg"
               className="w-full py-6 text-lg border-blue-200 hover:bg-blue-50 text-blue-600"
             >
-              Start Creating Today
+              Get Basic Plan
             </Button>
           </Link>
         </div>
@@ -175,10 +175,9 @@ export const PricingSection = () => {
             className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white py-6 text-lg"
             onClick={handleUpgradeClick}
           >
-            {isSubscribed ? "Already Subscribed" : "Upgrade to Pro"}
+            {isSubscribed ? "Already Subscribed" : "Get Pro Plan"}
           </Button>
         </div>
-
       </div>
 
       <div className="mt-12 text-center">
