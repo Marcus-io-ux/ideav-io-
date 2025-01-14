@@ -13,26 +13,42 @@ export const PlanTab = () => {
     );
   }
 
+  // Find the current plan details
+  const currentPlanDetails = availablePlans.find(
+    plan => plan.id === currentPlan?.tier_id
+  );
+
+  if (!currentPlanDetails) {
+    return (
+      <div className="space-y-6">
+        <div>
+          <h2 className="text-2xl font-bold">Subscription Plan</h2>
+          <p className="text-muted-foreground">
+            You are not currently subscribed to any plan.
+          </p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6">
       <div>
         <h2 className="text-2xl font-bold">Subscription Plan</h2>
         <p className="text-muted-foreground">
-          Choose the perfect plan to capture, develop, and bring your innovative ideas to life
+          Manage your current subscription plan
         </p>
       </div>
 
       <div className="max-w-xl mx-auto">
-        {availablePlans.map((plan) => (
-          <PlanCard
-            key={plan.id}
-            plan={plan}
-            isCurrentPlan={currentPlan?.tier_id === plan.id}
-            isLoading={isLoading}
-            onUpgrade={handleUpgrade}
-            onCancel={currentPlan ? handleCancel : undefined}
-          />
-        ))}
+        <PlanCard
+          key={currentPlanDetails.id}
+          plan={currentPlanDetails}
+          isCurrentPlan={true}
+          isLoading={isLoading}
+          onUpgrade={handleUpgrade}
+          onCancel={handleCancel}
+        />
       </div>
     </div>
   );
