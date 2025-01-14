@@ -10,7 +10,7 @@ export const CTASection = () => {
         <p className="text-lg mb-8">Join thousands of creators already using our platform.</p>
         <Link to="/signup">
           <Button size="lg" variant="secondary">
-            Get Started Now
+            Get Started
             <ArrowRight className="ml-2 h-4 w-4" />
           </Button>
         </Link>
