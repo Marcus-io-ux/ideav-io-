@@ -1,7 +1,7 @@
 import { SearchBar } from "@/components/SearchBar";
 import { AddIdeaDialog } from "@/components/dashboard/AddIdeaDialog";
 import { Button } from "@/components/ui/button";
-import { Grid, List, Star, FileText } from "lucide-react";
+import { Grid, List, Star, FileText, MessageSquarePlus } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface DashboardActionsBarProps {
@@ -15,6 +15,7 @@ interface DashboardActionsBarProps {
   showDrafts: boolean;
   setShowDrafts: (show: boolean) => void;
   handleIdeaSubmit: () => void;
+  onFeedbackClick: () => void;
 }
 
 export const DashboardActionsBar = ({
@@ -28,6 +29,7 @@ export const DashboardActionsBar = ({
   showDrafts,
   setShowDrafts,
   handleIdeaSubmit,
+  onFeedbackClick,
 }: DashboardActionsBarProps) => {
   return (
     <div className="w-full space-y-4">
@@ -46,7 +48,16 @@ export const DashboardActionsBar = ({
           </div>
         </div>
         <div className="flex items-center gap-2 w-full sm:w-auto justify-between sm:justify-end">
-          <AddIdeaDialog onIdeaSubmit={handleIdeaSubmit} />
+          <div className="flex items-center gap-2">
+            <AddIdeaDialog onIdeaSubmit={handleIdeaSubmit} />
+            <Button
+              onClick={onFeedbackClick}
+              className="flex items-center gap-2"
+            >
+              <MessageSquarePlus className="h-4 w-4" />
+              User Feedback
+            </Button>
+          </div>
           <div className="flex items-center gap-2">
             <Button
               variant={viewMode === "grid" ? "default" : "outline"}

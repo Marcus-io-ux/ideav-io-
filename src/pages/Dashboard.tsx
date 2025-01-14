@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import { PageHeader } from "@/components/ui/page-header";
-import { FeedbackButton } from "@/components/feedback/FeedbackButton";
 import { FeedbackModal } from "@/components/feedback/FeedbackModal";
 import { DashboardTutorial } from "@/components/dashboard/DashboardTutorial";
 import { useUserProfile } from "@/hooks/use-user-profile";
@@ -14,7 +13,6 @@ const Dashboard = () => {
   const [isFeedbackModalOpen, setIsFeedbackModalOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [viewMode, setViewMode] = useState<"grid" | "list">(() => {
-    // Initialize from localStorage, default to "grid" if not set
     return (localStorage.getItem("ideasViewMode") as "grid" | "list") || "grid";
   });
   const [showFavorites, setShowFavorites] = useState(false);
@@ -24,7 +22,6 @@ const Dashboard = () => {
 
   const { data: ideasData = [], isLoading } = useDashboardIdeas(showFavorites, showDrafts);
 
-  // Save view mode to localStorage whenever it changes
   useEffect(() => {
     localStorage.setItem("ideasViewMode", viewMode);
   }, [viewMode]);
@@ -79,23 +76,19 @@ const Dashboard = () => {
           "{dailyQuote}"
         </div>
         
-        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
-          <FeedbackButton onClick={() => setIsFeedbackModalOpen(true)} />
-          <div className="w-full">
-            <DashboardActionsBar
-              totalIdeas={ideasData.length}
-              searchQuery={searchQuery}
-              setSearchQuery={setSearchQuery}
-              viewMode={viewMode}
-              setViewMode={setViewMode}
-              showFavorites={showFavorites}
-              setShowFavorites={setShowFavorites}
-              showDrafts={showDrafts}
-              setShowDrafts={setShowDrafts}
-              handleIdeaSubmit={handleIdeaSubmit}
-            />
-          </div>
-        </div>
+        <DashboardActionsBar
+          totalIdeas={ideasData.length}
+          searchQuery={searchQuery}
+          setSearchQuery={setSearchQuery}
+          viewMode={viewMode}
+          setViewMode={setViewMode}
+          showFavorites={showFavorites}
+          setShowFavorites={setShowFavorites}
+          showDrafts={showDrafts}
+          setShowDrafts={setShowDrafts}
+          handleIdeaSubmit={handleIdeaSubmit}
+          onFeedbackClick={() => setIsFeedbackModalOpen(true)}
+        />
 
         <IdeasGrid
           ideas={filteredIdeas}
