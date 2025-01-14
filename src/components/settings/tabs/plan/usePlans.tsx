@@ -37,13 +37,6 @@ export const usePlans = () => {
       if (error) throw error;
       
       const defaultFeatures = {
-        free: [
-          "Create up to 50 ideas",
-          "Basic organization",
-          "Community access",
-          "Basic support",
-          "Basic analytics"
-        ],
         pro: [
           "Unlimited ideas",
           "Advanced organization",
@@ -54,14 +47,9 @@ export const usePlans = () => {
         ]
       };
 
-      return data?.filter(plan => 
-        plan.name.toLowerCase() === 'free' || 
-        plan.name.toLowerCase() === 'pro'
-      ).map(plan => ({
+      return data?.map(plan => ({
         ...plan,
-        features: plan.name.toLowerCase() === 'pro' 
-          ? defaultFeatures.pro 
-          : defaultFeatures.free
+        features: defaultFeatures.pro
       })) || [];
     },
   });
@@ -98,10 +86,41 @@ export const usePlans = () => {
     }
   };
 
+  const handleCancel = async () => {
+    setIsLoading(true);
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error("No user found");
+
+      const { error } = await supabase.functions.invoke('cancel-subscription', {
+        body: { 
+          userId: user.id
+        }
+      });
+
+      if (error) throw error;
+
+      toast({
+        title: "Success",
+        description: "Your subscription has been cancelled",
+      });
+    } catch (error: any) {
+      console.error("Error cancelling subscription:", error);
+      toast({
+        title: "Error",
+        description: error.message || "Failed to cancel subscription",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return {
     currentPlan,
     availablePlans,
     isLoading,
     handleUpgrade,
+    handleCancel,
   };
 };

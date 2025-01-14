@@ -3,7 +3,7 @@ import { PlanCard } from "./plan/PlanCard";
 import { usePlans } from "./plan/usePlans";
 
 export const PlanTab = () => {
-  const { currentPlan, availablePlans, isLoading, handleUpgrade } = usePlans();
+  const { currentPlan, availablePlans, isLoading, handleUpgrade, handleCancel } = usePlans();
 
   if (!availablePlans) {
     return (
@@ -12,6 +12,9 @@ export const PlanTab = () => {
       </div>
     );
   }
+
+  // Filter out the free plan
+  const proPlans = availablePlans.filter(plan => plan.name.toLowerCase() !== 'free');
 
   return (
     <div className="space-y-6">
@@ -22,25 +25,17 @@ export const PlanTab = () => {
         </p>
       </div>
 
-      <div className="grid md:grid-cols-2 gap-6">
-        {availablePlans.map((plan) => (
+      <div className="max-w-xl mx-auto">
+        {proPlans.map((plan) => (
           <PlanCard
             key={plan.id}
             plan={plan}
             isCurrentPlan={currentPlan?.tier_id === plan.id}
             isLoading={isLoading}
             onUpgrade={handleUpgrade}
+            onCancel={currentPlan ? handleCancel : undefined}
           />
         ))}
-      </div>
-
-      <div className="mt-12 text-center">
-        <div className="max-w-2xl mx-auto bg-white/50 backdrop-blur-sm p-6 rounded-lg border border-purple-100">
-          <p className="text-purple-600/90 italic text-lg">
-            "IdeaVault Pro transformed how I manage my creative projects. The collaboration features and AI-powered insights have been game-changing for my business!"
-          </p>
-          <p className="text-purple-600/70 mt-2">– Sarah Chen, Product Designer</p>
-        </div>
       </div>
     </div>
   );
