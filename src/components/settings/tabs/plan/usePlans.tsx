@@ -1,11 +1,12 @@
 import { supabase } from "@/integrations/supabase/client";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 
 export const usePlans = () => {
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
+  const queryClient = useQueryClient();
 
   const { data: currentPlan } = useQuery({
     queryKey: ["user-membership"],
@@ -103,12 +104,13 @@ export const usePlans = () => {
       if (!user) throw new Error("No user found");
 
       const { error } = await supabase.functions.invoke('cancel-subscription', {
-        body: { 
-          userId: user.id
-        }
+        body: { userId: user.id }
       });
 
       if (error) throw error;
+
+      // Invalidate the membership query to refresh the UI
+      await queryClient.invalidateQueries({ queryKey: ["user-membership"] });
 
       toast({
         title: "Success",
