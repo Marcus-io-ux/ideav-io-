@@ -14,14 +14,17 @@ export const usePlans = () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error("No user found");
       
+      // Changed from maybeSingle to select all active memberships
       const { data, error } = await supabase
         .from("user_memberships")
         .select("*, membership_tiers(*)")
         .eq("user_id", user.id)
-        .maybeSingle();
+        .eq("status", "active");
       
       if (error) throw error;
-      return data;
+      
+      // Return the most recent active membership if multiple exist
+      return data && data.length > 0 ? data[0] : null;
     },
   });
 

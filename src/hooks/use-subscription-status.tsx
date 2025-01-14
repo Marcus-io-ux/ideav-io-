@@ -9,21 +9,20 @@ export const useSubscriptionStatus = () => {
         const { data: { user } } = await supabase.auth.getUser();
         if (!user) return false;
 
-        // Get user's active membership with pro tier
+        // Get user's active memberships with pro tier
         const { data, error } = await supabase
           .from("user_memberships")
           .select("*, membership_tiers(name)")
           .eq("user_id", user.id)
-          .eq("status", "active")
-          .single();
+          .eq("status", "active");
 
         if (error) {
           console.error("Error checking subscription status:", error);
           return false;
         }
 
-        // Check if the user has an active pro membership
-        return data?.membership_tiers?.name === "pro";
+        // Check if any of the active memberships is a pro membership
+        return data?.some(membership => membership.membership_tiers?.name?.toLowerCase() === "pro") ?? false;
       } catch (error) {
         console.error("Error in subscription check:", error);
         return false;
