@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { Menu } from "lucide-react";
+import { Menu, HelpCircle, Info, Users, CreditCard, Home } from "lucide-react";
 import { useState } from "react";
 
 export const NavigationBar = () => {
@@ -30,32 +30,37 @@ export const NavigationBar = () => {
           <div className="hidden md:flex items-center space-x-6 lg:space-x-8">
             <button 
               onClick={() => scrollToSection('how-it-works')}
-              className="text-gray-600 hover:text-primary transition-colors text-sm lg:text-base"
+              className="flex items-center gap-2 text-gray-600 hover:text-primary transition-colors text-sm lg:text-base"
             >
+              <Home className="h-4 w-4" />
               How it Works
             </button>
             <button 
               onClick={() => scrollToSection('about-us')}
-              className="text-gray-600 hover:text-primary transition-colors text-sm lg:text-base"
+              className="flex items-center gap-2 text-gray-600 hover:text-primary transition-colors text-sm lg:text-base"
             >
+              <Info className="h-4 w-4" />
               About Us
             </button>
             <button 
               onClick={() => scrollToSection('community')}
-              className="text-gray-600 hover:text-primary transition-colors text-sm lg:text-base"
+              className="flex items-center gap-2 text-gray-600 hover:text-primary transition-colors text-sm lg:text-base"
             >
+              <Users className="h-4 w-4" />
               Community
             </button>
             <button 
               onClick={() => scrollToSection('pricing-section')}
-              className="text-gray-600 hover:text-primary transition-colors text-sm lg:text-base"
+              className="flex items-center gap-2 text-gray-600 hover:text-primary transition-colors text-sm lg:text-base"
             >
+              <CreditCard className="h-4 w-4" />
               Pricing
             </button>
             <button 
               onClick={() => scrollToSection('faq-section')}
-              className="text-gray-600 hover:text-primary transition-colors text-sm lg:text-base"
+              className="flex items-center gap-2 text-gray-600 hover:text-primary transition-colors text-sm lg:text-base"
             >
+              <HelpCircle className="h-4 w-4" />
               FAQ
             </button>
             <Button 
@@ -79,32 +84,37 @@ export const NavigationBar = () => {
               <nav className="flex flex-col gap-4">
                 <button
                   onClick={() => scrollToSection('how-it-works')}
-                  className="flex items-center px-2 py-3 text-lg font-medium transition-colors hover:text-primary"
+                  className="flex items-center gap-3 px-2 py-3 text-lg font-medium transition-colors hover:text-primary"
                 >
+                  <Home className="h-5 w-5" />
                   How it Works
                 </button>
                 <button
                   onClick={() => scrollToSection('about-us')}
-                  className="flex items-center px-2 py-3 text-lg font-medium transition-colors hover:text-primary"
+                  className="flex items-center gap-3 px-2 py-3 text-lg font-medium transition-colors hover:text-primary"
                 >
+                  <Info className="h-5 w-5" />
                   About Us
                 </button>
                 <button
                   onClick={() => scrollToSection('community')}
-                  className="flex items-center px-2 py-3 text-lg font-medium transition-colors hover:text-primary"
+                  className="flex items-center gap-3 px-2 py-3 text-lg font-medium transition-colors hover:text-primary"
                 >
+                  <Users className="h-5 w-5" />
                   Community
                 </button>
                 <button
                   onClick={() => scrollToSection('pricing-section')}
-                  className="flex items-center px-2 py-3 text-lg font-medium transition-colors hover:text-primary"
+                  className="flex items-center gap-3 px-2 py-3 text-lg font-medium transition-colors hover:text-primary"
                 >
+                  <CreditCard className="h-5 w-5" />
                   Pricing
                 </button>
                 <button
                   onClick={() => scrollToSection('faq-section')}
-                  className="flex items-center px-2 py-3 text-lg font-medium transition-colors hover:text-primary"
+                  className="flex items-center gap-3 px-2 py-3 text-lg font-medium transition-colors hover:text-primary"
                 >
+                  <HelpCircle className="h-5 w-5" />
                   FAQ
                 </button>
                 <Button 
