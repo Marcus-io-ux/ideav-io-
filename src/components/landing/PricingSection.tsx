@@ -116,7 +116,7 @@ export const PricingSection = () => {
           </div>
           <ul className="space-y-4 mb-8">
             {[
-              { icon: Brain, text: "Save up to 100 ideas in your personal vault" },
+              { icon: Brain, text: "Save up to 50 ideas in your personal vault" },
               { icon: FolderOpen, text: "Categorize and sort your ideas using folders and tags" },
               { icon: Users, text: "Participate in community discussions" },
               { icon: Phone, text: "Mobile-friendly dashboard access" },
