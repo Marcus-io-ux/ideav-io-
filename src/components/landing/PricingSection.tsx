@@ -118,7 +118,6 @@ export const PricingSection = () => {
             {[
               { icon: Brain, text: "Save up to 100 ideas in your personal vault" },
               { icon: FolderOpen, text: "Categorize and sort your ideas using folders and tags" },
-              { icon: FileText, text: "Access a limited library of pre-designed templates" },
               { icon: Users, text: "Participate in community discussions" },
               { icon: Bell, text: "Daily reminders to revisit and refine ideas" },
               { icon: Phone, text: "Mobile-friendly dashboard access" },
