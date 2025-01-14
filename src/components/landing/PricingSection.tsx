@@ -1,4 +1,4 @@
-import { Check, Award, Sparkles } from "lucide-react";
+import { Check, Award, Sparkles, Zap, Brain, Users, Lock, Gauge } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -116,18 +116,18 @@ export const PricingSection = () => {
           </div>
           <ul className="space-y-4 mb-8">
             {[
-              "Store up to 100 brilliant ideas",
-              "Smart idea organization tools",
-              "Access to the creator community",
-              "Basic analytics dashboard",
-              "Email support within 24 hours",
-              "Mobile app access",
-              "Basic collaboration tools",
-              "Standard idea templates"
+              { icon: Brain, text: "Store up to 100 brilliant ideas" },
+              { icon: Lock, text: "Smart idea organization tools" },
+              { icon: Users, text: "Access to the creator community" },
+              { icon: Gauge, text: "Basic analytics dashboard" },
+              { icon: Check, text: "Email support within 24 hours" },
+              { icon: Check, text: "Mobile app access" },
+              { icon: Check, text: "Basic collaboration tools" },
+              { icon: Check, text: "Standard idea templates" }
             ].map((feature) => (
-              <li key={feature} className="flex items-center gap-3">
-                <Check className="w-5 h-5 text-blue-500" />
-                <span className="text-blue-600/80">{feature}</span>
+              <li key={feature.text} className="flex items-center gap-3">
+                <feature.icon className="w-5 h-5 text-blue-500" />
+                <span className="text-blue-600/80">{feature.text}</span>
               </li>
             ))}
           </ul>
@@ -158,21 +158,21 @@ export const PricingSection = () => {
           </div>
           <ul className="space-y-4 mb-8">
             {[
-              "Unlimited idea storage",
-              "Advanced AI-powered organization",
-              "Priority community features",
-              "24/7 priority support",
-              "Advanced analytics & insights",
-              "Custom tags & categories",
-              "Team collaboration suite",
-              "API access for integration",
-              "Custom workflow automation",
-              "Advanced idea validation tools",
-              "Priority feature access"
+              { icon: Brain, text: "Unlimited idea storage" },
+              { icon: Zap, text: "Advanced AI-powered organization" },
+              { icon: Users, text: "Priority community features" },
+              { icon: Lock, text: "24/7 priority support" },
+              { icon: Gauge, text: "Advanced analytics & insights" },
+              { icon: Check, text: "Custom tags & categories" },
+              { icon: Check, text: "Team collaboration suite" },
+              { icon: Check, text: "API access for integration" },
+              { icon: Check, text: "Custom workflow automation" },
+              { icon: Check, text: "Advanced idea validation tools" },
+              { icon: Check, text: "Priority feature access" }
             ].map((feature) => (
-              <li key={feature} className="flex items-center gap-3">
-                <Check className="w-5 h-5 text-purple-500" />
-                <span className="text-purple-600/80">{feature}</span>
+              <li key={feature.text} className="flex items-center gap-3">
+                <feature.icon className="w-5 h-5 text-purple-500" />
+                <span className="text-purple-600/80">{feature.text}</span>
               </li>
             ))}
           </ul>
