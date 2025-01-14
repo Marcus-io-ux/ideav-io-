@@ -163,9 +163,6 @@ export const PricingSection = () => {
               { icon: Lock, text: "24/7 priority support" },
               { icon: Gauge, text: "Advanced analytics & insights" },
               { icon: Check, text: "Custom tags & categories" },
-              { icon: Check, text: "Team collaboration suite" },
-              { icon: Check, text: "API access for integration" },
-              { icon: Check, text: "Custom workflow automation" },
               { icon: Check, text: "Advanced idea validation tools" },
               { icon: Check, text: "Priority feature access" }
             ].map((feature) => (
@@ -183,7 +180,6 @@ export const PricingSection = () => {
             {isSubscribed ? "Already Subscribed" : "Upgrade to Pro"}
           </Button>
         </div>
-
       </div>
 
       <div className="mt-12 text-center">
