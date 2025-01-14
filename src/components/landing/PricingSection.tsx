@@ -186,8 +186,7 @@ export const PricingSection = () => {
         </div>
       </div>
 
-      <div className="mt-12 text-center space-y-4">
-        <p className="text-blue-600/80">30-day money-back guarantee • Cancel anytime • No hidden fees</p>
+      <div className="mt-12 text-center">
         <div className="max-w-2xl mx-auto bg-white/50 backdrop-blur-sm p-6 rounded-lg border border-purple-100">
           <p className="text-purple-600/90 italic text-lg">
             "IdeaVault Pro transformed how I manage my creative projects. The collaboration features and AI-powered insights have been game-changing for my business!"
