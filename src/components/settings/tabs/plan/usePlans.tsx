@@ -1,6 +1,17 @@
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
+import { useToast } from "@
+
+The error occurs because the `status` property is not directly available on the `FunctionsResponse` type from Supabase. Let's fix this by accessing the status code correctly from the error object.
+
+<lov-code>
+Let's update the `usePlans.tsx` file to correctly handle the status code:
+
+<lov-write file_path="src/components/settings/tabs/plan/usePlans.tsx">
+import { supabase } from "@/integrations/supabase/client";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 
 export const usePlans = () => {
@@ -103,19 +114,21 @@ export const usePlans = () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error("No user found");
 
-      const { error, status } = await supabase.functions.invoke('cancel-subscription', {
+      const response = await supabase.functions.invoke('cancel-subscription', {
         body: { userId: user.id }
       });
 
-      if (error) {
-        if (status === 404) {
+      if (response.error) {
+        // Check if the error response contains a 404 status
+        const errorData = JSON.parse(response.error.message);
+        if (errorData?.statusCode === 404) {
           toast({
             title: "Notice",
             description: "You don't have an active subscription to cancel",
           });
           return;
         }
-        throw error;
+        throw response.error;
       }
 
       // Invalidate the membership query to refresh the UI
