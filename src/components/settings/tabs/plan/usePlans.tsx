@@ -40,19 +40,21 @@ export const usePlans = () => {
       
       const planFeatures = {
         basic: [
-          "Create up to 50 ideas",
-          "Basic organization",
-          "Community access",
-          "Basic support",
-          "Basic analytics"
+          "Save up to 50 ideas in your personal vault",
+          "Categorize and sort your ideas using folders and tags",
+          "Participate in community discussions",
+          "Mobile-friendly dashboard access",
+          "Basic analytics and monthly metrics"
         ],
         pro: [
-          "Unlimited ideas",
-          "Advanced organization",
-          "Priority support",
-          "Collaboration features",
-          "Advanced analytics",
-          "Custom tags"
+          "Unlimited idea storage",
+          "Advanced AI-powered organization",
+          "Priority community features",
+          "24/7 priority support",
+          "Advanced analytics & insights",
+          "Custom tags & categories",
+          "Advanced idea validation tools",
+          "Priority feature access"
         ]
       };
 
@@ -101,21 +103,19 @@ export const usePlans = () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error("No user found");
 
-      const response = await supabase.functions.invoke('cancel-subscription', {
+      const { error, status } = await supabase.functions.invoke('cancel-subscription', {
         body: { userId: user.id }
       });
 
-      if (response.error) {
-        // Check if the error response contains a 404 status
-        const errorData = JSON.parse(response.error.message);
-        if (errorData?.statusCode === 404) {
+      if (error) {
+        if (status === 404) {
           toast({
             title: "Notice",
             description: "You don't have an active subscription to cancel",
           });
           return;
         }
-        throw response.error;
+        throw error;
       }
 
       // Invalidate the membership query to refresh the UI

@@ -37,22 +37,12 @@ export const AppRoutes = ({ isAuthenticated }: AppRoutesProps) => {
     <>
       {isAuthenticated && <NavigationBar />}
       <Routes>
-        {/* Public routes */}
         <Route
           path="/"
           element={
-            isAuthenticated ? (
-              <ProtectedRoute isAuthenticated={isAuthenticated}>
-                <Dashboard />
-              </ProtectedRoute>
-            ) : (
-              <Landing />
-            )
+            isAuthenticated ? <Navigate to="/dashboard" replace /> : <Landing />
           }
         />
-        <Route path="/features" element={<Features />} />
-        <Route path="/pricing" element={<Pricing />} />
-        <Route path="/about" element={<AboutUs />} />
         <Route
           path="/login"
           element={
@@ -65,8 +55,6 @@ export const AppRoutes = ({ isAuthenticated }: AppRoutesProps) => {
             isAuthenticated ? <Navigate to="/dashboard" replace /> : <Signup />
           }
         />
-
-        {/* Protected routes */}
         <Route
           path="/dashboard"
           element={
@@ -75,10 +63,13 @@ export const AppRoutes = ({ isAuthenticated }: AppRoutesProps) => {
             </ProtectedRoute>
           }
         />
+        <Route path="/features" element={<Features />} />
+        <Route path="/pricing" element={<Pricing />} />
+        <Route path="/about" element={<AboutUs />} />
         <Route
           path="/onboarding"
           element={
-            <ProtectedRoute isAuthenticated={isAuthenticated} requiresSubscription={false}>
+            <ProtectedRoute isAuthenticated={isAuthenticated}>
               <Onboarding />
             </ProtectedRoute>
           }

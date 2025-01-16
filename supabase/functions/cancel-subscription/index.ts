@@ -1,4 +1,5 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
+import Stripe from 'https://esm.sh/stripe@14.21.0';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.45.0';
 
 const corsHeaders = {
@@ -18,6 +19,11 @@ serve(async (req) => {
     if (!userId) {
       throw new Error('Missing user ID');
     }
+
+    // Initialize Stripe
+    const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY') || '', {
+      apiVersion: '2023-10-16',
+    });
 
     // Initialize Supabase client
     const supabaseAdmin = createClient(
@@ -40,16 +46,12 @@ serve(async (req) => {
       .maybeSingle();
 
     if (membershipError) {
-      console.error('Error fetching membership:', membershipError);
       throw membershipError;
     }
 
     if (!membership) {
       return new Response(
-        JSON.stringify({ 
-          statusCode: 404,
-          message: 'No active subscription found' 
-        }),
+        JSON.stringify({ message: 'No active subscription found' }),
         { 
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
           status: 404,
@@ -67,15 +69,11 @@ serve(async (req) => {
       .eq('id', membership.id);
 
     if (updateError) {
-      console.error('Error updating membership:', updateError);
       throw updateError;
     }
 
     return new Response(
-      JSON.stringify({ 
-        message: 'Subscription cancelled successfully',
-        membership: membership 
-      }),
+      JSON.stringify({ message: 'Subscription cancelled successfully' }),
       { 
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         status: 200,
@@ -84,13 +82,10 @@ serve(async (req) => {
   } catch (error) {
     console.error('Error:', error);
     return new Response(
-      JSON.stringify({ 
-        error: error.message,
-        statusCode: error.statusCode || 400
-      }),
+      JSON.stringify({ error: error.message }),
       { 
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        status: error.statusCode || 400,
+        status: 400,
       }
     );
   }
