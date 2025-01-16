@@ -2,7 +2,7 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Home, Settings, LogOut, Menu, Bell, User, Users, Inbox } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -15,20 +15,32 @@ export const NavigationBar = () => {
   const { toast } = useToast();
   const { data: isSubscribed, isLoading } = useSubscriptionStatus();
 
-  console.log("Subscription status:", { isSubscribed, isLoading }); // Debug log
+  console.log("Subscription status:", { isSubscribed, isLoading });
 
-  const handleLogout = async () => {
+  const handleLogout = useCallback(async () => {
     try {
+      // First clear any existing session
+      const { error: sessionError } = await supabase.auth.getSession();
+      if (sessionError) {
+        console.error('Session error:', sessionError);
+      }
+
+      // Then perform the logout
       const { error } = await supabase.auth.signOut();
-      if (error) throw error;
+      if (error) {
+        console.error('Logout error:', error);
+        throw error;
+      }
       
+      // Only show success toast and navigate if no error occurred
       toast({
         title: "Logged out successfully",
         description: "You have been logged out of your account",
       });
       
-      navigate("/");
-    } catch (error) {
+      // Use replace to prevent back navigation to authenticated routes
+      navigate("/", { replace: true });
+    } catch (error: any) {
       console.error('Error logging out:', error);
       toast({
         title: "Error",
@@ -36,7 +48,7 @@ export const NavigationBar = () => {
         variant: "destructive",
       });
     }
-  };
+  }, [navigate, toast]);
 
   const navItems = [
     { label: "My Ideas", icon: Home, path: "/dashboard" },
@@ -120,10 +132,7 @@ export const NavigationBar = () => {
                     <Button
                       variant="ghost"
                       className="w-full justify-start"
-                      onClick={() => {
-                        handleLogout();
-                        setIsOpen(false);
-                      }}
+                      onClick={handleLogout}
                     >
                       <LogOut className="h-4 w-4 mr-2" />
                       <span>Logout</span>

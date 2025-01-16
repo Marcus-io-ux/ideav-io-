@@ -31,6 +31,7 @@ export const useAuthState = (queryClient: QueryClient) => {
       }
     };
 
+    // Initial session check
     checkSession();
 
     const {
@@ -39,12 +40,11 @@ export const useAuthState = (queryClient: QueryClient) => {
       console.log("Auth state changed:", event, !!session);
       
       if (event === 'SIGNED_OUT') {
+        // Clear query cache and set authenticated state to false
         queryClient.clear();
         setIsAuthenticated(false);
-      } else if (event === 'SIGNED_IN') {
+      } else if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
         setIsAuthenticated(true);
-      } else if (event === 'TOKEN_REFRESHED') {
-        console.log('Token refreshed successfully');
       } else if (event === 'USER_UPDATED') {
         setIsAuthenticated(!!session);
       }

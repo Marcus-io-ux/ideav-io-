@@ -779,6 +779,12 @@ export type Database = {
           avatar_url: string
         }[]
       }
+      has_active_subscription: {
+        Args: {
+          user_id: string
+        }
+        Returns: boolean
+      }
       is_subscribed: {
         Args: {
           user_id: string
